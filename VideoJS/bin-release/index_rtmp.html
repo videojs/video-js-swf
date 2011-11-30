@@ -1,0 +1,403 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<meta http-equiv="Content-Style-Type" content="text/css" />
+		<meta http-equiv="imagetoolbar" content="no" />
+		<title>VideoJS Workbench</title>
+		<link rel="stylesheet" href="css/reset.css"/> 
+    <link rel="stylesheet" href="css/styles.css"/> 
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+		<script type="text/javascript" src="js/swfobject.js"></script>
+		<script type="text/javascript">
+
+			
+			function init(){
+				
+				$("#btnInstantiate").click(createSWF);
+				$("#btnSetProps").click(setProperties);
+				$("#btnSetRTMP").click(setRTMP);
+				$("#btnBeginPlay").click(playVideo);
+
+				// control
+				$("#btnPause").click(pauseVideo);
+				$("#btnResume").click(resumeVideo);
+				$("#btnSeekA").click(
+					function(){
+						seekVideo(120);
+					}
+				);
+				$("#btnSeekB").click(
+					function(){
+						seekVideo(600);
+					}
+				);
+				$("#btnSeekC").click(
+					function(){
+						seekVideo(1000);
+					}
+				);
+        $("#btnEnlarge").click(enlargePlayer);
+        $("#btnReduce").click(reducePlayer);
+
+				$(".tab-control").each(
+            function(){
+              var $tabControl = $(this);
+              // tabs
+              $tabControl.find("ul.tabs a").click(
+                function(e){
+                  e.preventDefault();
+                  var $this = $(this);
+                  var targetID = $this.attr("href").substring(1);
+                  $this.parent().siblings().each(
+                    function(){
+                      $(this).find("a").toggleClass("selected", false);
+                    }
+                  );
+                  $this.toggleClass("selected", true);
+                  $tabControl.find("div.tab-content").each(
+                    function(){
+                      if($(this).attr("id") == targetID){
+                        $(this).show();
+                      }
+                      else{
+                        $(this).hide();
+                      }
+                    }
+                  );
+                }
+              );
+              // show the first tab content item, and hide the rest
+              $tabControl.find("div.tab-content").each(
+                function(pIndex, pElement){
+                 if(pIndex != 0){
+                   $(pElement).hide();
+                 }
+                 else{
+                   $(pElement).show();
+                 }
+                }
+              );
+            }
+          );
+
+          // to avoid a bunch of lookups every 100ms, let's cache some elements in horrible
+          // global vars for the properties table
+          $propCurrentSrc = $("#propCurrentSrc");
+          $propCurrentTime = $("#propCurrentTime");
+          $propTime = $("#propTime");
+          $propDefaultPlaybackRate = $("#propDefaultPlaybackRate");
+          $propDuration = $("#propDuration");
+          $propEnded = $("#propEnded");
+          $propPaused = $("#propPaused");
+          $propMuted = $("#propMuted");
+          $propVolume = $("#propVolume");
+          $propSeeking = $("#propSeeking");
+          $propNetworkState = $("#propNetworkState");
+          $propReadyState = $("#propReadyState");
+          $propBufferedBytesStart = $("#propBufferedBytesStart");
+          $propBufferedBytesEnd = $("#propBufferedBytesEnd");
+          $propBytesTotal = $("#propBytesTotal");
+          $propVideoWidth = $("#propVideoWidth");
+          $propVideoHeight = $("#propVideoHeight");
+
+			}
+			
+			function log(msg){
+				try{
+					console.log(msg);
+				}
+				catch(error){}
+			}
+
+			function createSWF(e){
+				e.preventDefault();
+
+				var flashvars = {
+					readyFunction: "onSWFReady",
+					eventProxyFunction: "onSWFEvent",
+					errorEventProxyFunction: "onSWFErrorEvent",
+					src: "",
+					autoplay: false,
+					preload: false
+				};
+
+				var params = {
+					allowScriptAccess: "always",
+					bgcolor: "#000000"
+				};
+			
+				var attributes = {
+					id: "videoPlayer",
+					name: "videoPlayer"
+				};
+			
+				swfobject.embedSWF("VideoJS.swf", "videoPlayer", "100%", "100%", "9.0.124", "", flashvars, params, attributes);
+
+			}
+
+      function enlargePlayer(e){
+        e.preventDefault();
+        $("#videoPlayerWrapper").width(580).height(326);
+        $("#status").css("left", 950);
+      }
+
+      function reducePlayer(e){
+        e.preventDefault();
+        $("#videoPlayerWrapper").width(480).height(270);
+        $("#status").css("left", 850);
+      }
+
+			function onSWFReady(pObjectID){
+				log("Function call: onSWFReady: " + pObjectID);
+				$("#configuration").show();
+
+				setInterval(updatePlayerProperties, 250);
+			}
+
+			function setProperties(e){
+				e.preventDefault();
+				var el = $("#videoPlayer")[0];
+				el.vjs_setProperty("eventProxyFunction", "onSWFEvent");
+				el.vjs_setProperty("errorEventProxyFunction", "onSWFErrorEvent");
+				el.vjs_setProperty("poster", "img/testPattern_ussr_480x360.png");
+			}
+
+			function setRTMP(e){
+				e.preventDefault();
+				var el = $("#videoPlayer")[0];
+				el.vjs_setProperty("RTMPConnection", "rtmp://fms.andylemay.com:1935/cfx/st");
+        el.vjs_setProperty("RTMPStream", "mp4:debacle/debacle_500kbps.m4v");
+			}
+
+			function playVideo(e){
+				e.preventDefault();
+				var el = $("#videoPlayer")[0];
+				el.vjs_play();
+			}
+
+			function pauseVideo(e){
+				var el = $("#videoPlayer")[0];
+				el.vjs_pause();
+			}
+
+			function resumeVideo(e){
+				var el = $("#videoPlayer")[0];
+				el.vjs_resume();
+			}
+
+			function seekVideo(seconds){
+				var el = $("#videoPlayer")[0];
+				el.vjs_setProperty("currentTime", seconds);
+			}
+
+      function replay(){
+        var el = $("#videoPlayer")[0];
+        el.vjs_setProperty('currentTime', 0);
+        el.vjs_pause();
+      }
+
+			function onSWFEvent(swfID, eventName){
+				var $el = $("#events");
+				var time = new Date();
+				$el.append(pad2(time.getHours()) + ":" + pad2(time.getMinutes()) + ":" + pad2(time.getSeconds()) + " - " + eventName + "<br/>");
+				$el[0].scrollTop = $el[0].scrollHeight;
+
+				if(eventName == "playing" || eventName == "resume"){
+					$("#control").show();
+				}
+        else if(eventName == "ended"){
+          replay();
+        }
+		  }
+
+			function onSWFErrorEvent(swfID,eventName){
+				var $el = $("#errorEvents");
+				var time = new Date();
+				$el.append(pad2(time.getHours()) + ":" + pad2(time.getMinutes()) + ":" + pad2(time.getSeconds()) + " - " + eventName + "<br/>");
+				$el[0].scrollTop = $el[0].scrollHeight;
+			}
+
+			function pad2(num) {
+   			return (num < 10 ? '0' : '') + num;
+			}
+
+			function updatePlayerProperties(){
+
+				var el = $("#videoPlayer")[0];
+				
+				$propCurrentSrc.html(el.vjs_getProperty("currentSrc"));
+				$propCurrentTime.html(el.vjs_getProperty("currentTime"));
+				$propTime.html(el.vjs_getProperty("time"));
+				$propDefaultPlaybackRate.html(el.vjs_getProperty("defaultPlaybackRate"));
+				$propDuration.html(el.vjs_getProperty("duration")); // would normally be cached on durationchange
+				$propEnded.html(el.vjs_getProperty("ended").toString());
+				$propPaused.html(el.vjs_getProperty("paused").toString());
+				$propMuted.html(el.vjs_getProperty("muted").toString());
+				$propVolume.html(el.vjs_getProperty("volume"));
+				$propSeeking.html(el.vjs_getProperty("seeking").toString());
+				$propNetworkState.html(el.vjs_getProperty("networkState"));
+				$propReadyState.html(el.vjs_getProperty("readyState"));
+				$propBufferedBytesStart.html(el.vjs_getProperty("bufferedBytesStart"));
+				$propBufferedBytesEnd.html(el.vjs_getProperty("bufferedBytesEnd"));
+				$propBytesTotal.html(el.vjs_getProperty("bytesTotal")); // would normally be cached on metadata
+				$propVideoWidth.html(el.vjs_getProperty("videoWidth"));	// would normally be cached on metadata or playstart
+				$propVideoHeight.html(el.vjs_getProperty("videoHeight")); // would normally be cached on metadata or playstart
+
+
+
+			}
+
+			$(init);
+
+		</script>
+	</head>
+	<body style="background-color:#BBBBBB; padding:50px;">
+
+		<section id="status">
+			<div class="tab-control">
+              <ul class="tabs clearfix">
+                <li>
+                  <a class="selected" href="#events">Events</a>
+                </li>
+                <li>
+                  <a href="#errorEvents">Error Events</a>
+                </li>
+                <li>
+                  <a href="#properties">Properties</a>
+                </li>
+              </ul>
+              <div class="tab-content" id="events">
+
+              </div>
+              <div class="tab-content" id="errorEvents">
+
+              </div>
+              <div class="tab-content" id="properties">
+              	<table id="propertiesTable">
+              		<tr>
+              			<td colspan="2" class="value" id="propCurrentSrc"></td>
+              		</tr>
+              		<tr>
+              			<td class="prop">currentTime</td>
+              			<td class="value" id="propCurrentTime">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">time</td>
+              			<td class="value" id="propTime">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">defaultPlaybackRate</td>
+              			<td class="value" id="propDefaultPlaybackRate">1</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">duration</td>
+              			<td class="value" id="propDuration">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">ended</td>
+              			<td class="value" id="propEnded">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">paused</td>
+              			<td class="value" id="propPaused">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">muted</td>
+              			<td class="value" id="propMuted">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">volume</td>
+              			<td class="value" id="propVolume">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">seeking</td>
+              			<td class="value" id="propSeeking">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">networkState</td>
+              			<td class="value" id="propNetworkState">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">readyState</td>
+              			<td class="value" id="propReadyState">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">bufferedBytesStart</td>
+              			<td class="value" id="propBufferedBytesStart">0</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">bufferedBytesEnd</td>
+              			<td class="value" id="propBufferedBytesEnd">n/a</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">bytesTotal</td>
+              			<td class="value" id="propBytesTotal">0</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">videoWidth</td>
+              			<td class="value" id="propVideoWidth">0</td>
+              		</tr>
+              		<tr>
+              			<td class="prop">videoHeight</td>
+              			<td class="value" id="propVideoHeight">0</td>
+              		</tr>
+              	</table>
+              </div>
+            </div>
+		</section>
+		
+		<section id="instantiation">
+			<div class="row">
+        <div class="span2">
+        	<h1>Step 1: Instantiation</h1>
+        	<p>Create the swf object and provide the name of the JavaScript function that's called when the player has been instanced with a 'readyFunctionName' flashvars parameter.</p>
+        	<p>(the src and autoplay properties are able to be set at this time, but we won't do that here)</p>
+        	<a id="btnInstantiate" class="button" href="#">Create the SWF</a>
+        </div>
+        <div class="span4">
+          <div id="videoPlayerWrapper" style="">
+						<div id="videoPlayer"></div>
+					</div>
+        </div> 
+      </div>
+		</section>
+
+		<section id="configuration">
+			<div class="row">
+        <div class="span3">
+        	<h1>Step 2: Configuration &amp; Playback</h1>
+        	<p>Once the swf has been fully instanced, we have access to all of its methods and properties.</p>
+        	<p>Let's set some basic properties:</p>
+        	<ul>
+        		<li>eventProxyFunction: "onSWFEvent"</li>
+        		<li>errorEventProxyFunction: "onSWFErrorEvent"</li>
+        		<li>poster: "img/testPattern_ussr_480x360.png"</li>
+        	</ul>
+        	<a id="btnSetProps" class="button" href="#">Set Properties</a>
+        	<p>Next, we'll tell the swf what RTMP server to connect to, and what stream to play:</p>
+        	<a id="btnSetRTMP" class="button" href="#">Set RTMPConnection and RTMPStream</a>
+        	<p>If the SWF's autoplay property had been set to true at any point prior to this call, loading and playback would begin.</p>
+        	<p>To begin playback, call play():</p>
+        	<a id="btnBeginPlay" class="button" href="#">play()</a>
+        </div>
+        <div id="control" class="span3">
+        	<h1>Step 3: Control</h1>
+        	<p>Once playback has started, the SWF's control methods will work:</p>
+        	<a id="btnPause" class="button" href="#">pause()</a> 
+        	<a id="btnResume" class="button" href="#">resume()</a> 
+        	<br />
+        	<a id="btnSeekA" class="button" href="#">seek(120)</a> 
+        	<a id="btnSeekB" class="button" href="#">seek(600)</a> 
+        	<a id="btnSeekC" class="button" href="#">seek(1000)</a>
+          <br />
+          <a id="btnEnlarge" class="button" href="#">enlarge</a> 
+          <a id="btnReduce" class="button" href="#">reduce</a>
+        </div>
+      </div>
+		</section>
+
+
+
+	</body>	
+</html>
