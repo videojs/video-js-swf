@@ -407,6 +407,10 @@ package com.videojs{
             }
         }
         
+        public function get playing():Boolean{
+            return _isPlaying;
+        }
+        
         public function get paused():Boolean{
             return _isPaused;
         }

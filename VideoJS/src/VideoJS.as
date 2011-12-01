@@ -185,8 +185,10 @@ package{
         
         private function onStageResize(e:Event):void{
             ExternalInterface.call("console.log", "Resize to: " + stage.stageWidth.toString() + " x " + stage.stageHeight.toString());
-            _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-            _app.model.broadcastEvent(new VideoJSEvent(VideoJSEvent.STAGE_RESIZE, {}));
+            if(_app != null){
+                _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+                _app.model.broadcastEvent(new VideoJSEvent(VideoJSEvent.STAGE_RESIZE, {}));
+            }
         }
         
         private function onEchoCalled(pResponse:* = null):*{
