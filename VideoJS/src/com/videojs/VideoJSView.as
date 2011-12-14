@@ -90,10 +90,6 @@ package com.videojs{
 
         private function sizeVideoObject():void{
             
-            if(ExternalInterface.available){
-                ExternalInterface.call("console.log", "sizeVideoObject");
-            }
-            
             var __targetWidth:int, __targetHeight:int;
             
             var __availableWidth:int = _model.stageRect.width;
@@ -121,7 +117,7 @@ package com.videojs{
 
             // first, size the whole thing down based on the available width
             __targetWidth = __availableWidth;
-               __targetHeight = __targetWidth * (__nativeHeight / __nativeWidth);
+            __targetHeight = __targetWidth * (__nativeHeight / __nativeWidth);
             
             if(__targetHeight > __availableHeight){
                 __targetWidth = __targetWidth * (__availableHeight / __targetHeight);

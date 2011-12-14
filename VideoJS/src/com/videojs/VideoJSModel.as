@@ -706,7 +706,8 @@ package com.videojs{
                     broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
                     if(_pausePending){
                         _pausePending = false;
-                        pause();
+                        _ns.pause();
+                        _isPaused = true;
                     }
                     break;
                 
