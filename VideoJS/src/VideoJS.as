@@ -15,6 +15,8 @@ package{
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
     import flash.media.Video;
+    import flash.ui.ContextMenu;
+    import flash.ui.ContextMenuItem;
     import flash.utils.Timer;
     import flash.utils.setTimeout;
     
@@ -45,6 +47,14 @@ package{
             addChild(_app);
 
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
+
+            // add content-menu version info
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component", false, false);
+            var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2011 Zencoder, Inc.", false, false);
+            var _ctxMenu:ContextMenu = new ContextMenu();
+            _ctxMenu.hideBuiltInItems();
+            _ctxMenu.customItems.push(_ctxVersion, _ctxAbout);
+            this.contextMenu = _ctxMenu;
 
         }
         
