@@ -75,7 +75,7 @@ package com.videojs{
                 _uiPosterImage = new Loader();
                 _uiPosterImage.visible = false;
                 var __context:LoaderContext = new LoaderContext();
-                __context.checkPolicyFile = true;
+                //__context.checkPolicyFile = true;
                 _uiPosterImage.contentLoaderInfo.addEventListener(Event.COMPLETE, onPosterLoadComplete);
                 _uiPosterImage.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onPosterLoadError);
                 _uiPosterImage.contentLoaderInfo.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onPosterLoadSecurityError);
@@ -201,7 +201,9 @@ package com.videojs{
                 (_uiPosterImage.content as Bitmap).smoothing = true;
             }
             catch(e:Error){
-                
+                if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
+                    throw new Error(e.message);
+                }
             }
             _uiPosterContainer.addChild(_uiPosterImage);
             sizePoster();
