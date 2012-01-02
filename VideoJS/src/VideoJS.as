@@ -19,6 +19,7 @@ package{
     import flash.ui.ContextMenuItem;
     import flash.utils.Timer;
     import flash.utils.setTimeout;
+    import flash.system.Security;
     
     [SWF(backgroundColor="#000000", frameRate="60", width="480", height="270")]
     public class VideoJS extends Sprite{
@@ -33,7 +34,10 @@ package{
         }
         
         private function init():void{
-            
+            // Allow JS calls from other domains
+            Security.allowDomain("*");
+            Security.allowInsecureDomain("*");
+
             if(loaderInfo.hasOwnProperty("uncaughtErrorEvents")){
                 // we'll want to suppress ANY uncaught debug errors in production (for the sake of ux)
                 // IEventDispatcher(loaderInfo["uncaughtErrorEvents"]).addEventListener("uncaughtError", onUncaughtError);
@@ -49,8 +53,8 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component", false, false);
-            var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2011 Zencoder, Inc.", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v3.0", false, false);
+            var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2012 Zencoder, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
             _ctxMenu.customItems.push(_ctxVersion, _ctxAbout);
@@ -62,72 +66,26 @@ package{
             
             try{
                 ExternalInterface.addCallback("vjs_echo", onEchoCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_getProperty", onGetPropertyCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_setProperty", onSetPropertyCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_autoplay", onAutoplayCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_src", onSrcCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_load", onLoadCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_play", onPlayCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_pause", onPauseCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_resume", onResumeCalled);
-            }
-            catch(e:SecurityError){}
-            catch(e:Error){}
-            finally{}
-            
-            try{
                 ExternalInterface.addCallback("vjs_stop", onStopCalled);
             }
-            catch(e:SecurityError){}
-            catch(e:Error){}
+            catch(e:SecurityError){
+                if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
+                    throw new SecurityError(e.message);
+                }
+            }
+            catch(e:Error){
+                if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
+                    throw new Error(e.message);
+                }
+            }
             finally{}
             
             
@@ -174,7 +132,11 @@ package{
                 try{
                     ExternalInterface.call(loaderInfo.parameters.readyFunction, ExternalInterface.objectID);
                 }
-                catch(e:Error){}
+                catch(e:Error){
+                    if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
+                        throw new Error(e.message);
+                    }
+                }
             }
         }
         
