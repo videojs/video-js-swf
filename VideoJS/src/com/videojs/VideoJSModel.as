@@ -626,15 +626,23 @@ package com.videojs{
         }
         
         private function calculateThroughput():void{
+            // if it's finished loading, we can kill the calculations and assume it can play through
             if(_ns.bytesLoaded == _ns.bytesTotal){
+                _canPlayThrough = true;
                 _loadCompleted = true;
                 _throughputTimer.stop();
                 _throughputTimer.reset();
                 broadcastEventExternally(ExternalEventName.ON_CAN_PLAY_THROUGH);
             }
+            // if it's still loading, but we know its duration, we can check to see if the current transfer rate
+            // will sustain uninterrupted playback - this requires the duration to be known, which is currently
+            // only accessible via metadata, which isn't parsed until the Flash Player encounters the metadata atom
+            // in the file itself, which means that this logic will only work if the asset is playing - preload
+            // won't ever cause this logic to run :(
             else if(_ns.bytesTotal > 0 && _streamMetaData != null && _streamMetaData.duration != undefined){
                 _currentThroughput = _ns.bytesLoaded / ((getTimer() - _loadStartTimestamp) / 1000);
                 var __estimatedTimeToLoad:Number = (_ns.bytesTotal - _ns.bytesLoaded) * _currentThroughput;
+                
                 if(__estimatedTimeToLoad <= _streamMetaData.duration){
                     _throughputTimer.stop();
                     _throughputTimer.reset();
@@ -685,7 +693,6 @@ package com.videojs{
                     _throughputTimer.reset();
                     _throughputTimer.start();
                     broadcastEventExternally(ExternalEventName.ON_LOAD_START);
-                    
                     broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     if(_pauseOnStart && _loadStarted == false){
                         _ns.pause();
