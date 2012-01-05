@@ -481,6 +481,8 @@ package com.videojs{
             }
             // if the asset is already loading
             else{
+                ExternalInterface.call("console.log", "Trying to resume!");
+                _pausePending = false;
                 _ns.resume();
                 _isPaused = false;
                 broadcastEventExternally(ExternalEventName.ON_RESUME);
@@ -526,8 +528,8 @@ package com.videojs{
         public function seekBySeconds(pValue:Number):void{
             if(_isPlaying){
                 _isSeeking = true;
-                _ns.seek(pValue);
                 _throughputTimer.stop();
+                _ns.seek(pValue);
                 _isBuffering = true;
             }
             else if(_hasEnded){
@@ -681,7 +683,6 @@ package com.videojs{
         }
         
         private function onNetStreamStatus(e:NetStatusEvent):void{
-          
             switch(e.info.code){
                 case "NetStream.Play.Start":
                     _streamMetaData = null;

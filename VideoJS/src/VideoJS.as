@@ -15,11 +15,11 @@ package{
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
     import flash.media.Video;
+    import flash.system.Security;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
     import flash.utils.Timer;
     import flash.utils.setTimeout;
-    import flash.system.Security;
     
     [SWF(backgroundColor="#000000", frameRate="60", width="480", height="270")]
     public class VideoJS extends Sprite{
@@ -156,7 +156,6 @@ package{
         }
         
         private function onStageResize(e:Event):void{
-            ExternalInterface.call("console.log", "Resize to: " + stage.stageWidth.toString() + " x " + stage.stageHeight.toString());
             if(_app != null){
                 _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
                 _app.model.broadcastEvent(new VideoJSEvent(VideoJSEvent.STAGE_RESIZE, {}));
@@ -168,6 +167,8 @@ package{
         }
         
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
+            
+ 
             switch(pPropertyName){
                 case "autoplay":
                     return _app.model.autoplay;
@@ -247,6 +248,7 @@ package{
         }
         
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
+
             switch(pPropertyName){
                 case "loop":
                     _app.model.loop = _app.model.humanToBoolean(pValue);
