@@ -745,6 +745,7 @@ package com.videojs{
                     _isSeeking = false;
                     broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_SEEK_COMPLETE, {info:e.info}));
                     broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
+                    broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     _currentThroughput = 0;
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();

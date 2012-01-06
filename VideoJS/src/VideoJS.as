@@ -167,8 +167,7 @@ package{
         }
         
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
-            
- 
+
             switch(pPropertyName){
                 case "autoplay":
                     return _app.model.autoplay;
