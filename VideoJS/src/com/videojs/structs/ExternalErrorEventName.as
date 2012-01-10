@@ -8,6 +8,6 @@ package com.videojs.structs{
         public static const PROPERTY_NOT_FOUND:String = "propertynotfound";
         public static const POSTER_IO_ERROR:String = "posterioerror";
         public static const POSTER_SECURITY_ERROR:String = "postersecurityerror";
-        
+        public static const UNSUPPORTED_MODE:String = "unsupportedmode";
     }
 }
