@@ -96,6 +96,10 @@ package{
         
         private function finish():void{
             
+            if(loaderInfo.parameters.mode != undefined){
+                _app.model.mode = loaderInfo.parameters.mode;
+            }
+            
             if(loaderInfo.parameters.eventProxyFunction != undefined){
                 _app.model.jsEventProxyName = loaderInfo.parameters.eventProxyFunction;
             }
@@ -169,6 +173,8 @@ package{
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
             switch(pPropertyName){
+                case "mode":
+                    return _app.model.mode;
                 case "autoplay":
                     return _app.model.autoplay;
                 case "loop":
@@ -249,8 +255,12 @@ package{
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
 
             switch(pPropertyName){
+                case "mode":
+                    _app.model.mode = String(pValue);
+                    break;
                 case "loop":
                     _app.model.loop = _app.model.humanToBoolean(pValue);
+                    break;
                 case "background":
                     _app.model.backgroundColor = _app.model.hexToNumber(String(pValue));
                     break;
