@@ -13,7 +13,7 @@
 
       
       function init(){
-        
+
         $("#btnInstantiate").click(createSWF);
         $("#btnSetProps").click(setProperties);
         $("#btnSetSrc").click(setSource);
@@ -203,7 +203,6 @@
         var el = $("#videoPlayer")[0];
         el.vjs_pause();
         el.vjs_setProperty('currentTime', 0);
-        el.vjs_pause();
       }
 
       function onSWFEvent(swfID, eventName){
@@ -216,7 +215,7 @@
           $("#control").show();
         }
         else if(eventName == "ended"){
-          replay();
+          
         }
       }
 
@@ -235,6 +234,7 @@
 
         var el = $("#videoPlayer")[0];
         
+        
         $propCurrentSrc.html(el.vjs_getProperty("currentSrc"));
         $propCurrentTime.html(el.vjs_getProperty("currentTime"));
         $propTime.html(el.vjs_getProperty("time"));
@@ -252,9 +252,7 @@
         $propBytesTotal.html(el.vjs_getProperty("bytesTotal")); // would normally be cached on metadata
         $propVideoWidth.html(el.vjs_getProperty("videoWidth"));  // would normally be cached on metadata or playstart
         $propVideoHeight.html(el.vjs_getProperty("videoHeight")); // would normally be cached on metadata or playstart
-
-
-
+        
       }
 
       $(init);

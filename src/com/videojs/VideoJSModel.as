@@ -253,7 +253,6 @@ package com.videojs{
          * 
          */        
         public function get time():Number{
-            
             if(_provider){
                 return _provider.time;
             }

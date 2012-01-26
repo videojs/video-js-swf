@@ -308,7 +308,18 @@ package com.videojs.providers{
                 _nc.client = this;
                 _nc.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
             }
-            _nc.connect(_src.connectionURL);
+            
+            // initiating an RTMP connection carries some overhead, so if we're already connected
+            // to a server, and that server is the same as the one that hosts whatever we're trying to
+            // play, we should skip straight to the playback
+            if(_nc.connected){
+                if(_src.connectionURL != _nc.uri){
+                    _nc.connect(_src.connectionURL);
+                }
+                else{
+                    initNetStream();
+                }
+            }
         }
         
         private function initNetStream():void{
@@ -383,6 +394,11 @@ package com.videojs.providers{
         
         private function onNetStreamStatus(e:NetStatusEvent):void{
             switch(e.info.code){
+                case "NetStream.Play.Reset":
+                    
+                    
+                    
+                    break;
                 case "NetStream.Play.Start":
                     _metadata = null;
                     _canPlayThrough = false;
