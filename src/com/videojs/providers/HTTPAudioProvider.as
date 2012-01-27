@@ -277,13 +277,16 @@ package com.videojs.providers{
                 _audioPausePoint = _soundChannel.position;
                 _soundChannel.stop();
                 _audioPlaybackPaused = true;
+                _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
             }
         }
         
         public function resume():void{
-            if(_audioPlaybackStarted){
+            if(_audioPlaybackStarted && _audioPlaybackPaused){
                 _soundChannel = _sound.play(_audioPausePoint);
                 _audioPlaybackPaused = false;
+                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                _model.broadcastEventExternally(ExternalEventName.ON_START);
             }
         }
         
