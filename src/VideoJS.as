@@ -53,7 +53,7 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v3.0", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v3.0.1", false, false);
             var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2012 Zencoder, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
@@ -95,6 +95,10 @@ package{
         }
         
         private function finish():void{
+            
+            if(loaderInfo.parameters.mode != undefined){
+                _app.model.mode = loaderInfo.parameters.mode;
+            }
             
             if(loaderInfo.parameters.eventProxyFunction != undefined){
                 _app.model.jsEventProxyName = loaderInfo.parameters.eventProxyFunction;
@@ -169,6 +173,8 @@ package{
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
             switch(pPropertyName){
+                case "mode":
+                    return _app.model.mode;
                 case "autoplay":
                     return _app.model.autoplay;
                 case "loop":
@@ -249,8 +255,12 @@ package{
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
 
             switch(pPropertyName){
+                case "mode":
+                    _app.model.mode = String(pValue);
+                    break;
                 case "loop":
                     _app.model.loop = _app.model.humanToBoolean(pValue);
+                    break;
                 case "background":
                     _app.model.backgroundColor = _app.model.hexToNumber(String(pValue));
                     break;
