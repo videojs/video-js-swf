@@ -186,7 +186,17 @@ package com.videojs.providers{
         }
         
         public function set src(pSrc:Object):void{
-            
+            if(_isPlaying){
+                _ns.close();
+                _loadErrored = false;
+                _loadStarted = false;
+                _loadCompleted = false;
+                _src = pSrc;
+                initNetConnection();
+            }
+            else{
+                init(pSrc);
+            }
         }
         
         public function get srcAsString():String{
@@ -319,6 +329,9 @@ package com.videojs.providers{
                 else{
                     initNetStream();
                 }
+            }
+            else{
+                _nc.connect(_src.connectionURL);
             }
         }
         

@@ -181,7 +181,7 @@ package com.videojs.providers{
         }
         
         public function set src(pSrc:Object):void{
-            
+            init(pSrc);
         }
         
         public function get srcAsString():String{
