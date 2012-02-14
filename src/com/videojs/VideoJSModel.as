@@ -516,6 +516,7 @@ package com.videojs{
         private function initProvider():void{
             if(_provider){
                 _provider.die();
+                _provider = null;
             }
             var __src:Object;
             // We need to determine which provider to load, based on the values of our exposed properties.
@@ -528,7 +529,7 @@ package com.videojs{
                         };
                         _provider = new HTTPVideoProvider();
                         _provider.attachVideo(_videoReference);
-                        _provider.init(__src);
+                        _provider.init(__src, _autoplay);
                     }
                     else if(_currentPlaybackType == PlaybackType.RTMP){
                         __src = {
@@ -537,7 +538,7 @@ package com.videojs{
                         };
                         _provider = new RTMPVideoProvider();
                         _provider.attachVideo(_videoReference);
-                        _provider.init(__src);
+                        _provider.init(__src, _autoplay);
                     }
                     
                     break;
@@ -546,7 +547,7 @@ package com.videojs{
                         path:_src
                     };
                     _provider = new HTTPAudioProvider();
-                    _provider.init(__src);
+                    _provider.init(__src, _autoplay);
                     break;
                 default:
                     broadcastEventExternally(ExternalErrorEventName.UNSUPPORTED_MODE);

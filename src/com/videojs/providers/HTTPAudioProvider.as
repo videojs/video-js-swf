@@ -164,11 +164,14 @@ package com.videojs.providers{
             _src = pSrc;
         }
         
-        public function init(pSrc:Object):void{
+        public function init(pSrc:Object, pAutoplay:Boolean):void{
             _src = pSrc;
             _loadErrored = false;
             _loadStarted = false;
             _loadCompleted = false;
+            if(pAutoplay){
+               play(); 
+            }
         }
         
         public function load():void{

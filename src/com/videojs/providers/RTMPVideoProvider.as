@@ -195,7 +195,7 @@ package com.videojs.providers{
                 initNetConnection();
             }
             else{
-                init(pSrc);
+                init(pSrc, false);
             }
         }
         
@@ -206,11 +206,14 @@ package com.videojs.providers{
             return "";
         }
         
-        public function init(pSrc:Object):void{
+        public function init(pSrc:Object, pAutoplay:Boolean):void{
             _src = pSrc;
             _loadErrored = false;
             _loadStarted = false;
             _loadCompleted = false;
+            if(pAutoplay){
+                play();
+            }
         }
         
         public function load():void{

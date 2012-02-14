@@ -119,7 +119,7 @@
           eventProxyFunction: "onSWFEvent",
           errorEventProxyFunction: "onSWFErrorEvent",
           src: "",
-          autoplay: false,
+          autoplay: true,
           preload: false,
           poster: "img/testPattern_ussr_480x360.png"
         };
@@ -217,6 +217,12 @@
         else if(eventName == "ended"){
           replay();
         }
+        else if(eventName == "loadeddata"){
+          
+        }
+        else if(eventName == "seeked"){
+
+        }
       }
 
       function onSWFErrorEvent(swfID,eventName){
@@ -251,9 +257,6 @@
         $propBytesTotal.html(el.vjs_getProperty("bytesTotal")); // would normally be cached on metadata
         $propVideoWidth.html(el.vjs_getProperty("videoWidth"));  // would normally be cached on metadata or playstart
         $propVideoHeight.html(el.vjs_getProperty("videoHeight")); // would normally be cached on metadata or playstart
-
-
-
       }
 
       $(init);
@@ -406,8 +409,5 @@
         </div>
       </div>
     </section>
-
-
-
   </body>  
 </html>

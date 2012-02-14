@@ -112,7 +112,7 @@ package com.videojs.providers{
         /**
          * Should return the most reasonable string representation of the current assets source location.
          */
-        function init(pSrc:Object):void;
+        function init(pSrc:Object, pAutoplay:Boolean):void;
         
         /**
          * Called when the media asset should be preloaded, but not played.

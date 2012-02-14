@@ -30,6 +30,13 @@ package com.videojs.providers{
         private var _pausePending:Boolean = false;
         private var _videoReference:Video;
         
+        /**
+         * When the player is paused, and a seek is executed, the NetStream.time property will NOT update until the decoder encounters a new time tag,
+         * which won't happen until playback is resumed. This wrecks havoc with external scrubber logic, so when the player is paused and a seek is requested,
+         * we cache the intended time, and use it IN PLACE OF NetStream's time when the time accessor is hit. 
+         */        
+        private var _pausedSeekValue:Number = -1;
+        
         private var _src:Object;
         private var _metadata:Object;
         private var _isPlaying:Boolean = false;
@@ -62,7 +69,12 @@ package com.videojs.providers{
         
         public function get time():Number{
             if(_ns != null){
-                return _ns.time;
+                if(_pausedSeekValue != -1){
+                    return _pausedSeekValue;
+                }
+                else{
+                    return _ns.time;
+                }
             }
             else{
                 return 0;
@@ -181,7 +193,7 @@ package com.videojs.providers{
         }
         
         public function set src(pSrc:Object):void{
-            init(pSrc);
+            init(pSrc, false);
         }
         
         public function get srcAsString():String{
@@ -191,12 +203,14 @@ package com.videojs.providers{
             return "";
         }
         
-        public function init(pSrc:Object):void{
+        public function init(pSrc:Object, pAutoplay:Boolean):void{
             _src = pSrc;
             _loadErrored = false;
             _loadStarted = false;
             _loadCompleted = false;
-            initNetConnection();
+            if(pAutoplay){
+                initNetConnection();
+            }
         }
         
         public function load():void{
@@ -248,10 +262,15 @@ package com.videojs.providers{
         
         public function seekBySeconds(pTime:Number):void{
             if(_isPlaying){
-                _isSeeking = true;
-                _throughputTimer.stop();
-                _ns.seek(pTime);
-                _isBuffering = true;
+                if(duration != 0 && pTime <= duration){
+                    _isSeeking = true;
+                    _throughputTimer.stop();
+                    if(_isPaused){
+                        _pausedSeekValue = pTime;
+                    }
+                    _ns.seek(pTime);
+                    _isBuffering = true;
+                }
             }
             else if(_hasEnded){
                 _ns.seek(pTime);
@@ -363,6 +382,7 @@ package com.videojs.providers{
         private function onNetStreamStatus(e:NetStatusEvent):void{
             switch(e.info.code){
                 case "NetStream.Play.Start":
+                    _pausedSeekValue = -1;
                     _metadata = null;
                     _canPlayThrough = false;
                     _hasEnded = false;
@@ -386,6 +406,7 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Buffer.Full":
+                    _pausedSeekValue = -1;
                     _isBuffering = false;
                     _isPlaying = true;
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
