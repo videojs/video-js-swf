@@ -431,7 +431,6 @@ package com.videojs.providers{
                         _isPaused = true;
                     }
                     else{
-                        _model.broadcastEventExternally(ExternalEventName.ON_START);
                         _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));
                     }
@@ -443,6 +442,7 @@ package com.videojs.providers{
                     _isPlaying = true;
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
                     _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
+                    _model.broadcastEventExternally(ExternalEventName.ON_START);
                     if(_pausePending){
                         _pausePending = false;
                         _ns.pause();
