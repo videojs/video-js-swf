@@ -38,6 +38,7 @@ package com.videojs{
             _uiBackground.graphics.beginFill(_model.backgroundColor, 1);
             _uiBackground.graphics.drawRect(0, 0, _model.stageRect.width, _model.stageRect.height);
             _uiBackground.graphics.endFill();
+            _uiBackground.alpha = _model.backgroundAlpha;
             addChild(_uiBackground);
             
             _uiPosterContainer = new Sprite();

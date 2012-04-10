@@ -263,6 +263,7 @@ package{
                     break;
                 case "background":
                     _app.model.backgroundColor = _app.model.hexToNumber(String(pValue));
+                    _app.model.backgroundAlpha = 1;
                     break;
                 case "eventProxyFunction":
                     _app.model.jsEventProxyName = String(pValue);

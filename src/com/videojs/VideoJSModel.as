@@ -45,6 +45,7 @@ package com.videojs{
         private var _jsEventProxyName:String = "";
         private var _jsErrorEventProxyName:String = "";
         private var _backgroundColor:Number = 0;
+        private var _backgroundAlpha:Number = 0;
         private var _volume:Number = 1;
         private var _autoplay:Boolean = false;
         private var _preload:Boolean = false;
@@ -122,6 +123,18 @@ package com.videojs{
             else{
                 _backgroundColor = pColor;
                 broadcastEvent(new VideoPlaybackEvent(VideoJSEvent.BACKGROUND_COLOR_SET, {}));
+            }
+        }
+        
+        public function get backgroundAlpha():Number{
+            return _backgroundAlpha;
+        }
+        public function set backgroundAlpha(pAlpha:Number):void{
+            if(pAlpha < 0){
+                _backgroundAlpha = 0;
+            }
+            else{
+                _backgroundAlpha = pAlpha;
             }
         }
         
