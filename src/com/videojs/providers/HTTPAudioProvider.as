@@ -234,10 +234,16 @@ package com.videojs.providers{
                 else{
                     // if we're already playing
                     if(_audioPlaybackStarted){
-                        _soundChannel.stop();
-                        _soundChannel = null;
-                        _throughputTimer.stop();
-                        _throughputTimer.reset();
+                        // if we're paused
+                        if(_audioPlaybackPaused){
+                            resume();
+                        }
+                        else{
+                            _soundChannel.stop();
+                            _soundChannel = null;
+                            _throughputTimer.stop();
+                            _throughputTimer.reset();   
+                        }
                     }
                     else{
                         _sound = new Sound();
@@ -320,6 +326,7 @@ package com.videojs.providers{
                 _soundChannel.stop();
                 _audioPlaybackStarted = false;
                 _audioPlaybackStopped = true;
+                _audioPlaybackPaused = false;
             }
         }
         
