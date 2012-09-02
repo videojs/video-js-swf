@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="imagetoolbar" content="no" />
+    <title>VideoJS Workbench</title>
+    <link rel="stylesheet" href="css/reset.css"/> 
+    <style>body,#videoPlayer{width:100%;height:100%;overflow:hidden;}</style>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/swfobject.js"></script>
+    <script type="text/javascript">
+
+      
+      function init(){
+        createSWF();  
+        
+        
+      }
+
+      function onSWFReady(pObjectID){
+        var el = $("#videoPlayer")[0];
+        el.vjs_src("http://video-js.zencoder.com/oceans-clip.mp4");
+        el.vjs_load();
+        el.vjs_play();
+      }
+
+
+      function createSWF(e){
+        var flashvars = {
+          readyFunction: "onSWFReady",
+          src: "",
+          autoplay: true,
+          fillContainer: true,
+          preload: false,
+          poster: "img/testPattern_ussr_480x360.png"
+        };
+
+        var params = {
+          allowScriptAccess: "always",
+          bgcolor: "#000000"
+        };
+      
+        var attributes = {
+          id: "videoPlayer",
+          name: "videoPlayer"
+        };
+      
+        swfobject.embedSWF("VideoJS.swf", "videoPlayer", "100%", "100%", "9.0.124", "", flashvars, params, attributes);
+
+      };
+
+      $(init);
+
+    </script>
+  </head>
+  <body>
+
+    <div id="videoPlayer"></div>
+  </body>  
+</html>
