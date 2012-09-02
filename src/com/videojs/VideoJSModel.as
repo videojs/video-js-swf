@@ -277,7 +277,9 @@ package com.videojs{
         }
         public function set muted(pValue:Boolean):void{
             if(pValue){
+                var __lastSetVolume = _lastSetVolume;
                 volume = 0;
+                _lastSetVolume = __lastSetVolume;
             }
             else{
                 volume = _lastSetVolume;
