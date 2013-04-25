@@ -131,18 +131,6 @@ package{
                     _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
                 }
             }
-            
-            if(loaderInfo.parameters.readyFunction != undefined){
-                try{
-                    ExternalInterface.call(loaderInfo.parameters.readyFunction, ExternalInterface.objectID);
-                }
-                catch(e:Error){
-                    if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
-                        throw new Error(e.message);
-                    }
-                }
-            }
-        }
         
         private function onAddedToStage(e:Event):void{
             stage.addEventListener(Event.RESIZE, onStageResize);
