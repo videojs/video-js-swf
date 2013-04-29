@@ -53,7 +53,7 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v3.0.1", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v3.0.2", false, false);
             var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2013 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
@@ -87,9 +87,6 @@ package{
                 }
             }
             finally{}
-            
-            
-            
             setTimeout(finish, 50);
 
         }
@@ -131,19 +128,8 @@ package{
                     _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
                 }
             }
-            
-            if(loaderInfo.parameters.readyFunction != undefined){
-                try{
-                    ExternalInterface.call(loaderInfo.parameters.readyFunction, ExternalInterface.objectID);
-                }
-                catch(e:Error){
-                    if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
-                        throw new Error(e.message);
-                    }
-                }
-            }
         }
-        
+
         private function onAddedToStage(e:Event):void{
             stage.addEventListener(Event.RESIZE, onStageResize);
             stage.scaleMode = StageScaleMode.NO_SCALE;
