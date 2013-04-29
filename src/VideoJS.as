@@ -128,7 +128,8 @@ package{
                     _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
                 }
             }
-        
+        }
+
         private function onAddedToStage(e:Event):void{
             stage.addEventListener(Event.RESIZE, onStageResize);
             stage.scaleMode = StageScaleMode.NO_SCALE;
