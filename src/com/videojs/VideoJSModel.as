@@ -13,23 +13,11 @@ package com.videojs{
     
     import flash.events.Event;
     import flash.events.EventDispatcher;
-    import flash.events.IEventDispatcher;
-    import flash.events.IOErrorEvent;
-    import flash.events.NetStatusEvent;
-    import flash.events.ProgressEvent;
-    import flash.events.TimerEvent;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
-    import flash.media.Sound;
-    import flash.media.SoundChannel;
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
     import flash.media.Video;
-    import flash.net.NetConnection;
-    import flash.net.NetStream;
-    import flash.net.URLRequest;
-    import flash.utils.Timer;
-    import flash.utils.getTimer;
     
     public class VideoJSModel extends EventDispatcher{
 
@@ -96,14 +84,14 @@ package com.videojs{
             return _jsEventProxyName;
         }
         public function set jsEventProxyName(pName:String):void{
-            _jsEventProxyName = pName;
+            _jsEventProxyName = cleanEIString(pName);
         }
         
         public function get jsErrorEventProxyName():String{
             return _jsErrorEventProxyName;
         }
         public function set jsErrorEventProxyName(pName:String):void{
-            _jsErrorEventProxyName = pName;
+            _jsErrorEventProxyName = cleanEIString(pName);
         }
         
         public function get stageRect():Rectangle{
@@ -277,7 +265,7 @@ package com.videojs{
         }
         public function set muted(pValue:Boolean):void{
             if(pValue){
-                var __lastSetVolume = _lastSetVolume;
+                var __lastSetVolume:Number = _lastSetVolume;
                 volume = 0;
                 _lastSetVolume = __lastSetVolume;
             }
@@ -527,6 +515,14 @@ package com.videojs{
                 return false;
             }
         }
+		
+		/**
+		 * Removes dangerous characters from a user-provided string that will be passed to ExternalInterface.call()
+		 * 
+		 */        
+		public function cleanEIString(pString:String):String{
+			return pString.replace(/[^A-Za-z0-9_.]/gi, "");
+		}
         
         private function initProvider():void{
             if(_provider){

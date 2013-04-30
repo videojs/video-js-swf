@@ -1,8 +1,6 @@
 package{
     
     import com.videojs.VideoJSApp;
-    import com.videojs.VideoJSModel;
-    import com.videojs.VideoJSView;
     import com.videojs.events.VideoJSEvent;
     import com.videojs.structs.ExternalErrorEventName;
     
@@ -10,11 +8,9 @@ package{
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.events.Event;
-    import flash.events.IEventDispatcher;
     import flash.events.TimerEvent;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
-    import flash.media.Video;
     import flash.system.Security;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
@@ -53,7 +49,7 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v3.0.1", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v3.0.2", false, false);
             var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2013 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
@@ -134,7 +130,7 @@ package{
             
             if(loaderInfo.parameters.readyFunction != undefined){
                 try{
-                    ExternalInterface.call(loaderInfo.parameters.readyFunction, ExternalInterface.objectID);
+                    ExternalInterface.call(_app.model.cleanEIString(loaderInfo.parameters.readyFunction), ExternalInterface.objectID);
                 }
                 catch(e:Error){
                     if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
