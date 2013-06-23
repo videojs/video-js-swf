@@ -14,6 +14,7 @@ package{
     import flash.system.Security;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.setTimeout;
     
@@ -164,7 +165,14 @@ package{
         }
 
         private function onAppendBufferCalled(array:*):void{
+            // translate the array from js into bytes
+            var bytes:ByteArray = new ByteArray();
+            for (var i:int = 0; i < array.length; i++) {
+                bytes.writeByte(array[i]);
+            }
 
+            // write the bytes to the provider
+            _app.model.appendBuffer(bytes);
         }
         
         private function onEchoCalled(pResponse:* = null):*{

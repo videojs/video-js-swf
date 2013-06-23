@@ -13,6 +13,7 @@ package com.videojs.providers{
     import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
     

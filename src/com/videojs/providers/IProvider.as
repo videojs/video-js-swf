@@ -1,6 +1,7 @@
 package com.videojs.providers{
     
     import flash.media.Video;
+    import flash.utils.ByteArray;
     
     public interface IProvider{
         

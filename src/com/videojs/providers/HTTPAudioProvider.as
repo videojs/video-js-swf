@@ -13,6 +13,7 @@ package com.videojs.providers{
     import flash.media.SoundChannel;
     import flash.media.Video;
     import flash.net.URLRequest;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
     
