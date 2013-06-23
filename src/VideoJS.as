@@ -61,6 +61,7 @@ package{
         private function registerExternalMethods():void{
             
             try{
+                ExternalInterface.addCallback("vjs_appendBuffer", onAppendBufferCalled);
                 ExternalInterface.addCallback("vjs_echo", onEchoCalled);
                 ExternalInterface.addCallback("vjs_getProperty", onGetPropertyCalled);
                 ExternalInterface.addCallback("vjs_setProperty", onSetPropertyCalled);
@@ -160,6 +161,10 @@ package{
                 _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
                 _app.model.broadcastEvent(new VideoJSEvent(VideoJSEvent.STAGE_RESIZE, {}));
             }
+        }
+
+        private function onAppendBufferCalled(array:*):void{
+
         }
         
         private function onEchoCalled(pResponse:* = null):*{
@@ -305,7 +310,13 @@ package{
         }
         
         private function onSrcCalled(pSrc:* = ""):void{
-            _app.model.src = String(pSrc);
+            if (pSrc.indexOf('blob:video-js:') === 0) {
+                // initialize the netstream object in "data generation" mode
+                // this allows us to feed it bytes directly with appendBytes
+                _app.model.src = null;
+            } else {
+                _app.model.src = String(pSrc);
+            }
         }
         
         private function onLoadCalled():void{

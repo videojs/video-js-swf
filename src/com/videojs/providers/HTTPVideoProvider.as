@@ -138,6 +138,10 @@ package com.videojs.providers{
                 }
             }
         }
+
+        public function appendBuffer(bytes:ByteArray):void{
+            _ns.appendBytes(bytes);
+        }
         
         public function get buffered():Number{
             if(duration > 0){

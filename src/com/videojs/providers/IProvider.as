@@ -23,6 +23,12 @@ package com.videojs.providers{
          * Should return a value that indicates the current asset's duration, in seconds.
          */
         function get duration():Number;
+
+        /**
+         * Appends the segment data in a ByteArray to the source buffer.
+         * @param  bytes the ByteArray of data to append.
+         */
+        function appendBuffer(bytes:ByteArray):void;
         
         /**
          * Should return an interger that reflects the closest parallel to
