@@ -9,7 +9,6 @@ package com.videojs.providers{
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
-    import flash.external.ExternalInterface;
     import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;

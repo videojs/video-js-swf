@@ -119,7 +119,13 @@ package{
             }
             
             if(loaderInfo.parameters.src != undefined && loaderInfo.parameters.src != ""){
+	      if (isExternalSrc(loaderInfo.parameters.src)) {
+		_app.model.srcFromFlashvars = null;
+		ExternalInterface.call('videojs.MediaSource.sourceBufferUrls["' + loaderInfo.parameters.src + '"]', ExternalInterface.objectID);
+	      } else {
                 _app.model.srcFromFlashvars = String(loaderInfo.parameters.src);
+	      }
+
             }
             else{
                 if(loaderInfo.parameters.RTMPConnection != undefined && loaderInfo.parameters.RTMPConnection != ""){
@@ -287,7 +293,12 @@ package{
                     _app.model.poster = String(pValue);
                     break;
                 case "src":
-                    _app.model.src = String(pValue);
+	            if (isExternalSrc(pValue)) {
+		      _app.model.src = null;
+		      ExternalInterface.call('videojs.MediaSource.sourceBufferUrls["' + pValue + '"]', ExternalInterface.objectID);
+		      } else {
+			_app.model.src = String(pValue);	
+		      }
                     break;
                 case "currentTime":
                     _app.model.seekBySeconds(Number(pValue));
@@ -316,15 +327,23 @@ package{
         private function onAutoplayCalled(pAutoplay:* = false):void{
             _app.model.autoplay = _app.model.humanToBoolean(pAutoplay);
         }
+
+        private function isExternalSrc(pSrc:*):Boolean{
+	  return pSrc.indexOf('blob:vjs-source/') === 0;
+	}
+        private function srcForString(pSrc:*):String{
+	  return pSrc.indexOf('blob:vjs-source/') === 0 ? null : String(pSrc);
+	}
         
         private function onSrcCalled(pSrc:* = ""):void{
-            if (pSrc.indexOf('blob:video-js:') === 0) {
-                // initialize the netstream object in "data generation" mode
-                // this allows us to feed it bytes directly with appendBytes
-                _app.model.src = null;
-            } else {
-                _app.model.src = String(pSrc);
-            }
+	  var src:String;
+	  if (isExternalSrc(pSrc)) {
+	    src = null;
+	    ExternalInterface.call('videojs.MediaSource.sourceBufferUrls["' + pSrc + '"]', ExternalInterface.objectID);
+	  } else {
+	    _app.model.src = String(pSrc);
+	  }
+	  _app.model.src = src;
         }
         
         private function onLoadCalled():void{
