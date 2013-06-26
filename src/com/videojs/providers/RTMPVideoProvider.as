@@ -35,6 +35,7 @@ package com.videojs.providers{
         
         private var _src:Object;
         private var _metadata:Object;
+        private var _hasDuration:Boolean = false;
         private var _isPlaying:Boolean = false;
         private var _isPaused:Boolean = true;
         private var _isBuffering:Boolean = false;
@@ -42,6 +43,7 @@ package com.videojs.providers{
         private var _isLive:Boolean = false;
         private var _canSeekAhead:Boolean = false;
         private var _hasEnded:Boolean = false;
+        private var _reportEnded:Boolean = false;
         private var _canPlayThrough:Boolean = false;
         private var _loop:Boolean = false;
         
@@ -169,8 +171,7 @@ package com.videojs.providers{
         }
         
         public function get ended():Boolean{
-            
-            return false;
+            return _reportEnded;
         }
         
         public function get seeking():Boolean{
@@ -186,6 +187,7 @@ package com.videojs.providers{
         }
         
         public function set src(pSrc:Object):void{
+            _hasDuration = false;
             if(_isPlaying){
                 _ns.close();
                 _loadErrored = false;
@@ -232,14 +234,23 @@ package com.videojs.providers{
                 _metadata = {};
                 initNetConnection();
             }
-            // if the asset is already loading
-            else{
+            // if the asset is paused
+            else if(_isPaused && !_reportEnded){
                 _pausePending = false;
                 _ns.resume();
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-                _model.broadcastEventExternally(ExternalEventName.ON_START);
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
+            }
+            // video playback ended, seek to beginning
+            else if(_hasEnded){
+                _ns.seek(0);
+                _isPlaying = true;
+                _isPaused = false;
+                _hasEnded = false;
+                _reportEnded = false;
+                _isBuffering = true;
+                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
             }
         }
         
@@ -252,6 +263,10 @@ package com.videojs.providers{
                     _pausePending = true;
                 }
             }
+            else if(_hasEnded && !_isPaused) {
+                _isPaused = true;
+                _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
+            }
         }
         
         public function resume():void{
@@ -259,7 +274,6 @@ package com.videojs.providers{
                 _ns.resume();
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-                _model.broadcastEventExternally(ExternalEventName.ON_START);
             }
         }
         
@@ -274,7 +288,9 @@ package com.videojs.providers{
                 _ns.seek(pTime);
                 _isPlaying = true;
                 _hasEnded = false;
+                _reportEnded = false;
                 _isBuffering = true;
+                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
             }
         }
         
@@ -301,6 +317,7 @@ package com.videojs.providers{
                 _ns.close();
                 _isPlaying = false;
                 _hasEnded = true;
+                _reportEnded = true;
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {}));
                 _throughputTimer.stop();
                 _throughputTimer.reset();
@@ -349,6 +366,7 @@ package com.videojs.providers{
             _ns.bufferTime = 1;
             _ns.play(_src.streamURL);
             _videoReference.attachNetStream(_ns);
+            _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
         
@@ -416,22 +434,23 @@ package com.videojs.providers{
                     
                     break;
                 case "NetStream.Play.Start":
-                    _metadata = null;
                     _canPlayThrough = false;
                     _hasEnded = false;
+                    _reportEnded = false;
                     _isBuffering = true;
                     _currentThroughput = 0;
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     if(_pauseOnStart && _loadStarted == false){
                         _ns.pause();
                         _isPaused = true;
                     }
                     else{
-                        _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                        if (!_isPlaying) {
+                            _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                        }
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));
                     }
                     _loadStarted = true;
@@ -451,22 +470,29 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Buffer.Empty":
-                    _isBuffering = true;
-                    _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
+                    // playback is over
+                    if (_hasEnded) {
+                        if(!_loop){
+                            _isPlaying = false;
+                            _hasEnded = true;
+                            _reportEnded = true;
+                            _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
+                            _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
+                        }
+                        else{
+                            _ns.seek(0);
+                        }
+                    }
+                    // other stream buffering
+                    else {
+                        _isBuffering = true;
+                        _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
+                    }
+
                     break;
                 
                 case "NetStream.Play.Stop":
-                    
-                    if(!_loop){
-                        _isPlaying = false;
-                        _hasEnded = true;
-                        _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
-                        _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
-                    }
-                    else{
-                        _ns.seek(0);
-                    }
-                    
+                    _hasEnded = true;
                     _throughputTimer.stop();
                     _throughputTimer.reset();
                     break;
@@ -482,7 +508,7 @@ package com.videojs.providers{
                     _throughputTimer.reset();
                     _throughputTimer.start();
                     
-                    break;    
+                    break;
                 
                 case "NetStream.Play.StreamNotFound":
                     _loadErrored = true;
@@ -510,7 +536,10 @@ package com.videojs.providers{
             if(pMetaData.duration != undefined){
                 _isLive = false;
                 _canSeekAhead = true;
-                _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _metadata.duration);
+                if (!_hasDuration) {
+                    _hasDuration = true;
+                    _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _metadata.duration);
+                }
             }
             else{
                 _isLive = true;
@@ -529,6 +558,10 @@ package com.videojs.providers{
         }
         
         public function onPlayStatus(e:Object):void{
+
+        }
+
+        public function onBWDone():void{
 
         }
     }
