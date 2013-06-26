@@ -205,9 +205,19 @@ package com.videojs{
         public function set rtmpStream(pValue:String):void{
             _src = "";
             _rtmpStream = pValue;
-            _currentPlaybackType = PlaybackType.RTMP;
             broadcastEventExternally(ExternalEventName.ON_SRC_CHANGE, _src);
-            initProvider();
+            if (_provider != null && _currentPlaybackType == PlaybackType.RTMP) {
+                var __src:Object = {
+                    connectionURL: _rtmpConnectionURL,
+                    streamURL: _rtmpStream
+                };
+                _provider.src = __src;
+            }
+            else {
+                _currentPlaybackType = PlaybackType.RTMP;
+                initProvider();
+            }
+
             if(_autoplay){
                 play();
             }
