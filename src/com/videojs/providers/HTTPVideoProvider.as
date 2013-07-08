@@ -15,7 +15,7 @@ package com.videojs.providers{
     import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
-    
+
     public class HTTPVideoProvider extends EventDispatcher implements IProvider{
         
         private var _nc:NetConnection;
@@ -341,6 +341,11 @@ package com.videojs.providers{
             _ns.bufferTime = .5;
             _ns.play(_src.path);
             _videoReference.attachNetStream(_ns);
+
+            if (_src.path === null) {
+              _pausePending = true;
+              _loadStarted = true;
+            }
             
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
