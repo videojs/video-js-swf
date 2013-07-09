@@ -9,13 +9,15 @@ Installation
 
 2. Install [Apache Flex](http://flex.apache.org/installer.html).  There's no need to install any of the optional items.
 
-3. One additional item needs to be downloaded for the Flex SDK.  Subsitute in the location of your Flex SDK directory in both lines below.
+3. Run the setup.sh script. Supply your video.js and Flex SDK directories as the first and second arguments:
 
-    ```bash
-    mkdir [flex_sdk_dir]/frameworks/libs/player/10.3/
-    curl -o [flex_sdk_dir]/frameworks/libs/player/10.3/playerglobal.swc http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc
-    ```
-    
+   ```bash
+   ./setup.sh [video_js_dir] [flex_sdk_dir]
+   ```
+   This script will do the following:
+   - Create a new directory in your Flex SDK for the playerglobal10_3.swc, and download it
+   - Create bin-debug and bin-release directories
+.
 4. Install a simple HTTP server for simpler testing.
 
     ```bash

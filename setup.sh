@@ -6,23 +6,45 @@
 # From a shell prompt: sh setup.sh video-js-location
 
 video_js=$1
-if [ -z "$video_js" ]
+flex_sdk=$2
+start_dir=`pwd`
+
+if [ -z "$video_js" ] && [ -z "$flex_sdk" ] ;
 then
   video_js="$VIDEO_JS"
   if [ -z "$video_js" ]
   then
-    echo "setup.sh video_js_dir"
-    exit 1;
+    echo "Usage: setup.sh video_js_dir flex_sdk_dir" ;
+    exit 1 ;
   fi
 fi
 
-mkdir -p bin-debug
-cp -r "$video_js/dist/video-js/" bin-debug
-rm bin-debug/video-js.swf
-cp -f demo.html bin-debug/
+if [ ! -d "$video_js" ] ;
+then
+  echo 'No Video.js found at ' "$video_js" ;
+  exit 1 ;
+fi
 
-mkdir -p bin-release
-cp -rf bin-debug/ bin-release/
-sed -i.bak 's/VideoJS.swf/video-js.swf/' bin-release/demo.html
+if [ ! -d "$flex_sdk" ] ;
+then
+  echo 'No Flex SDK found at ' "$flex_sdk" ;
+  exit 1 ;
+fi
 
+echo "Downloading the Flash 10.3 playerglobal.swc" ;
+cd "$flex_sdk" ;
+mkdir -p frameworks/libs/player/10.3 ;
+curl -o frameworks/libs/player/10.3/playerglobal.swc "http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc" ;
 
+echo "Setting up bin-debug and bin-release directories" ;
+cd "$start_dir" ;
+mkdir -p bin-debug ;
+cp -r "$video_js/dist/video-js/" bin-debug ;
+rm bin-debug/video-js.swf ;
+cp -f demo.html bin-debug/ ;
+
+mkdir -p bin-release ;
+cp -rf bin-debug/ bin-release/ ;
+sed -i.bak 's/VideoJS.swf/video-js.swf/' bin-release/demo.html ;
+
+echo "Finished." ;
