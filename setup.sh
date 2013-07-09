@@ -16,13 +16,15 @@ then
   fi
 fi
 
+echo "Setting up Video.js and demo files in bin-debug..."
+
 mkdir -p bin-debug
 cp -r "$video_js/dist/video-js/" bin-debug
 rm bin-debug/video-js.swf
 cp -f demo.html bin-debug/
 
+echo "Copying files to bin-release..."
+
 mkdir -p bin-release
 cp -rf bin-debug/ bin-release/
 sed -i.bak 's/VideoJS.swf/video-js.swf/' bin-release/demo.html
-
-
