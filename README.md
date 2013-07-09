@@ -9,7 +9,7 @@ Installation
 
 2. Install [Apache Flex](http://flex.apache.org/installer.html).  There's no need to install any of the optional items.
 
-3. Go into video-js-swf and run the setup.sh script. Supply your video.js and Flex SDK directories as the first and second arguments:
+3. Go into video-js-swf and run the setup.sh script with your video.js and Flex SDK directories as the first and second arguments:
 
    ```bash
    ./setup.sh [video_js_dir] [flex_sdk_dir]
