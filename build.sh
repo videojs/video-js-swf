@@ -4,7 +4,20 @@
 
 # From a shell prompt: sh build.sh
 
+flex_sdk=$1
+if [ -z "$flex_sdk" ]
+then
+  flex_sdk="$FLEX_SDK"
+  if [ -z "$flex_sdk" ]
+  then
+    echo "build.sh flex_sdk_dir"
+    exit 1;
+  fi
+fi
+
 echo "Compiling video-js.swf..."
 
-# Make sure the path to mxmlc is correct!
-/Developer/SDKs/flex_sdk_4/bin/mxmlc ./src/VideoJS.as -o ./bin-release/video-js.swf -use-network=false -static-link-runtime-shared-libraries=true
+# TODO: fix starting comment
+# copy video-js.swf to video.js 
+
+$flex_sdk/bin/mxmlc ./src/VideoJS.as -o ./bin-release/video-js.swf -target-player=10.3

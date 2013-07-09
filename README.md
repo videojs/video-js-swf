@@ -1,8 +1,38 @@
+The light-weight Flash video player that makes Flash work like HTML5 video. This allows player skins, plugins, and other features to work with both HTML5 and Flash
+
+TODO: note that this project isn't needed to use the SWF.  Just use video.js for that.
+
 Installation
 ============
 
-* You will need a copy of the Flex 4+ SDK in order to build this project.  A copy can be pulled from [here](http://www.adobe.com/devnet/flex/flex-sdk-download-all.html).  Place it in the location of your choice.
+1. Go through the Getting started section for  [Video.js](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md) 
 
-* Open up build.sh and modify "/Developer/SDKs/flex_sdk_4/bin/mxmlc" to point to the location of the mxmlc file on your file system.
+2. Install [Apache Flex](http://flex.apache.org/installer.html).  There's no need to install any of the optional items.
 
-* Type sh build.sh into your terminal.  The SWF should be built into the bin-release folder. 
+3. One additional item needs to be downloaded for the Flex SDK.  Subsitute in the location of your Flex SDK directory in both lines below.
+
+    mkdir [flex_sdk_dir]/frameworks/libs/player/10.3/
+    curl -o [flex_sdk_dir]/frameworks/libs/player/10.3/playerglobal.swc http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc
+
+4. Install a simple HTTP server for simpler testing.
+
+    npm -g install simple-http-server
+
+5. Set up the local testing directories, bin-release and bin-debug, with setup.sh.  Make sure to include the path to Video.js as the first argument to the script.
+
+    ./setup.sh [video_js_dir]
+
+6. Build video-js.swf using build.sh.  Make sure to include the path to the Flex SDK as the first argument to the script.
+
+    ./build.sh [flex_sdk_dir]
+
+7. Start running the simple HTTP server from the command-line
+
+    nserver
+
+And then you can see the demo working: [http://localhost:8000/bin-release/demo.html]
+
+Using with Your IDE
+============
+
+TODO: make a note about .actionScriptProperties checked in and generally ready to use with bin-debug.  Need to point the output URL to launch to http://localhost:8000/bin-release/demo.html and have nserver running
