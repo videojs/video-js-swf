@@ -12,7 +12,7 @@
 		 import org.flexunit.internals.TraceListener;
          import org.flexunit.listeners.UIListener;
          import org.flexunit.runner.FlexUnitCore;
-         import com.videojs.test.VideoJSModelTest;
+         import com.videojs.test.suite.VideoJSTestSuite;
 		  
          public function runTests() : void {
 			var core : FlexUnitCore = new FlexUnitCore();
@@ -26,7 +26,7 @@
 			//core.addListener( new TraceListener() ); - For AS3 Projects
 			//core.addListener( TextListener.getDefaultTextListener( LogEventLevel.DEBUG ) ); - For Flex Projects
 			
-            core.run(VideoJSModelTest);
+            core.run(VideoJSTestSuite);
          }
       ]]>
    </mx:Script>

@@ -33,6 +33,7 @@
     <sourceAttachmentPath/>
   </compiler>
   <applications>
+    <application path="FlexUnitCompilerApplication.as"/>
     <application path="FlexUnitApplication.as"/>
     <application path="VideoJS.as"/>
   </applications>
