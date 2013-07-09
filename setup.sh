@@ -31,18 +31,19 @@ then
   exit 1 ;
 fi
 
-echo "Downloading the Flash 10.3 playerglobal.swc" ;
+echo "Downloading the Flash 10.3 playerglobal.swc..." ;
 cd "$flex_sdk" ;
 mkdir -p frameworks/libs/player/10.3 ;
 curl -o frameworks/libs/player/10.3/playerglobal.swc "http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc" ;
 
-echo "Setting up bin-debug and bin-release directories" ;
+echo "Setting up Video.js and demo files in bin-debug..."
 cd "$start_dir" ;
 mkdir -p bin-debug ;
 cp -r "$video_js/dist/video-js/" bin-debug ;
 rm bin-debug/video-js.swf ;
 cp -f demo.html bin-debug/ ;
 
+echo "Setting up Video.js and demo files in bin-release..."
 mkdir -p bin-release ;
 cp -rf bin-debug/ bin-release/ ;
 sed -i.bak 's/VideoJS.swf/video-js.swf/' bin-release/demo.html ;
