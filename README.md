@@ -1,8 +1,55 @@
+The light-weight Flash video player that makes Flash work like HTML5 video. This allows player skins, plugins, and other features to work with both HTML5 and Flash
+
+This project doesn't need to be used if you simply want to use the Flash video player.  Head back to the main Video.js project if that's all you need, as the compiled SWF is checked in there.
+
 Installation
 ============
 
-* You will need a copy of the Flex 4+ SDK in order to build this project.  A copy can be pulled from [here](http://www.adobe.com/devnet/flex/flex-sdk-download-all.html).  Place it in the location of your choice.
+1. Go through the Getting started section for [Video.js](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md) 
 
-* Open up build.sh and modify "/Developer/SDKs/flex_sdk_4/bin/mxmlc" to point to the location of the mxmlc file on your file system.
+2. Install [Apache Flex](http://flex.apache.org/installer.html).  There's no need to install any of the optional items.
 
-* Type sh build.sh into your terminal.  The SWF should be built into the bin-release folder. 
+3. In the base directory of video-js-swf, you'll see a setup.sh script.  Make sure to include the path to Video.js and Flex SDK as arguments to the script.
+
+   ```bash
+   ./setup.sh [video_js_dir] [flex_sdk_dir]
+   ```
+   This script will do the following:
+   - Create a new directory in your Flex SDK for playerglobal10_3.swc, and download this file.
+   - Set up the bin-debug and bin-release directories.
+.
+4. Install a simple HTTP server for simpler testing.
+
+    ```bash
+    npm -g install simple-http-server
+    ```
+    
+5. Build video-js.swf using build.sh.  Make sure to include the path to the Flex SDK as an argument to the script.
+
+    ```bash
+    ./build.sh [flex_sdk_dir]
+    ```
+
+   This script will do the following:
+   - Compile the source into bin-release using the release compiler settings.
+   - Copy the SWF into [video.js]/src/swf/video-js.swf
+    
+7. Start running the simple HTTP server from the command-line.
+
+    ```bash
+    nserver
+    ```
+    
+Now you can see the demo working with your newly-built code: [http://localhost:8000/bin-release/demo.html]
+
+You can keep using build.sh to rebuild the Flash code.
+
+Using with Your IDE
+============
+
+The bin-debug directory is set up for usage with your IDE
+
+If you don't want to keep using build.sh to build the code, the bin-debug directory is set up for use with your IDE.  It is similar to the bin-release directory, except that the SWF name is expected to be VideoJS.swf.  This works better with some IDEs that expect the SWF name to be the same as the main class name.
+
+You can also use the given .actionscriptProperties with Flash Builder.  It is set up to use bin-debug and generally ready to use.  When you want to run the project, set the output URL to http://localhost:8000/bin-release/demo.html.  As long as nserver is running, you should get the latest code you compile there.
+
