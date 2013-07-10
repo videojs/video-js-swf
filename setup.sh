@@ -23,7 +23,7 @@ fi
 
 echo "Downloading the Flash 10.3 playerglobal.swc..." 
 mkdir -p "$flex_sdk/frameworks/libs/player/10.3"
-curl -o "$flex_sdk/frameworks/libs/player/10.3/playerglobal.swc" "http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc"
+curl --silent -o "$flex_sdk/frameworks/libs/player/10.3/playerglobal.swc" "http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc"
 
 echo "Setting up Video.js and demo files in bin-debug..."
 mkdir -p bin-debug
