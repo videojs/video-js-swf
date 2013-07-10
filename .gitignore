@@ -1,7 +1,4 @@
 .DS_Store
 test/*
-bin-release/*.html
-bin-release/css*
-bin-release/img*
-bin-release/js*
-bin-release/mp3*
+bin-release
+bin-debug
