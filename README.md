@@ -49,7 +49,7 @@ Using with Your IDE
 
 The bin-debug directory is set up for usage with your IDE
 
-If you don't want to keep using build.sh to build the code, the bin-debug directory is set up for usage with your IDEA.  It is similar to the bin-release directory, except that the SWF name is expected to be VideoJS.swf.  This works better with some IDEs that expect the SWF name to be the same as the main class name.
+If you don't want to keep using build.sh to build the code, the bin-debug directory is set up for use with your IDE.  It is similar to the bin-release directory, except that the SWF name is expected to be VideoJS.swf.  This works better with some IDEs that expect the SWF name to be the same as the main class name.
 
 You can also use the given .actionscriptProperties with Flash Builder.  It is set up to use bin-debug and generally ready to use.  When you want to run the project, set the output URL to http://localhost:8000/bin-release/demo.html.  As long as nserver is running, you should get the latest code you compile there.
 
