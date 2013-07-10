@@ -13,5 +13,5 @@ fi
 echo "Compiling test-video-js.swf..."
 
 $flex_sdk/bin/mxmlc ./src/AirTestRunner.mxml -o ./bin-debug/test-video-js.swf -use-network=false -static-link-runtime-shared-libraries=true -library-path+=libs
-
-echo "SWF compiled to bin-debug/test-video-js.swf.  Open the SWF to see results"
+open ./bin-debug/test-video-js.swf
+echo "SWF compiled to bin-debug/test-video-js.swf."
