@@ -62,8 +62,6 @@ The unit tests can be found in [project root]/src/com/videojs/test/
 
 In order to run the tests:
 
-    ```bash
     ./test.sh
-    ```
 
 A copy of the produced swf will also be compiled into the bin-debug folder.
