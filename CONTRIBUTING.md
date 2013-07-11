@@ -29,6 +29,17 @@ git pull upstream master
         
 4. Create a new branch for your work.
 
+4. Since you've installed and built video.js already, you may already be familiar with the [Zencoder Contribflow](https://github.com/zencoder/contribflow) node moule.  You can use Contribflow to simplify your workflow with video-js-swf too!
+If you haven't done it already, you can install Contribflow easily.
+  
+  On Unix-based systems, you'll have to do this as a superuser:
+  `sudo npm install -g contribflow`
+
+  On Windows, you can just run:
+  `npm install -g contribflow`
+
+5. Create a new branch for your work.
+
   Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
   Next, create the branch. You'll use contrib to do this task.
 
@@ -44,7 +55,7 @@ git pull upstream master
 
   You will be prompted to name the branch.  After that, contrib will create the branch locally, and use git to push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug!
 
-5. Thoroughly test your feature or fix. In addition to new unit tests, and testing the area(s) specific to the area you're working on, a brief smoketest of the player never hurts. We'd like to suggest this short smoke test with both FLV and MP4 video formats:
+6. Thoroughly test your feature or fix. In addition to new unit tests, and testing the area(s) specific to the area you're working on, a brief smoketest of the player never hurts. We'd like to suggest this short smoke test with both FLV and MP4 video formats:
   1. Playback should start after clicking Play overlay
   2. Playback should start after clicking Play button
   3. Playback should pause when clicking the Pause button
@@ -55,7 +66,7 @@ git pull upstream master
 
   (This may seem like a lot of steps, but they could all be accomplished with a couple of short-duration test files, within a few minutes.)
 
-6. Use contrib to submit your [Pull Request](#pull-requests).
+7. Use contrib to submit your [Pull Request](#pull-requests).
 
   First, checkout your feature or issue branch:
   ```bash
