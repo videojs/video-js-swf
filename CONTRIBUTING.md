@@ -91,11 +91,9 @@ A bug is a demonstrable problem that is caused by the code in the repository. Go
 
 Guidelines for bug reports:
 
-    Use the GitHub issue search — check if the issue has already been reported.
-
-    Check if the issue has been fixed — try to reproduce it using the latest master branch in the repository.
-
-    Isolate the problem — ideally create a reduced test case and a live example.
+- Use the GitHub issue search — check if the issue has already been reported.
+- Check if the issue has been fixed — try to reproduce it using the latest master branch in the repository.
+- Isolate the problem — ideally create a reduced test case and a live example.
 
 A good bug report should be as detailed as possible, so that others won't have to follow up for the essential details.
 
@@ -121,13 +119,10 @@ NOTE: Testing Flash Locally in Chrome
 
 Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you can do either of the following:
 
-    Do your development and testing using a local HTTP server.
-
-    Disable the version of Flash included with Chrome and enable a system-wide version of Flash instead.
+1. Do your development and testing using a local HTTP server.
+2. Disable the version of Flash included with Chrome and enable a system-wide version of Flash instead.
 
 Other Video.js Pojects
-
-    Video.js - Our open source HTML5 & Flash video player.
-
-    Videojs.com - The public site with helpful tools and information about Video.js.
+Video.js - Our open source HTML5 & Flash video player.
+Videojs.com - The public site with helpful tools and information about Video.js.
 
