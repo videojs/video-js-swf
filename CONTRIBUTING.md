@@ -1,9 +1,9 @@
-If you're on this page, you must be interested in spending some time giving back to this humble project. If that's the case, here are some ways you can help build the future of the Video.js SWF.
+If you're on this page, you must be interested in spending some time giving back to this humble project. If that's the case, here are some ways you can help build the future of the Video.js SWF:
 
-    Features and changes
-    Bug reports and fixes
-    Answer questions on Stack Overflow
-    Related Video.js projects
+- Features and changes
+- Bug reports and fixes
+- Answer questions on Stack Overflow
+- Related Video.js projects
 
 Getting started
 
