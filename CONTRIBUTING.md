@@ -27,35 +27,9 @@ git pull upstream master
 
   If you're fixing a bug, please submit an issue for it. If you're fixing an existing bug, claim it by adding a comment to it. This will give a heads-up to anyone watching the issue that you're working on a fix. Please refer to the [Filing Bugs](#bugs) section below for some guidelines on filing new issues.
         
-4. Create a new branch for your work.
+4. Create a new branch for your work, and make your changes.
 
-4. Since you've installed and built video.js already, you may already be familiar with the [Zencoder Contribflow](https://github.com/zencoder/contribflow) node moule.  You can use Contribflow to simplify your workflow with video-js-swf too!
-If you haven't done it already, you can install Contribflow easily.
-  
-  On Unix-based systems, you'll have to do this as a superuser:
-  `sudo npm install -g contribflow`
-
-  On Windows, you can just run:
-  `npm install -g contribflow`
-
-5. Create a new branch for your work.
-
-  Since the issue filing process is described elsewhere, let's assume that you've filed or claimed the issue already.
-  Next, create the branch. You'll use contrib to do this task.
-
-  Run this command for new features:
-  ```bash
-  contrib feature start
-  ```
-
-  Run this command if you're fixing an issue:
-  ```bash
-  contrib hotfix start
-  ```
-
-  You will be prompted to name the branch.  After that, contrib will create the branch locally, and use git to push it up to your origin, and track it.  You're now ready to start building your feature or fixing that bug!
-
-6. Thoroughly test your feature or fix. In addition to new unit tests, and testing the area(s) specific to the area you're working on, a brief smoketest of the player never hurts. We'd like to suggest this short smoke test with both FLV and MP4 video formats:
+5. Thoroughly test your feature or fix. In addition to new unit tests, and testing the area(s) specific to the area you're working on, a brief smoketest of the player never hurts. We'd like to suggest this short smoke test with both FLV and MP4 video formats:
   1. Playback should start after clicking Play overlay
   2. Playback should start after clicking Play button
   3. Playback should pause when clicking the Pause button
@@ -66,23 +40,7 @@ If you haven't done it already, you can install Contribflow easily.
 
   (This may seem like a lot of steps, but they could all be accomplished with a couple of short-duration test files, within a few minutes.)
 
-7. Use contrib to submit your [Pull Request](#pull-requests).
-
-  First, checkout your feature or issue branch:
-  ```bash
-  git checkout (branchname)
-  ```
-
-  Next, submit your Pull Request, for your new feature:
-  ```bash
-  contrib feature submit
-  ```
-  Or for your bug fix:
-  ```bash
-  contrib hotfix submit
-  ```
-
-  You'll be prompted for title and description for the Pull Request.  After that, contrib will use Git to submit your Pull Request to video-js-swf.
+6. After committing your changes to your fork of the repo, submit your [Pull Request](#pull-requests).
 
 ##Filing Bugs
 
