@@ -330,7 +330,7 @@ package com.videojs.providers{
         public function die():void{
             
         }
-        
+                
         private function initNetConnection():void{
             if(_nc == null){
                 _nc = new NetConnection();
@@ -555,9 +555,32 @@ package com.videojs.providers{
         public function onPlayStatus(e:Object):void{
 
         }
-
-        public function onBWDone():void{
-
+        
+        /**
+         * Called from FMS when bandwidth detection is completed.
+         */
+        public function onBWDone(... pRest):void {        
+            // no op for now but needed by NetConnection
         }
+        
+        /**
+         * Called from FMS when subscribing to live streams.
+         */
+        public function onFCSubscribe(pInfo:Object):void {
+            // no op for now but needed by NetConnection            
+        }
+        
+        /**
+         * Called from FMS when unsubscribing to live streams.
+         */
+        public function onFCUnsubscribe(pInfo:Object):void {
+            // no op for now but needed by NetConnection            
+        }        
+        
+        /**
+         * Called from FMS for NetStreams. Incorrectly used for NetConnections as well.
+         * This is here to prevent runtime errors.
+         */
+        public function streamInfo(pObj:Object):void {}        
     }
 }
