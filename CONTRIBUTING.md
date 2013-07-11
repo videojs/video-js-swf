@@ -5,7 +5,7 @@ If you're on this page, you must be interested in spending some time giving back
 - Answer questions on Stack Overflow
 - Related Video.js projects
 
-Getting started
+##Getting Started
 
 1. Fork the video-js-swf git repository. At the top of every github page, there is a Fork button. Click it, and the forking process will copy video-js-swf into your organization. You can find more information on Forking a Github repository here.
 
@@ -84,8 +84,7 @@ If you haven't done it already, you can install Contribflow easily.
 
   You'll be prompted for title and description for the Pull Request.  After that, contrib will use Git to submit your Pull Request to video-js-swf.
 
-
-Filing Bugs
+##Filing Bugs
 
 A bug is a demonstrable problem that is caused by the code in the repository. Good bug reports are extremely helpful. Thank You!
 
@@ -115,7 +114,7 @@ Here's an example:
 
     Any other information you want to share that is relevant to the issue being reported. This might include the lines of code that you have identified as causing the bug, and potential solutions (and your opinions on their merits).
 
-NOTE: Testing Flash Locally in Chrome
+####NOTE: Testing Flash Locally in Chrome
 
 Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you can do either of the following:
 
