@@ -121,7 +121,7 @@ Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded 
 1. Do your development and testing using a local HTTP server.
 2. Disable the version of Flash included with Chrome and enable a system-wide version of Flash instead.
 
-Other Video.js Pojects
+Other Video.js Projects
 Video.js - Our open source HTML5 & Flash video player.
 Videojs.com - The public site with helpful tools and information about Video.js.
 
