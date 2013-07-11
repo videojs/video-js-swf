@@ -56,7 +56,6 @@ package com.videojs.providers{
             _rtmpRetryTimer.addEventListener(TimerEvent.TIMER, onRTMPRetryTimerTick);
             _throughputTimer = new Timer(250, 0);
             _throughputTimer.addEventListener(TimerEvent.TIMER, onThroughputTimerTick);
-
         }
 
         public function get loop():Boolean{
@@ -429,9 +428,6 @@ package com.videojs.providers{
         private function onNetStreamStatus(e:NetStatusEvent):void{
             switch(e.info.code){
                 case "NetStream.Play.Reset":
-                    
-                    
-                    
                     break;
                 case "NetStream.Play.Start":
                     _canPlayThrough = false;
@@ -516,7 +512,6 @@ package com.videojs.providers{
                     break;
                 
                 default:
-                    
                     if(e.info.level == "error"){
                         _model.broadcastErrorEventExternally(e.info.code);
                         _model.broadcastErrorEventExternally(e.info.description);
