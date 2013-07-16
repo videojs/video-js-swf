@@ -2,12 +2,14 @@ package{
     
     import com.videojs.VideoJSApp;
     import com.videojs.events.VideoJSEvent;
+    import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.ExternalErrorEventName;
     
     import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.events.Event;
+    import flash.events.MouseEvent;
     import flash.events.TimerEvent;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
@@ -120,10 +122,10 @@ package{
                 _app.model.srcFromFlashvars = String(loaderInfo.parameters.src);
             }
             else{
-                if(loaderInfo.parameters.RTMPConnection != undefined && loaderInfo.parameters.RTMPConnection != ""){
-                    _app.model.rtmpConnectionURL = loaderInfo.parameters.RTMPConnection;
+                if(loaderInfo.parameters.rtmpConnection != undefined && loaderInfo.parameters.rtmpConnection != ""){
+                    _app.model.rtmpConnectionURL = loaderInfo.parameters.rtmpConnection;
                 }
-                if(loaderInfo.parameters.RTMPStream != undefined && loaderInfo.parameters.RTMPStream != ""){
+                if(loaderInfo.parameters.rtmpStream != undefined && loaderInfo.parameters.rtmpStream != ""){
                     _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
                 }
             }
@@ -141,6 +143,7 @@ package{
         }
         
         private function onAddedToStage(e:Event):void{
+            stage.addEventListener(MouseEvent.CLICK, onStageClick);
             stage.addEventListener(Event.RESIZE, onStageResize);
             stage.scaleMode = StageScaleMode.NO_SCALE;
             stage.align = StageAlign.TOP_LEFT;
@@ -244,12 +247,17 @@ package{
                 case "videoHeight":
                     return _app.model.videoHeight;
                     break;
+                case "rtmpConnection":
+                    return _app.model.rtmpConnectionURL;
+                    break;     
+                case "rtmpStream":
+                    return _app.model.rtmpStream;
+                    break;                                       
             }
             return null;
         }
         
-        private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
-
+        private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{            
             switch(pPropertyName){
                 case "mode":
                     _app.model.mode = String(pValue);
@@ -288,10 +296,10 @@ package{
                 case "volume":
                     _app.model.volume = Number(pValue);
                     break;
-                case "RTMPConnection":
+                case "rtmpConnection":
                     _app.model.rtmpConnectionURL = String(pValue);
                     break;
-                case "RTMPStream":
+                case "rtmpStream":
                     _app.model.rtmpStream = String(pValue);
                     break;
                 default:
@@ -330,6 +338,10 @@ package{
         
         private function onUncaughtError(e:Event):void{
             e.preventDefault();
+        }
+
+        private function onStageClick(e:MouseEvent):void{
+            _app.model.broadcastEventExternally(ExternalEventName.ON_STAGE_CLICK);
         }
         
     }
