@@ -312,9 +312,32 @@ package com.videojs.providers{
         public function attachVideo(pVideo:Video):void{
             _videoReference = pVideo;
         }
-        
+
         public function die():void{
-            
+            if(_videoReference)
+            {
+                _videoReference.attachNetStream(null);
+            }
+
+            if( _ns )
+            {
+                try {
+                    _ns.close();
+                    _ns = null;
+                } catch( err: Error ) {
+
+                }
+            }
+
+            if( _nc )
+            {
+                try {
+                    _nc.close();
+                    _nc = null;
+                } catch( err: Error ) {
+
+                }
+            }
         }
         
         private function initNetConnection():void{
