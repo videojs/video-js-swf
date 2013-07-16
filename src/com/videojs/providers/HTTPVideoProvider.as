@@ -312,22 +312,65 @@ package com.videojs.providers{
         public function attachVideo(pVideo:Video):void{
             _videoReference = pVideo;
         }
-        
+
         public function die():void{
-            
+            if(_videoReference)
+            {
+                _videoReference.attachNetStream(null);
+            }
+
+            if( _ns )
+            {
+                try {
+                    _ns.close();
+                    _ns = null;
+                } catch( err: Error ) {
+
+                }
+            }
+
+            if( _nc )
+            {
+                try {
+                    _nc.close();
+                    _nc = null;
+                } catch( err: Error ) {
+
+                }
+            }
+
+            if(_throughputTimer)
+            {
+                try {
+                    _throughputTimer.stop();
+                    _throughputTimer = null;
+                } catch( err: Error ) {
+
+                }
+            }
         }
         
         private function initNetConnection():void{
-            if(_nc == null){
-                _nc = new NetConnection();
-                _nc.client = this;
-                _nc.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
+
+            if(_nc != null) {
+                try {
+                    _nc.close();
+                } catch( err: Error ) {
+
+                }
+                _nc.removeEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
+                _nc = null;
             }
+
+            _nc = new NetConnection();
+            _nc.client = this;
+            _nc.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
             _nc.connect(null);
         }
         
         private function initNetStream():void{
             if(_ns != null){
+                _ns.close();
                 _ns.removeEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
                 _ns = null;
             }
