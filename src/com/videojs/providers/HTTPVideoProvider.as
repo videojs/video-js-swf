@@ -338,6 +338,16 @@ package com.videojs.providers{
 
                 }
             }
+
+            if(_throughputTimer)
+            {
+                try {
+                    _throughputTimer.stop();
+                    _throughputTimer = null;
+                } catch( err: Error ) {
+
+                }
+            }
         }
         
         private function initNetConnection():void{
