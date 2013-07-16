@@ -314,7 +314,16 @@ package com.videojs.providers{
         }
         
         public function die():void{
-            
+            if(_ns != null) {
+                _ns.close();
+                _ns = null;
+            }
+            if(_nc != null) {
+                _nc.close();
+                _nc = null;
+            }
+            _throughputTimer.stop();
+            _throughputTimer.reset();
         }
         
         private function initNetConnection():void{
@@ -322,13 +331,14 @@ package com.videojs.providers{
                 _nc = new NetConnection();
                 _nc.client = this;
                 _nc.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
+                _nc.connect(null);
             }
-            _nc.connect(null);
         }
         
         private function initNetStream():void{
             if(_ns != null){
                 _ns.removeEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
+                _ns.close();
                 _ns = null;
             }
             _ns = new NetStream(_nc);
