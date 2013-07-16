@@ -5,7 +5,7 @@ This project doesn't need to be used if you simply want to use the Flash video p
 Installation
 ============
 
-1. Go through the Getting started section for [Video.js](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md) 
+1. Go through the Getting started section for [Video.js](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md).  Most importantly, you will need have already built video.js successfully before building video-js-swf.
 
 2. Install [Apache Flex](http://flex.apache.org/installer.html).  There's no need to install any of the optional items.
 
@@ -27,7 +27,7 @@ Installation
 5. Build video-js.swf using build.sh.  Make sure to include the path to the Flex SDK as an argument to the script.
 
     ```bash
-    ./build.sh [flex_sdk_dir]
+    ./build.sh [video_js_dir] [flex_sdk_dir]
     ```
 
    This script will do the following:
@@ -40,7 +40,8 @@ Installation
     nserver
     ```
     
-Now you can see the demo working with your newly-built code: [http://localhost:8000/bin-release/demo.html]
+Now you can see the demo working with your newly-built code: 
+Start the simple HTTP server in the video-js-swf root directory, and open your browser at [http://localhost:8000/bin-release/demo.html]
 
 You can keep using build.sh to rebuild the Flash code.
 
