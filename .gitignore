@@ -2,3 +2,4 @@
 test/*
 bin-release
 bin-debug
+*.iml

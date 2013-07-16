@@ -331,9 +331,18 @@ package com.videojs.providers{
         }
         
         public function attachVideo(pVideo:Video):void{}
-        
+
         public function die():void
         {
+            if(_soundChannel)
+            {
+                try{
+                    stop();
+                    _soundChannel = null;
+                } catch( err:Error ) {
+
+                }
+            }
         }
         
         private function doLoadCalculations():void{
