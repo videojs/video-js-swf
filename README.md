@@ -53,3 +53,15 @@ If you don't want to keep using build.sh to build the code, the bin-debug direct
 
 You can also use the given .actionscriptProperties with Flash Builder.  It is set up to use bin-debug and generally ready to use.  When you want to run the project, set the output URL to http://localhost:8000/bin-release/demo.html.  As long as nserver is running, you should get the latest code you compile there.
 
+Running Unit Tests
+===========
+
+This project uses FlexUnit which is built into [Adobe FlashBuilder](ihttp://www.adobe.com/products/flash-builder.html) and is also available on [GitHub](https://github.com/flexunit/flexunit) if you are only interested in the binaries.
+
+The unit tests can be found in [project root]/src/com/videojs/test/
+
+In order to run the tests:
+
+    ./test.sh
+
+A copy of the produced swf will also be compiled into the bin-debug folder.
