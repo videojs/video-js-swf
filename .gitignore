@@ -1,5 +1,6 @@
 .DS_Store
 test/*
 bin-release
-bin-debug
 *.iml
+bin-debug/VideoJS.swf
+

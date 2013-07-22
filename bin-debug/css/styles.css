@@ -1,0 +1,262 @@
+.clearfix:before, 
+.clearfix:after { 
+  content: "\0020"; 
+  display: block; 
+  height: 0; 
+  overflow: hidden; 
+}
+
+.clearfix:after { 
+  clear: both; 
+}
+
+.clearfix { 
+  zoom: 1; 
+}
+
+body{
+  padding-top: 50px;
+  background: #333;
+  color: #fff;
+  font-family: 'Lucida Sans', 'Lucida Grande', Helvetica, Arial, sans-serif;
+  font-size: 11px;
+}
+
+h1{
+  margin-bottom: 20px;
+  font-size: 1.4em;
+}
+
+p{
+  margin-bottom: 20px;
+  line-height: 1.4em;
+}
+
+ul{
+  margin-bottom: 20px;
+}
+
+li{
+  margin-left: 20px;
+  margin-bottom: 5px;
+}
+
+section{
+  width: 900px;
+}
+
+#videoPlayerWrapper{
+  width: 480px;
+  height: 270px;
+}
+
+#status{
+  width: 300px;
+  height: 270px;
+  background: #fff;
+  position: absolute;
+  top: 60px;
+  left: 850px;
+}
+
+#configuration{
+  display: none;
+}
+
+#control{
+  display: none;
+}
+
+#videoPlayerWrapper{
+  width:480px;
+  height:270px;
+  border: 1px dashed #fff;
+  background: #999;
+}
+
+div.tab-control ul{
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 0;
+  height: 30px;
+  overflow: hidden;
+}
+
+div.tab-control li{
+  display: block;
+  float: left;
+}
+
+div.tab-control li a{
+  display: block;
+  padding: 10px;
+  color: #999;
+  text-decoration: none;
+}
+
+div.tab-control li:first-child a{
+
+}
+
+div.tab-control li a.selected{
+  color: #333;
+}
+
+div.tab-control div.tab-content{
+  display: none;
+  overflow-y: auto;
+  margin: 10px;
+  height: 220px;
+  color: #0000FF;
+  border: 1px solid #ccc;
+}
+
+
+a.button {
+  display: inline-block;
+  vertical-align: middle;
+  padding: .5em 10px;
+  margin-bottom: 20px;
+  border: 1px solid #555;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+  
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 1px 2px rgba(0, 0, 0, 0.05);
+  
+  background-color: #878787;
+  background-repeat: repeat-x;
+  background-image: -moz-linear-gradient(#c1c1c1, #878787);
+  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#c1c1c1), to(#878787));
+  background-image: -webkit-linear-gradient(#c1c1c1, #878787);
+  background-image: -ms-linear-gradient(#c1c1c1, #878787);
+  background-image: linear-gradient(#c1c1c1, #878787);
+
+  font-family: 'OpenSansSemibold', 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+  font-size: 12px;
+  line-height: 1.5em;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  color: #ffffff;
+}
+
+a.button:hover {
+  background-position: 0 -10px;
+  text-decoration: none;
+}
+
+a.button:active {
+  -moz-box-shadow: inset 0px 0px 5px rgba(0,0,0,0.5);
+  -webkit-box-shadow: inset 0px 0px 5px rgba(0,0,0,0.5);
+  box-shadow: inset 0px 0px 5px rgba(0,0,0,0.5);
+}
+
+#propertiesTable{
+  width: 100%;
+}
+
+#propertiesTable tr{
+  border-bottom: 1px solid #ccc;
+}
+
+#propertiesTable tr:last-child{
+  border-bottom: 0;
+}
+
+#propertiesTable td{
+  padding: 10px;
+}
+
+#propertiesTable td.prop{
+  width: 60%;
+  text-align: right;
+  color: #333;
+}
+
+#propertiesTable td.value{
+  width: 40%;
+}
+
+/* Mini Grid System */
+
+.row{
+  padding: 1em 0 1em 0;
+  margin-left: -20px;
+}
+
+.row::before, .row::after {
+  display: table;
+  content: "";
+}
+
+.row::after {
+  clear: both;
+}
+
+.row .span1,
+.row .span2,
+.row .span3,
+.row .span4,
+.row .span5,
+.row .span6{
+  display: inline;
+  float: left;
+  margin-left: 20px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.row .span1{
+  width: 130px;
+}
+
+.row .span2{
+  width: 280px;
+}
+
+.row .span3{
+  width: 430px;
+}
+
+.row .span4{
+  width: 580px;
+}
+
+.row .span5{
+  width: 730px;
+}
+
+.row .span6{
+  width: 880px;
+}
+
+.row .offset1{
+  margin-left: 150px;
+}
+
+.row .offset2{
+  margin-left: 300px;
+}
+
+.row .offset3{
+  margin-left: 450px;
+}
+
+.row .offset4{
+  margin-left: 600px;
+}
+
+.row .offset5{
+  margin-left: 750px;
+}
+
+.white{
+  background: #fff;
+}
