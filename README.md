@@ -57,8 +57,6 @@ The integration tests can be found in [project root]/test
 
 In order to run all of the tests, run test.sh.
 
-    ```bash
     ./test.sh
-    ```
 
 A copy of the SWF produced for the unit tests will be compiled into the bin-debug folder.  Both the unit and integration tests will attempt to run with the 'open' command, or an instruction will be given on how to run them manually.
