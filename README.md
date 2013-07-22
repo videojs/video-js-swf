@@ -55,7 +55,7 @@ For integration tests, this project uses [qunit](http://qunitjs.com/).
 
 The integration tests can be found in [project root]/test
 
-In order to run all of the tests:
+In order to run all of the tests, run test.sh.
 
     ```bash
     ./test.sh
