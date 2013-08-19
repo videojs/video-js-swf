@@ -1,6 +1,7 @@
 .DS_Store
-test/*
 bin-release
 *.iml
+bin-debug/test-video-js.swf
 bin-debug/VideoJS.swf
+http/node_modules
 

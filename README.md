@@ -16,10 +16,11 @@ Installation
     curl -o "/Applications/Flex/frameworks/libs/player/10.3/playerglobal.swc" "http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc"
    ```
 
-4. Install a simple HTTP server for simpler testing.
+4. Install the pieces for a simple HTTP server for simpler testing.
 
     ```bash
-    npm -g install simple-http-server
+    npm -g install forever
+    cd http && npm install && cd ..
     ```
     
 5. Build the SWF using build.sh. If you have Video.js installed at "../video.js" and the Flex SDK installed at "/Applications/Flex", you won't need to provide any arguments.  Otherwise you'll need to include the paths to this projects as arguments to the script.
@@ -28,10 +29,10 @@ Installation
     ./build.sh
     ```
 
-7. Start running the simple HTTP server from the command-line in the video-js-swf root directory.
+7. Start running the simple HTTP server from the command-line in the video-js-swf root directory.  It will run as a background process and can be stopped later by using "stop" instead of "start".
 
     ```bash
-    nserver
+    forever start http/server.js 
     ```
     
 8. Open your browser at [http://localhost:8000/bin-debug/index.html](http://localhost:8000/bin-debug/index.html) to see a video play.  You can keep using build.sh to rebuild the Flash code.
@@ -55,3 +56,5 @@ In order to run all of the tests, run test.sh.
     ./test.sh
 
 A copy of the SWF produced for the unit tests will be compiled into the bin-debug folder.  Both the unit and integration tests will attempt to run with the 'open' command, or an instruction will be given on how to run them manually.
+
+There are very few tests.  Adding to them is a fantastic and much appreciated way to contribute.
