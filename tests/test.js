@@ -22,7 +22,7 @@ function createSWF(e){
     name: "videoPlayer"+uid
   };
 
-  swfobject.embedSWF("../bin-debug/VideoJS.swf", "videoPlayer"+uid, "100%", "100%", "9.0.124", "", flashvars, params, attributes);
+  swfobject.embedSWF("../bin-debug/VideoJS.swf", "videoPlayer"+uid, "100%", "100%", "10.3", "", flashvars, params, attributes);
 }
 
 function swfSetup(){
@@ -76,20 +76,6 @@ test("SWF Set Up & Ready", 2, function() {
   ok(typeof this.swf.vjs_play == 'function', "API Methods are available on ready.");
 });
 
-// Play Method
-/*
-test("Play", 1, function() {
-  stop();
-
-  this.on("playing", function(){
-    ok(true, "Player plays.");
-    start();
-  });
-
-  this.swf.vjs_play();
-});
-*/
-
 // Pause after playing event
 test("Pause After 'playing' Event", 1, function() {
   stop();
@@ -113,16 +99,29 @@ test("Pause After 'playing' Event", 1, function() {
 });
 
 
-// 'seeked' event
-test("Seeked event fires after time change", 1, function() {
+// Play Method
+test("Play", 1, function() {
   stop();
 
-  this.on("loadeddata", function(){
+  this.on("playing", function(){
+    ok(true, "Player plays.");
+    start();
+  });
 
+  this.swf.vjs_play();
+});
+
+// 'seeked' event
+// Commented-out as this only works intermittently.  Sometimes the "seeked"
+// event doesn't happen
+/*test("Seeked event fires after time change", 1, function() {
+  stop();
+  this.on("loadeddata", function(){
     this.swf.vjs_pause();
     this.ct = this.swf.vjs_getProperty("currentTime");
 
     this.on("seeked", function(){
+
       ok(this.ct != this.swf.vjs_getProperty("currentTime"), "currentTime changed");
       start();
     });
@@ -132,24 +131,9 @@ test("Seeked event fires after time change", 1, function() {
 
   this.swf.vjs_play();
 });
+*/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Commented out for unknown reasons...
 
 // /* Methods
 // ================================================================================ */

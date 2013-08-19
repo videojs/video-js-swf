@@ -5,64 +5,56 @@ This project doesn't need to be used if you simply want to use the Flash video p
 Installation
 ============
 
-1. Go through the Getting started section for [Video.js](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md).  Most importantly, you will need have already built video.js successfully before building video-js-swf.
+1. Go through the Getting started section for [Video.js](https://github.com/videojs/video.js/blob/master/CONTRIBUTING.md).  Most importantly, you will need have already built Video.js successfully before building video-js-swf.
 
-2. Install [Apache Flex](http://flex.apache.org/installer.html).  There's no need to install any of the optional items.
+2. Install [Apache Flex](http://flex.apache.org/installer.html) in /Applications/Flex. There's no need to install any of the optional items.
 
-3. In the base directory of video-js-swf, you'll see a setup.sh script.  Make sure to include the path to Video.js and Flex SDK as arguments to the script.
+3. You'll need the Flash Player 10.3 library to compile.  Run the commands below to get them installed.
 
-   ```bash
-   ./setup.sh [video_js_dir] [flex_sdk_dir]
+    ```bash
+    mkdir -p "/Applications/Flex/frameworks/libs/player/10.3"
+    curl -o "/Applications/Flex/frameworks/libs/player/10.3/playerglobal.swc" "http://fpdownload.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc"
    ```
-   This script will do the following:
-   - Create a new directory in your Flex SDK for playerglobal10_3.swc, and download this file.
-   - Set up the bin-debug and bin-release directories.
-.
-4. Install a simple HTTP server for simpler testing.
+
+4. Install the pieces for a simple HTTP server for simpler testing.
 
     ```bash
-    npm -g install simple-http-server
+    npm -g install forever
+    cd http && npm install && cd ..
     ```
     
-5. Build video-js.swf using build.sh.  Make sure to include the path to the Flex SDK as an argument to the script.
+5. Build the SWF using build.sh. If you have Video.js installed at "../video.js" and the Flex SDK installed at "/Applications/Flex", you won't need to provide any arguments.  Otherwise you'll need to include the paths to this projects as arguments to the script.
 
     ```bash
-    ./build.sh [video_js_dir] [flex_sdk_dir]
+    ./build.sh
     ```
 
-   This script will do the following:
-   - Compile the source into bin-release using the release compiler settings.
-   - Copy the SWF into [video.js]/src/swf/video-js.swf
-    
-7. Start running the simple HTTP server from the command-line.
+7. Start running the simple HTTP server from the command-line in the video-js-swf root directory.  It will run as a background process and can be stopped later by using "stop" instead of "start".
 
     ```bash
-    nserver
+    forever start http/server.js 
     ```
     
-Now you can see the demo working with your newly-built code: 
-Start the simple HTTP server in the video-js-swf root directory, and open your browser at [http://localhost:8000/bin-release/demo.html]
-
-You can keep using build.sh to rebuild the Flash code.
+8. Open your browser at [http://localhost:8000/bin-debug/index.html](http://localhost:8000/bin-debug/index.html) to see a video play.  You can keep using build.sh to rebuild the Flash code.
 
 Using with Your IDE
 ============
 
-The bin-debug directory is set up for usage with your IDE
+If you don't want to keep using build.sh to build the code, you don't have to.  The bin-debug directory is set up for usage with your IDE.
 
-If you don't want to keep using build.sh to build the code, the bin-debug directory is set up for use with your IDE.  It is similar to the bin-release directory, except that the SWF name is expected to be VideoJS.swf.  This works better with some IDEs that expect the SWF name to be the same as the main class name.
+You can use the given .actionscriptProperties with Flash Builder.  It is set up to use bin-debug and generally ready to use.  When you want to run the project, set the output URL to http://localhost:8000/bin-debug/index.html.  As long as nserver is running, you should get the latest code you compile there.
 
-You can also use the given .actionscriptProperties with Flash Builder.  It is set up to use bin-debug and generally ready to use.  When you want to run the project, set the output URL to http://localhost:8000/bin-release/demo.html.  As long as nserver is running, you should get the latest code you compile there.
-
-Running Unit Tests
+Running Unit and Integration Tests
 ===========
 
-This project uses FlexUnit which is built into [Adobe FlashBuilder](ihttp://www.adobe.com/products/flash-builder.html) and is also available on [GitHub](https://github.com/flexunit/flexunit) if you are only interested in the binaries.
+For unit tests, this project uses [FlexUnit](http://flexunit.org/). The unit tests can be found in [project root]/src/com/videojs/test/
 
-The unit tests can be found in [project root]/src/com/videojs/test/
+For integration tests, this project uses [qunit](http://qunitjs.com/). The integration tests can be found in [project root]/test
 
-In order to run the tests:
+In order to run all of the tests, run test.sh.
 
     ./test.sh
 
-A copy of the produced swf will also be compiled into the bin-debug folder.
+A copy of the SWF produced for the unit tests will be compiled into the bin-debug folder.  Both the unit and integration tests will attempt to run with the 'open' command, or an instruction will be given on how to run them manually.
+
+There are very few tests.  Adding to them is a fantastic and much appreciated way to contribute.
