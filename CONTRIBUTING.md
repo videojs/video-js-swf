@@ -29,7 +29,7 @@ git pull upstream master
         
 4. Create a new branch for your work, and make your changes.
 
-5. Thoroughly test your feature or fix. In addition to new unit tests, and testing the area(s) specific to the area you're working on, a brief smoketest of the player never hurts. We'd like to suggest this short smoke test with both FLV and MP4 video formats:
+5. Thoroughly test your feature or fix.  See the guide for running the unit and integration tests in the README.  Adding new tests is both highly encouraged and appreciated.  In addition to the automated tests, and testing the area(s) specific to the area you're working on, a brief smoketest of the player never hurts. We'd like to suggest this short smoke test with both FLV and MP4 video formats:
   1. Playback should start after clicking Play overlay
   2. Playback should start after clicking Play button
   3. Playback should pause when clicking the Pause button
@@ -40,7 +40,7 @@ git pull upstream master
 
   (This may seem like a lot of steps, but they could all be accomplished with a couple of short-duration test files, within a few minutes.)
 
-6. After committing your changes to your fork of the repo, submit your [Pull Request](#pull-requests).
+6. After committing your changes to your fork of the repo, submit your [Pull Request](#pull-requests).  If you are changing the source code, make sure to submit a second pull request to the main Video.js repo.  This must be done to change the copy of video-js.swf that Video.js uses.  When you run build.sh, video-js.swf is always updated to contain the latest changes you have in video-js-swf.
 
 ##Filing Bugs
 
@@ -76,7 +76,7 @@ Here's an example:
 
 Chrome 21+ (as of 2013/01/01) doens't run Flash files that are local and loaded into a locally accessed page (file:///). To get around this you can do either of the following:
 
-1. Do your development and testing using a local HTTP server.
+1. Do your development and testing using a local HTTP server.  See the README for instructions on using simple-http-server for this purpose.
 2. Disable the version of Flash included with Chrome and enable a system-wide version of Flash instead.
 
 Other Video.js Projects
