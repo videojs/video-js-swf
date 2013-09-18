@@ -174,7 +174,43 @@ package{
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
             switch(pPropertyName){
-                case "mode":
+				/* --- ADD MBR Support Start --- */
+
+				case "isDynamicStream":
+					return _app.model.isDynamicStream;
+					break;
+
+				case "initialIndex":
+					return _app.model.initialIndex;
+					break;
+
+				case "currentIndex":
+					return _app.model.currentIndex;
+					break;
+
+				case "currentBitrate":
+					return _app.model.currentBitrate;
+					break;
+
+				case "autoSwitch":
+					return _app.model.autoSwitch;
+					break;
+
+				case "switching":
+					return _app.model.switching;
+					break;
+
+				case "maxAllowedIndex":
+					return _app.model.maxAllowedIndex;
+					break;
+
+				case "numDynamicStreams":
+					return _app.model.numDynamicStreams;
+					break;
+
+				/* --- ADD MBR Support End --- */
+
+				case "mode":
                     return _app.model.mode;
                 case "autoplay":
                     return _app.model.autoplay;
