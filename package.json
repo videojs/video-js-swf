@@ -1,0 +1,30 @@
+{
+  "name": "video-js-swf",
+  "description": "The Flash SWF component for the Video.js Flash player.",
+  "version": "1.0.1",
+  "copyright": "Copyright 2013 Brightcove, Inc. https://github.com/videojs/video.js/blob/master/LICENSE",
+  "keywords": [
+    "html5",
+    "flash",
+    "video",
+    "player",
+    "swf"
+  ],
+  "homepage": "http://videojs.com",
+  "author": "Brightcove and Andy Lemay",
+  "scripts": {
+    "test": "test.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zencoder/video-js-swf.git"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "grunt": "~0.4.1",
+    "semver": "~2.1.0",
+    "grunt-karma": "~0.4.4",
+    "karma-qunit": "~0.0.2",
+    "qunit": "~0.5.16"
+  }
+}

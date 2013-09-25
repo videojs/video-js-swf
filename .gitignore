@@ -4,4 +4,9 @@ bin-release
 bin-debug/test-video-js.swf
 bin-debug/VideoJS.swf
 http/node_modules
+node_modules
+
+# ignore any Karma conf.js files in the test/ directory
+tests/*.conf.js
+
 
