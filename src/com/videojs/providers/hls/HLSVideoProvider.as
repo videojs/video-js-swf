@@ -481,7 +481,7 @@ import com.videojs.providers.hls.utils.ManifestManager;
                     _ns.bufferTime = NETSTREAM_PLAY_BUFFER_END_SIZE;
 
 					if (_manifestManager && _manifestManager.isDynamicStream) {
-						_manifestManager.useBandwidthDetection = true;
+						_manifestManager.readyForAdaptiveSwitching = true;
 					}
 
                     break;

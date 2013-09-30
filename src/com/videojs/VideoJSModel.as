@@ -12,8 +12,9 @@ package com.videojs{
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.PlaybackType;
     import com.videojs.structs.PlayerMode;
+import com.videojs.utils.Console;
 
-    import flash.events.Event;
+import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
@@ -23,7 +24,7 @@ package com.videojs{
 
     public class VideoJSModel extends EventDispatcher{
 
-        private var _masterVolume:SoundTransform;
+		private var _masterVolume:SoundTransform;
         private var _currentPlaybackType:String;
         private var _videoReference:Video;
         private var _lastSetVolume:Number = 1;
@@ -325,7 +326,7 @@ package com.videojs{
         public function set srcFromFlashvars(pValue:String):void{
             _src = pValue;
             // detect HLS by checking the extension of src
-            if(_src.lastIndexOf(".m3u8") == _src.length - 5){
+			if(_src.search(/(https?|file)\:\/\/.*?\.m3u8(\?.*)?/i) != -1){
                 _currentPlaybackType = PlaybackType.HLS;
                 broadcastEventExternally("#HLS# : M3U8 detected!");
             }

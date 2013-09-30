@@ -210,12 +210,12 @@ import flash.events.IOErrorEvent;
 			if( _deltaMS < CACHE_THRESHOLD ){
 				_isCached = true;
 			} else if ( _deltaMS < 1000 ) {
-				_loadThroughput = _segmentLoader.bytesTotal*(1+(1000-_deltaMS));
+				_loadThroughput = Math.round((_segmentLoader.bytesLoaded*1000)/_deltaMS);
 			} else {
-				_loadThroughput = _segmentLoader.bytesTotal/(_deltaMS/1000);
+				_loadThroughput = Math.round(_segmentLoader.bytesTotal/(_deltaMS/1000));
 			}
 
-			Console.log('isCached?', (_deltaMS < CACHE_THRESHOLD) );
+			Console.log('isCached?', _isCached );
 			Console.log(_loadThroughput, 'bytes per second (Bps)');
 			Console.log(_loadThroughput*8, 'bits per second (bps)', '[HLS Benchmark]');
 			Console.log('==================');
