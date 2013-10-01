@@ -614,8 +614,9 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
         }
 
-        private function parsePlaylist(pPlaylistData:String, pParentURI:String):Array{
-            var __levels:Array = [];
+        private function parsePlaylist(pPlaylistData:String, pParentURI:String):Vector.<HLSRendition> {
+            _renditions = new Vector.<HLSRendition>();
+            //var __levels:Array = [];
 
             var __lines:Array = pPlaylistData.split("\n");
             var __len:uint = __lines.length;
@@ -627,67 +628,67 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			if(pPlaylistData.indexOf(M3U8TagType.STREAM_INF) == -1)
 			{
 				_model.broadcastErrorEventExternally(HLSErrorEvent.INVALID_PLAYLIST, {message: HLSErrorEventMessage.PLAYLIST_EMPTY});
-				return [];
+			} else
+			{
+				while(__currentLine < __len){
+					if(__lines[__currentLine].indexOf(M3U8TagType.STREAM_INF) == 0){
+
+						var __rendition:HLSRendition = new HLSRendition();
+							__rendition.bandwidth = 0;
+							__rendition.url = "";
+
+						if(__lines[__currentLine].indexOf("BANDWIDTH=") != -1){
+							// HLS BUG //
+							// Broken on renditions with data listed AFTER BW in manifest
+							// i.e. -  #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=240000,RESOLUTION=396x224 //
+							// reports as 0 instead of 240000 //
+							// __level.bw = int(__lines[__currentLine].toString().slice(__lines[__currentLine].indexOf("BANDWIDTH=")+10));
+
+							// Fix //
+							// iterate through rest of line for next non numeric character or EOL
+							var lineContent:String = __lines[__currentLine] as String;
+							var startIndex:int = __lines[__currentLine].indexOf("BANDWIDTH=") + 10;
+							var endIndex:int = __lines[__currentLine].length-1;
+							var breakIndex:int;
+
+							for( var i:int = startIndex; i < endIndex; i++ )
+							{
+								if(i == endIndex-1)
+								{
+									__rendition.bandwidth = int(lineContent.slice(startIndex));
+								   break;
+								} else if (isNaN(parseInt(lineContent.charAt(i)))){
+								   breakIndex = i;
+									__rendition.bandwidth = int(lineContent.substr(startIndex,breakIndex-startIndex));
+								   break;
+								};
+							};
+
+							_model.broadcastEventExternally("Rendition Loaded: "+ _renditions.length.toString());
+
+						} else {
+							// NO BANDWIDTH VALUE
+						}
+
+						var __url:String = __lines[__currentLine+1];
+						if(__url.indexOf("http://") == -1 && __url.indexOf("https://") == -1){
+							__rendition.url = __directory + __url;
+						}
+						else{
+							__rendition.url = __url;
+						}
+
+						_renditions.push(__rendition);
+
+						__currentLine++;
+					}
+					__currentLine++;
+				}
 			}
 
-            while(__currentLine < __len){
-                if(__lines[__currentLine].indexOf(M3U8TagType.STREAM_INF) == 0){
+			_model.broadcastEventExternally("MBR Manifest Parsed : Rendition Count: "+ _renditions.length.toString());
 
-                    var __level:Object = {};
-                    __level.bw = 0;
-                    __level.url = "";
-
-                    if(__lines[__currentLine].indexOf("BANDWIDTH=") != -1){
-                        // HLS BUG //
-                        // Broken on renditions with data listed AFTER BW in manifest
-                        // i.e. -  #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=240000,RESOLUTION=396x224 //
-                        // reports as 0 instead of 240000 //
-                        // __level.bw = int(__lines[__currentLine].toString().slice(__lines[__currentLine].indexOf("BANDWIDTH=")+10));
-
-                        // Fix //
-                        // iterate through rest of line for next non numeric character or EOL
-                        var lineContent:String = __lines[__currentLine] as String;
-                        var startIndex:int = __lines[__currentLine].indexOf("BANDWIDTH=") + 10;
-                        var endIndex:int = __lines[__currentLine].length-1;
-                        var breakIndex:int;
-
-                        for( var i:int = startIndex; i < endIndex; i++ )
-                        {
-                            if(i == endIndex-1)
-                            {
-                               __level.bw = int(lineContent.slice(startIndex));
-                               break;
-                            } else if (isNaN(parseInt(lineContent.charAt(i)))){
-                               breakIndex = i;
-                               __level.bw = int(lineContent.substr(startIndex,breakIndex-startIndex));
-                               break;
-                            };
-                        };
-
-                        _model.broadcastEventExternally("Rendition Loaded: "+ __levels.length.toString());
-
-                    } else {
-						// NO BANDWIDTH VALUE
-					}
-
-                    var __url:String = __lines[__currentLine+1];
-                    if(__url.indexOf("http://") == -1 && __url.indexOf("https://") == -1){
-                        __level.url = __directory + __url;
-                    }
-                    else{
-                        __level.url = __url;
-                    }
-                    __levels.push(__level);
-                    __currentLine++;
-                }
-                __currentLine++;
-            }
-
-			_model.broadcastEventExternally("MBR Manifest Parsed : Rendition Count: "+ __levels.length.toString());
-
-			renditions = __levels;
-
-            return __levels;
+			return _renditions;
         }
 
 		public var renditions:Array;
@@ -832,17 +833,14 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
             // If this .m3u8 is a playlist...
             if(_manifestLoader.data.indexOf(M3U8TagType.STREAM_INF) != -1){
-                // Grab the enclosed manifest URLs
-                var __levels:Array = parsePlaylist(_manifestLoader.data, _manifestURI);
-                // If some exist...
-                if(__levels.length> 0)
+                if(_renditions.length> 0)
 				{
 
-					_numDynamicStreams = __levels.length;
-					_maxAllowedIndex = __levels.length - 1;
-					_model.broadcastEventExternally(HLSEvent.DYNAMIC_STREAM_CHANGE, { renditions: __levels, currentIndex: _currentIndex, maxAllowedIndex: _maxAllowedIndex, numDynamicStreams: _numDynamicStreams} );
-					_manifestURI = __levels[_initialIndex].url;
-					_currentBitrate = __levels[_initialIndex].bw;
+					_numDynamicStreams = _renditions.length;
+					_maxAllowedIndex = _renditions.length - 1;
+					_model.broadcastEventExternally(HLSEvent.DYNAMIC_STREAM_CHANGE, { renditions: _renditions, currentIndex: _currentIndex, maxAllowedIndex: _maxAllowedIndex, numDynamicStreams: _numDynamicStreams} );
+					_manifestURI = _renditions[_initialIndex].url;
+					_currentBitrate = _renditions[_initialIndex].bandwidth;
 
 					Console.log("HLS MBR: isDynamicStreamChange");
 					Console.log("HLS MBR: currentIndex:" + _currentIndex);
@@ -857,8 +855,6 @@ import com.videojs.providers.hls.structs.M3U8TagType;
                     return;
                 }
             }
-
-
 
             var __isFirst:Boolean = false;
             if(_manifestLoadCount == 0){
