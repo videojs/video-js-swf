@@ -140,7 +140,8 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 		}
 
 		public function switchTo(pIndex:int):void {
-			_model.broadcastEventExternally("USER SWITCH REQUEST: " + pIndex);
+			Console.log("USER SWITCH REQUEST: " + pIndex);
+
 			_currentIndex = pIndex;
 
 			for each( var rend:HLSRendition in renditions)
