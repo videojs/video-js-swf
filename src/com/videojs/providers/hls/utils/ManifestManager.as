@@ -55,6 +55,7 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 		private var _currentBitrate:int = 0;
 		private var _maxAllowedIndex:int = 0;
 		private var _numDynamicStreams:int = 1;
+		private var _bitrateLimit:int = -1;
 
 		private var _readyForAdaptiveSwitching:Boolean = false;
 		private var _useViewportEnabledAdvancedSwitching:Boolean = true;
@@ -126,17 +127,29 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			return _currentBitrate;
 		}
 
+		public function get renditions():Vector.<HLSRendition> {
+			return _renditions;
+		}
+
+		public function get bitrateLimit():int {
+			return _bitrateLimit;
+		}
+
+		public function set bitrateLimit( bpsLimit:int ):void {
+			_bitrateLimit = bpsLimit;
+		}
+
 		public function switchTo(pIndex:int):void {
 			_model.broadcastEventExternally("USER SWITCH REQUEST: " + pIndex);
 			_currentIndex = pIndex;
 
-			for each( var o:Object in renditions)
+			for each( var rend:HLSRendition in renditions)
 			{
-				Console.log(renditions.indexOf(o), o.url);
-				if( renditions.indexOf(o) == pIndex )
+				Console.log(renditions.indexOf(rend), rend.url);
+				if( renditions.indexOf(rend) == pIndex )
 				{
-					_manifestURI = o.url;
-					_currentBitrate = o.bw;
+					_manifestURI = rend.url;
+					_currentBitrate = rend.bandwidth;
 					_model.broadcastEventExternally(HLSEvent.RENDITION_SELECTED, pIndex);
                 }
 			}
@@ -160,8 +173,13 @@ import com.videojs.providers.hls.structs.M3U8TagType;
             }
 		}
 
+		public function getRenditionByIndex( index:int ):HLSRendition {
+			return (_renditions && _renditions.length <= index) ? _renditions[index] : null;
+		}
 
 		/* --- ADD MBR Support End --- */
+
+
 
         public function get segmentParser():SegmentParser{
             return _segmentParser;
@@ -638,14 +656,7 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 							__rendition.url = "";
 
 						if(__lines[__currentLine].indexOf("BANDWIDTH=") != -1){
-							// HLS BUG //
-							// Broken on renditions with data listed AFTER BW in manifest
-							// i.e. -  #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=240000,RESOLUTION=396x224 //
-							// reports as 0 instead of 240000 //
-							// __level.bw = int(__lines[__currentLine].toString().slice(__lines[__currentLine].indexOf("BANDWIDTH=")+10));
 
-							// Fix //
-							// iterate through rest of line for next non numeric character or EOL
 							var lineContent:String = __lines[__currentLine] as String;
 							var startIndex:int = __lines[__currentLine].indexOf("BANDWIDTH=") + 10;
 							var endIndex:int = __lines[__currentLine].length-1;
@@ -664,7 +675,7 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 								};
 							};
 
-							_model.broadcastEventExternally("Rendition Loaded: "+ _renditions.length.toString());
+							Console.log("Rendition Loaded: "+ _renditions.length.toString());
 
 						} else {
 							// NO BANDWIDTH VALUE
@@ -686,14 +697,12 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 				}
 			}
 
-			_model.broadcastEventExternally("MBR Manifest Parsed : Rendition Count: "+ _renditions.length.toString());
+			Console.log("MBR Manifest Parsed : Renditions Loaded: "+ _renditions.length.toString());
 
 			return _renditions;
         }
 
-		public var renditions:Array;
-
-        private function getAbsoluteSegmentURI(pURI:String):String{
+		private function getAbsoluteSegmentURI(pURI:String):String{
 
             var __prefix:String;
 
@@ -928,13 +937,29 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
 					if( _runningBWvalues.length >= 3 && _autoSwitch )
 					{
-						Console.log('SWITCH_CHECK');
+
+						Console.log("==================");
+						Console.log("Switch Check Start");
 
 						var _proposedIndex:int = -1;
 
-						_model.broadcastEventExternally('rendition_switch_check');
-                        _runningBWvalues = _runningBWvalues.slice(_runningBWvalues.length-3, _runningBWvalues.length);
-						_runningBW = parseInt(Number(_totalBW/_runningBWvalues.length).toFixed(0));
+						_runningBWvalues = _runningBWvalues.slice(_runningBWvalues.length-3, _runningBWvalues.length);
+
+						if( _bitrateLimit > 0 )
+						{
+							Console.log("Bitrate Limit Override:", _bitrateLimit, "bps");
+
+							_runningBW = _bitrateLimit;
+						} else
+						{
+							_runningBW = parseInt(Number(_totalBW/_runningBWvalues.length).toFixed(0));
+						}
+
+						_model.broadcastEventExternally('rendition_switch_check', {bandwidthValueUsed: _runningBW, bitrateLimitUsed: (_bitrateLimit>0), bandwidthCount: _runningBWvalues.length});
+
+						Console.log('Bandwidth Value Used:', _runningBW);
+						Console.log('Bitrate Limit Used:', (_bitrateLimit>0));
+						Console.log('Items Calculated:',_runningBWvalues.length);
 
 						if(_useViewportEnabledAdvancedSwitching)
 						{
@@ -946,17 +971,18 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
 						if( !_switching )
 						{
-							Console.log('proposed index:', _proposedIndex);
-							Console.log('current index:', _currentIndex);
+							Console.log('Proposed Index:', _proposedIndex);
+							Console.log('Current Index:', _currentIndex);
 
 							if( _proposedIndex != -1 && _proposedIndex != _currentIndex )
 							{
 								switchTo( _proposedIndex );
 							}
 						}
-					}
 
-					Console.log('=== avg', _runningBW, 'over ' + _runningBWvalues.length + ' items');
+						Console.log("Switch Check End");
+						Console.log("==================");
+					}
 				}
 			}
 
@@ -972,6 +998,8 @@ import com.videojs.providers.hls.structs.M3U8TagType;
                     dispatchEvent(new HLSEvent(HLSEvent.FIRST_SEGMENT_LOADED, {}));
                 }
             }
+
+
         }
 
 		public function determineIndexByBandwidth(bandwidth:int):int

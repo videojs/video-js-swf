@@ -51,8 +51,6 @@ import com.videojs.providers.hls.utils.ManifestManager;
         private var _pauseOnStart:Boolean = false;
         private var _streamEndImminent:Boolean = false;
 
-
-
         private var _model:VideoJSModel;
 
         private static const NETSTREAM_PLAY_BUFFER_START_SIZE:Number = 1;
@@ -70,6 +68,16 @@ import com.videojs.providers.hls.utils.ManifestManager;
         }
 
 		/* --- ADD MBR Support Start --- */
+		public function get bitrateLimit():int {
+			return (_manifestManager) ? _manifestManager.bitrateLimit : 0;
+		}
+
+		public function set bitrateLimit( bps:int ):void {
+			if( _manifestManager )
+			{
+				_manifestManager.bitrateLimit = bps;
+			}
+		}
 
 		public function get isDynamicStream():Boolean {
 			return (_manifestManager) ? _manifestManager.isDynamicStream : false;

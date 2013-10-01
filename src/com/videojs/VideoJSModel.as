@@ -45,6 +45,7 @@ import flash.events.Event;
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
         private var _poster:String = "";
+		private var _bitrateLimit:int = -1;
 
         private static var _instance:VideoJSModel;
 
@@ -68,6 +69,20 @@ import flash.events.Event;
         }
 
 		/* --- ADD MBR Support Start --- */
+
+		public function get bitrateLimit():int {
+			if(_provider && _provider is HLSVideoProvider) {
+				return (_provider as HLSVideoProvider).bitrateLimit;
+			} else {
+				return 0;
+			}
+		}
+
+		public function set bitrateLimit( bps:int ):void {
+			if(_provider && _provider is HLSVideoProvider) {
+				(_provider as HLSVideoProvider).bitrateLimit = bps;
+			}
+		}
 
 		public function get isDynamicStream():Boolean {
 			if(_provider && _provider is HLSVideoProvider) {

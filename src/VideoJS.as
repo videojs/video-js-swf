@@ -97,6 +97,10 @@ import flash.display.Sprite;
 
         private function finish():void{
 
+			if(loaderInfo.parameters.bitrateLimit != undefined) {
+				_app.model.bitrateLimit = parseInt(loaderInfo.parameters.bitrateLimit);
+			}
+
             if(loaderInfo.parameters.mode != undefined){
                 _app.model.mode = loaderInfo.parameters.mode;
             }
@@ -176,6 +180,9 @@ import flash.display.Sprite;
 
             switch(pPropertyName){
 				/* --- ADD MBR Support Start --- */
+				case "bitrateLimit":
+				    return _app.model.bitrateLimit;
+					break;
 
 				case "isDynamicStream":
 					return _app.model.isDynamicStream;
@@ -299,6 +306,10 @@ import flash.display.Sprite;
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
             switch(pPropertyName){
 				/* MBR Cases */
+				case "bitrateLimit":
+					_app.model.bitrateLimit = parseInt(pValue);
+					break;
+
 				case "autoSwitch":
 					break;
 
