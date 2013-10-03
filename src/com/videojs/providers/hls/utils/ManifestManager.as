@@ -55,7 +55,6 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 		private var _currentBitrate:int = 0;
 		private var _maxAllowedIndex:int = 0;
 		private var _numDynamicStreams:int = 1;
-		private var _bitrateLimit:int = -1;
 
 		private var _readyForAdaptiveSwitching:Boolean = false;
 		private var _useViewportEnabledAdvancedSwitching:Boolean = true;
@@ -78,6 +77,7 @@ import com.videojs.providers.hls.structs.M3U8TagType;
             _auditTimer.addEventListener(TimerEvent.TIMER, onAuditTimerTick);
             _manifestReloadTimer = new Timer(_manifestReloadInterval, 0);
             _manifestReloadTimer.addEventListener(TimerEvent.TIMER, onManifestReloadTimerTick);
+			Console.log('New ManifestManager');
         }
 
 		/* --- ADD MBR Support Start --- */
@@ -131,18 +131,11 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			return _renditions;
 		}
 
-		public function get bitrateLimit():int {
-			return _bitrateLimit;
-		}
-
-		public function set bitrateLimit( bpsLimit:int ):void {
-			_bitrateLimit = bpsLimit;
-		}
-
 		public function switchTo(pIndex:int):void {
 			Console.log("USER SWITCH REQUEST: " + pIndex);
 
 			_currentIndex = pIndex;
+			_currentRendition = _renditions[_currentIndex];
 
 			for each( var rend:HLSRendition in renditions)
 			{
@@ -156,13 +149,14 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			}
 
 			setSwitching(true);
-			init();
+			init(_currentIndex);
 
 		}
 
 		private function setSwitching( value:Boolean ):void
 		{
 			_switching = value;
+			_readyForAdaptiveSwitching = false;
 
 			if( value )
 			{
@@ -240,8 +234,9 @@ import com.videojs.providers.hls.structs.M3U8TagType;
             }
         }
 
-        public function init():void{
-            _maxSegmentDuration = -1;
+        public function init(initialIndex:int=0):void{
+            _initialIndex = initialIndex;
+			_maxSegmentDuration = -1;
             _totalDuration = 0;
             _endlistEncountered = false;
 			_lastKnownSequenceID = -1;
@@ -653,8 +648,6 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 					if(__lines[__currentLine].indexOf(M3U8TagType.STREAM_INF) == 0){
 
 						var __rendition:HLSRendition = new HLSRendition();
-							__rendition.bandwidth = 0;
-							__rendition.url = "";
 
 						if(__lines[__currentLine].indexOf("BANDWIDTH=") != -1){
 
@@ -676,10 +669,19 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 								};
 							};
 
-							Console.log("Rendition Loaded: "+ _renditions.length.toString());
-
 						} else {
 							// NO BANDWIDTH VALUE
+						}
+
+						var resolutionKey:String = "RESOLUTION=";
+						var resolutionSplit:String = "x";
+
+						if(__lines[__currentLine].indexOf(resolutionKey) != -1){
+							var resolutionIndex:int = __lines[__currentLine].indexOf(resolutionKey) + resolutionKey.length;
+							var resolutionValue:String = __lines[__currentLine].substr(resolutionIndex)
+
+							__rendition.mediaWidth = Number(resolutionValue.split(resolutionSplit)[0]);
+							__rendition.mediaHeight = Number(resolutionValue.split(resolutionSplit)[1]);
 						}
 
 						var __url:String = __lines[__currentLine+1];
@@ -692,13 +694,15 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
 						_renditions.push(__rendition);
 
+						Console.log("Rendition Loaded:", __rendition);
+
 						__currentLine++;
 					}
 					__currentLine++;
 				}
 			}
 
-			Console.log("MBR Manifest Parsed : Renditions Loaded: "+ _renditions.length.toString());
+			Console.log("MBR Manifest Parsed : Renditions Loaded:", _renditions.length.toString());
 
 			return _renditions;
         }
@@ -840,17 +844,20 @@ import com.videojs.providers.hls.structs.M3U8TagType;
         }
 
         private function onManifestLoadComplete(e:Event):void{
-
+			Console.log('ManifestLoadComplete');
+			Console.log(_manifestLoader.data.toString());
             // If this .m3u8 is a playlist...
             if(_manifestLoader.data.indexOf(M3U8TagType.STREAM_INF) != -1){
-                if(_renditions.length> 0)
+				parsePlaylist(_manifestLoader.data, _manifestURI);
+				if(_renditions.length> 0)
 				{
-
+					Console.log('got renditions');
 					_numDynamicStreams = _renditions.length;
 					_maxAllowedIndex = _renditions.length - 1;
 					_model.broadcastEventExternally(HLSEvent.DYNAMIC_STREAM_CHANGE, { renditions: _renditions, currentIndex: _currentIndex, maxAllowedIndex: _maxAllowedIndex, numDynamicStreams: _numDynamicStreams} );
 					_manifestURI = _renditions[_initialIndex].url;
 					_currentBitrate = _renditions[_initialIndex].bandwidth;
+					_currentRendition = _renditions[_initialIndex];
 
 					Console.log("HLS MBR: isDynamicStreamChange");
 					Console.log("HLS MBR: currentIndex:" + _currentIndex);
@@ -862,6 +869,7 @@ import com.videojs.providers.hls.structs.M3U8TagType;
                 }
                 // If none exist...
                 else{
+					Console.log('got nothing');
                     return;
                 }
             }
@@ -946,37 +954,39 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
 						_runningBWvalues = _runningBWvalues.slice(_runningBWvalues.length-3, _runningBWvalues.length);
 
-						if( _bitrateLimit > 0 )
+						if( _model.bitrateLimit > 0 )
 						{
-							Console.log("Bitrate Limit Override:", _bitrateLimit, "bps");
+							Console.log("Bitrate Limit Override:", _model.bitrateLimit, "bps");
 
-							_runningBW = _bitrateLimit;
+							_runningBW = _model.bitrateLimit;
 						} else
 						{
 							_runningBW = parseInt(Number(_totalBW/_runningBWvalues.length).toFixed(0));
 						}
 
-						_model.broadcastEventExternally('rendition_switch_check', {bandwidthValueUsed: _runningBW, bitrateLimitUsed: (_bitrateLimit>0), bandwidthCount: _runningBWvalues.length});
+						_model.broadcastEventExternally('rendition_switch_check', {bandwidthValueUsed: _runningBW, bitrateLimitUsed: (_model.bitrateLimit>0), bandwidthCount: _runningBWvalues.length});
 
 						Console.log('Bandwidth Value Used:', _runningBW);
-						Console.log('Bitrate Limit Used:', (_bitrateLimit>0));
+						Console.log('Bitrate Limit Used:', (_model.bitrateLimit>0));
 						Console.log('Items Calculated:',_runningBWvalues.length);
 
 						if(_useViewportEnabledAdvancedSwitching)
 						{
-							_proposedIndex = determineIndexByBandwidthAndPlayerDimensions(_runningBW, _model.stageRect.width, _model.stageRect.height);
+							_proposedIndex = getIndexByBandwidthAndPlayerDimensions(_runningBW, _model.stageRect.width, _model.stageRect.height);
 						} else
 						{
-							_proposedIndex = determineIndexByBandwidth(_runningBW);
+							_proposedIndex = getIndexByBandwidth(_runningBW);
 						}
 
 						if( !_switching )
 						{
-							Console.log('Proposed Index:', _proposedIndex);
-							Console.log('Current Index:', _currentIndex);
+							Console.warn('Proposed Index:', _proposedIndex);
+							Console.warn('Current Index:', _currentIndex);
 
 							if( _proposedIndex != -1 && _proposedIndex != _currentIndex )
 							{
+								_runningBWvalues = [];
+
 								switchTo( _proposedIndex );
 							}
 						}
@@ -991,7 +1001,6 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
             if((e.target as StreamSegment).sequenceID == _firstKnownSequenceID){
                 if(_isSeeking){
-                    _isSeeking = false;
                     dispatchEvent(new HLSEvent(HLSEvent.FIRST_SEEK_SEGMENT_LOADED, {}));
                 }
                 else{
@@ -1003,7 +1012,7 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
         }
 
-		public function determineIndexByBandwidth(bandwidth:int):int
+		public function getIndexByBandwidth(bandwidth:Number):int
 		{
 			// Algorithm
 			// 1. Determine current rendition
@@ -1015,31 +1024,30 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 				var currIndex:int = _currentIndex;
 				var currRendition:HLSRendition = _currentRendition;
 				var responseIndex:int = -1;
-				var deltaValue:Number = 0;
+				var deltaValue:Number = -1;
 
 				for each( var rend:HLSRendition in _renditions )
 				{
-					if( rend.bandwidth <= _currentBandwidth )
+					if( deltaValue == -1 || (deltaValue != -1 && (bandwidth-rend.bandwidth) < deltaValue) )
 					{
-						if( Math.floor(_currentBandwidth-rend.bandwidth) < deltaValue )
-						{
-							responseIndex = _renditions.indexOf(rend);
-							deltaValue = Math.floor(_currentBandwidth-rend.bandwidth);
-						}
+						deltaValue = (bandwidth-rend.bandwidth);
+						responseIndex = _renditions.indexOf(rend);
 					}
 				}
+
+				Console.log("Based on BW value:", bandwidth, "should be index", responseIndex );
 
 				return responseIndex;
 
 			} else
 			{
-				Console.warn("Unknown RENDITIONS in determineIndexByBandwidth");
+				Console.warn("Unknown RENDITIONS in getIndexByBandwidth");
 				return -1;
 			}
 
 		}
 
-		public function determineIndexByBandwidthAndPlayerDimensions(bandwidth:int, playerWidth:Number, playerHeight:Number):int
+		public function getIndexByBandwidthAndPlayerDimensions(bandwidth:Number, playerWidth:Number, playerHeight:Number):int
 		{
 			// Algorithm
 			// 1. Determine the appropriate index by bandwidth value --> determineIndexByBandwidth(bandwidth);
@@ -1047,21 +1055,41 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			// the width and height of the current viewport dimensions, then find a lower index
 			// 3. Return the rendition index
 
-			if( _renditions && _renditions.length != 0 && _currentRendition && _currentIndex)
+			Console.warn("Determine Factors:", bandwidth, playerWidth, playerHeight);
+
+			if( _renditions != null && _renditions.length != 0 && _currentRendition != null && _currentIndex != -1)
 			{
-				var currIndex:int = _currentIndex;
 				var currRendition:HLSRendition = _currentRendition;
-				var bwAppropriateIndex:int = determineIndexByBandwidth(bandwidth);
+				var bwAppropriateIndex:int = getIndexByBandwidth(bandwidth);
 				var bwAppropriateRendition:HLSRendition = _renditions[bwAppropriateIndex];
 				var playerWidth:Number = _model.stageRect.width;
 				var playerHeight:Number = _model.stageRect.height;
-				var widthDelta:Number = currRendition.mediaWidth - playerWidth;
-				var heightDelta:Number = currRendition.mediaHeight - playerHeight;
 				var responseIndex:int = bwAppropriateIndex;
+				var bwDelta:Number = Math.abs(bandwidth-bwAppropriateRendition.bandwidth);
 
-				if( bwAppropriateRendition.mediaWidth > playerWidth && bwAppropriateRendition.mediaHeight > playerHeight )
+				if( bwAppropriateRendition.mediaWidth > playerWidth || bwAppropriateRendition.mediaHeight > playerHeight )
 				{
+					Console.warn('bwRendition Too big for viewport');
+					Console.warn('look for best viewport sized rendition instead');
+
+					var widthDelta:Number;
+
 					for each( var rend:HLSRendition in _renditions )
+					{
+						if(rend.mediaWidth <= playerWidth && rend.bandwidth < bandwidth)
+						{
+							widthDelta = playerWidth-rend.mediaWidth;
+
+							if(bandwidth-rend.bandwidth<bwDelta)
+							{
+								Console.warn('--', _renditions.indexOf(rend), widthDelta, 'smaller', bandwidth-rend.bandwidth);
+								bwDelta = bandwidth-rend.bandwidth;
+								responseIndex = _renditions.indexOf(rend);
+							}
+						}
+					}
+
+					/*for each( var rend:HLSRendition in _renditions )
 					{
 						if( rend.mediaWidth != -1 && rend.mediaWidth != -1 )
 						{
@@ -1075,13 +1103,13 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 								}
 							}
 						}
-					}
+					}*/
 				}
 
 				return responseIndex;
 			} else
 			{
-				Console.warn("Unknown RENDITIONS in determineIndexByBandwidthAndPlayerDimensions");
+				Console.warn("Unknown RENDITIONS in getIndexByBandwidthAndPlayerDimensions");
 				return -1;
 			}
 		}

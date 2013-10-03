@@ -12,9 +12,8 @@ package com.videojs{
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.PlaybackType;
     import com.videojs.structs.PlayerMode;
-import com.videojs.utils.Console;
 
-import flash.events.Event;
+	import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
@@ -59,7 +58,7 @@ import flash.events.Event;
                 _masterVolume = new SoundTransform();
                 _stageRect = new Rectangle(0, 0, 100, 100);
             }
-        }
+		}
 
         public static function getInstance():VideoJSModel {
             if (_instance === null){
@@ -71,17 +70,11 @@ import flash.events.Event;
 		/* --- ADD MBR Support Start --- */
 
 		public function get bitrateLimit():int {
-			if(_provider && _provider is HLSVideoProvider) {
-				return (_provider as HLSVideoProvider).bitrateLimit;
-			} else {
-				return 0;
-			}
+			return _bitrateLimit
 		}
 
 		public function set bitrateLimit( bps:int ):void {
-			if(_provider && _provider is HLSVideoProvider) {
-				(_provider as HLSVideoProvider).bitrateLimit = bps;
-			}
+			_bitrateLimit = bps;
 		}
 
 		public function get isDynamicStream():Boolean {
@@ -343,7 +336,6 @@ import flash.events.Event;
             // detect HLS by checking the extension of src
 			if(_src.search(/(https?|file)\:\/\/.*?\.m3u8(\?.*)?/i) != -1){
                 _currentPlaybackType = PlaybackType.HLS;
-                broadcastEventExternally("#HLS# : M3U8 detected!");
             }
             else{
                 _currentPlaybackType = PlaybackType.HTTP;
@@ -355,7 +347,7 @@ import flash.events.Event;
             else if(_preload){
                 _provider.load();
             }
-        }
+		}
 
 
         public function get poster():String{

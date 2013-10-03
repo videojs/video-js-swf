@@ -52,7 +52,7 @@ import flash.display.Sprite;
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0 (HLS 0.1.3)", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0 (HLS 0.1.99)", false, false);
             var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2013 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
@@ -76,7 +76,7 @@ import flash.display.Sprite;
                 ExternalInterface.addCallback("vjs_stop", onStopCalled);
 				// MBR Extention //
 				ExternalInterface.addCallback("vjs_switchTo", onSwitchToCalled);
-            }
+			}
             catch(e:SecurityError){
                 if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
                     throw new SecurityError(e.message);
@@ -304,10 +304,11 @@ import flash.display.Sprite;
         }
 
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
-            switch(pPropertyName){
+            Console.warn("onSetProp", pPropertyName);
+			switch(pPropertyName){
 				/* MBR Cases */
 				case "bitrateLimit":
-					_app.model.bitrateLimit = parseInt(pValue);
+					_app.model.bitrateLimit = pValue;
 					break;
 
 				case "autoSwitch":
@@ -407,6 +408,5 @@ import flash.display.Sprite;
 		private function onSwitchToCalled(pIndex:int):void {
 			_app.model.switchTo(pIndex);
 		}
-
     }
 }
