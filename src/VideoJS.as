@@ -185,7 +185,7 @@ package{
 					break;
 
 				case "bitrateLimit":
-				    return _app.model.bitrateLimit;
+				    return _app.model.bandwidth;
 					break;
 
 				case "isDynamicStream":
