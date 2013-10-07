@@ -45,6 +45,8 @@ package com.videojs{
         private var _rtmpStream:String = "";
         private var _poster:String = "";
 		private var _bitrateLimit:int = -1;
+		private var _bandwidth:Number = 0;
+
 
         private static var _instance:VideoJSModel;
 
@@ -68,9 +70,16 @@ package com.videojs{
         }
 
 		/* --- ADD MBR Support Start --- */
+		public function get bandwidth():Number {
+			return _bandwidth;
+		}
+
+		public function set bandwidth( bps:Number ):void {
+			_bitrateLimit = bps;
+		}
 
 		public function get bitrateLimit():int {
-			return _bitrateLimit
+			return _bitrateLimit;
 		}
 
 		public function set bitrateLimit( bps:int ):void {

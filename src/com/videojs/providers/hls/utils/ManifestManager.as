@@ -953,15 +953,17 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 						var _proposedIndex:int = -1;
 
 						_runningBWvalues = _runningBWvalues.slice(_runningBWvalues.length-3, _runningBWvalues.length);
+						_runningBW = parseInt(Number(_totalBW/_runningBWvalues.length).toFixed(0));
 
-						if( _model.bitrateLimit > 0 )
+						// BW OVERRIDES
+						if( _model.bandwidth > 0 )
 						{
-							Console.log("Bitrate Limit Override:", _model.bitrateLimit, "bps");
-
+							Console.log("Bandwidth Override Used", _model.bandwidth, "bps");
+							_runningBW = _model.bandwidth;
+						} else if( _model.bitrateLimit > 0 && _model.bitrateLimit < _runningBW)
+						{
+							Console.log("BitrateLimit Override Used", _model.bitrateLimit, "bps");
 							_runningBW = _model.bitrateLimit;
-						} else
-						{
-							_runningBW = parseInt(Number(_totalBW/_runningBWvalues.length).toFixed(0));
 						}
 
 						_model.broadcastEventExternally('rendition_switch_check', {bandwidthValueUsed: _runningBW, bitrateLimitUsed: (_model.bitrateLimit>0), bandwidthCount: _runningBWvalues.length});
@@ -1088,22 +1090,6 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 							}
 						}
 					}
-
-					/*for each( var rend:HLSRendition in _renditions )
-					{
-						if( rend.mediaWidth != -1 && rend.mediaWidth != -1 )
-						{
-							if( rend.mediaWidth < playerWidth && rend.mediaHeight < playerHeight )
-							{
-								if( ((playerWidth - rend.mediaWidth) < widthDelta) && ((playerHeight - rend.mediaHeight) < heightDelta) )
-								{
-									widthDelta = (playerWidth - rend.mediaWidth);
-									heightDelta = (playerHeight - rend.mediaHeight);
-									responseIndex = _renditions.indexOf(rend);
-								}
-							}
-						}
-					}*/
 				}
 
 				return responseIndex;

@@ -4,9 +4,9 @@ package{
     import com.videojs.events.VideoJSEvent;
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.ExternalErrorEventName;
-import com.videojs.utils.Console;
+	import com.videojs.utils.Console;
 
-import flash.display.Sprite;
+	import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.events.Event;
@@ -52,7 +52,7 @@ import flash.display.Sprite;
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0 (HLS 0.1.99)", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0 (HLS 0.1.5)", false, false);
             var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2013 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
@@ -180,6 +180,10 @@ import flash.display.Sprite;
 
             switch(pPropertyName){
 				/* --- ADD MBR Support Start --- */
+				case "bandwidth":
+					return _app.model.bandwidth;
+					break;
+
 				case "bitrateLimit":
 				    return _app.model.bitrateLimit;
 					break;
@@ -307,6 +311,10 @@ import flash.display.Sprite;
             Console.warn("onSetProp", pPropertyName);
 			switch(pPropertyName){
 				/* MBR Cases */
+				case "bandwidth":
+					_app.model.bandwidth = pValue;
+					break;
+
 				case "bitrateLimit":
 					_app.model.bitrateLimit = pValue;
 					break;
