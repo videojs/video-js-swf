@@ -16,6 +16,7 @@ package{
     import flash.system.Security;
     import flash.ui.ContextMenu;
     import flash.ui.ContextMenuItem;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.setTimeout;
     
@@ -63,6 +64,7 @@ package{
         private function registerExternalMethods():void{
             
             try{
+                ExternalInterface.addCallback("vjs_appendBuffer", onAppendBufferCalled);
                 ExternalInterface.addCallback("vjs_echo", onEchoCalled);
                 ExternalInterface.addCallback("vjs_getProperty", onGetPropertyCalled);
                 ExternalInterface.addCallback("vjs_setProperty", onSetPropertyCalled);
@@ -119,15 +121,20 @@ package{
             }
             
             if(loaderInfo.parameters.src != undefined && loaderInfo.parameters.src != ""){
+              if (isExternalMSObjectURL(loaderInfo.parameters.src)) {
+                _app.model.srcFromFlashvars = null;
+                openExternalMSObject(loaderInfo.parameters.src);
+              } else {
                 _app.model.srcFromFlashvars = String(loaderInfo.parameters.src);
-            }
-            else{
-                if(loaderInfo.parameters.rtmpConnection != undefined && loaderInfo.parameters.rtmpConnection != ""){
-                    _app.model.rtmpConnectionURL = loaderInfo.parameters.rtmpConnection;
-                }
-                if(loaderInfo.parameters.rtmpStream != undefined && loaderInfo.parameters.rtmpStream != ""){
-                    _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
-                }
+              }
+            } else{
+              if(loaderInfo.parameters.rtmpConnection != undefined && loaderInfo.parameters.rtmpConnection != ""){
+                _app.model.rtmpConnectionURL = loaderInfo.parameters.rtmpConnection;
+              }
+
+              if(loaderInfo.parameters.rtmpStream != undefined && loaderInfo.parameters.rtmpStream != ""){
+                _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
+              }
             }
             
             if(loaderInfo.parameters.readyFunction != undefined){
@@ -163,6 +170,17 @@ package{
                 _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
                 _app.model.broadcastEvent(new VideoJSEvent(VideoJSEvent.STAGE_RESIZE, {}));
             }
+        }
+
+        private function onAppendBufferCalled(array:*):void{
+            // translate the array from js into bytes
+            var bytes:ByteArray = new ByteArray();
+            for (var i:int = 0; i < array.length; i++) {
+                bytes.writeByte(array[i]);
+            }
+
+            // write the bytes to the provider
+            _app.model.appendBuffer(bytes);
         }
         
         private function onEchoCalled(pResponse:* = null):*{
@@ -282,7 +300,8 @@ package{
                     _app.model.poster = String(pValue);
                     break;
                 case "src":
-                    _app.model.src = String(pValue);
+                    // same as when vjs_src() is called directly
+                    onSrcCalled(pValue);
                     break;
                 case "currentTime":
                     _app.model.seekBySeconds(Number(pValue));
@@ -309,11 +328,30 @@ package{
         }
         
         private function onAutoplayCalled(pAutoplay:* = false):void{
-            _app.model.autoplay = _app.model.humanToBoolean(pAutoplay);
+          _app.model.autoplay = _app.model.humanToBoolean(pAutoplay);
+        }
+
+        private function isExternalMSObjectURL(pSrc:*):Boolean{
+          return pSrc.indexOf('blob:vjs-media-source/') === 0;
+        }
+
+        private function openExternalMSObject(pSrc:*):void{
+          ExternalInterface.call('videojs.MediaSource.open("' +pSrc+ '", "' +ExternalInterface.objectID+ '")');
         }
         
         private function onSrcCalled(pSrc:* = ""):void{
+          // check if an external media source object will provide the video data
+          if (isExternalMSObjectURL(pSrc)) {
+            // null is passed to the netstream which enables appendBytes mode
+            _app.model.src = null;
+            // open the media source object for creating a source buffer
+            // and provide a reference to this swf for passing data from the soure buffer
+            openExternalMSObject(pSrc);
+
+            // ExternalInterface.call('videojs.MediaSource.sourceBufferUrls["' + pSrc + '"]', ExternalInterface.objectID);
+          } else {
             _app.model.src = String(pSrc);
+          }
         }
         
         private function onLoadCalled():void{

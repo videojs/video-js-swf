@@ -13,6 +13,7 @@ package com.videojs.providers{
     import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
     
@@ -131,6 +132,10 @@ package com.videojs.providers{
                     return 2;
                 }
             }
+        }
+
+        public function appendBuffer(bytes:ByteArray):void{
+            throw "RTMPVideoProvider does not support appendBuffer";
         }
         
         public function get buffered():Number{
