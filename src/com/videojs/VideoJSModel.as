@@ -13,7 +13,7 @@ package com.videojs{
     import com.videojs.structs.PlaybackType;
     import com.videojs.structs.PlayerMode;
 
-    import flash.events.Event;
+	import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
@@ -23,7 +23,7 @@ package com.videojs{
 
     public class VideoJSModel extends EventDispatcher{
 
-        private var _masterVolume:SoundTransform;
+		private var _masterVolume:SoundTransform;
         private var _currentPlaybackType:String;
         private var _videoReference:Video;
         private var _lastSetVolume:Number = 1;
@@ -44,6 +44,9 @@ package com.videojs{
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
         private var _poster:String = "";
+		private var _bitrateLimit:int = -1;
+		private var _bandwidth:Number = 0;
+
 
         private static var _instance:VideoJSModel;
 
@@ -57,7 +60,7 @@ package com.videojs{
                 _masterVolume = new SoundTransform();
                 _stageRect = new Rectangle(0, 0, 100, 100);
             }
-        }
+		}
 
         public static function getInstance():VideoJSModel {
             if (_instance === null){
@@ -67,6 +70,21 @@ package com.videojs{
         }
 
 		/* --- ADD MBR Support Start --- */
+		public function get bandwidth():Number {
+			return _bandwidth;
+		}
+
+		public function set bandwidth( bps:Number ):void {
+			_bitrateLimit = bps;
+		}
+
+		public function get bitrateLimit():int {
+			return _bitrateLimit;
+		}
+
+		public function set bitrateLimit( bps:int ):void {
+			_bitrateLimit = bps;
+		}
 
 		public function get isDynamicStream():Boolean {
 			if(_provider && _provider is HLSVideoProvider) {
@@ -325,9 +343,8 @@ package com.videojs{
         public function set srcFromFlashvars(pValue:String):void{
             _src = pValue;
             // detect HLS by checking the extension of src
-            if(_src.lastIndexOf(".m3u8") == _src.length - 5){
+			if(_src.search(/(https?|file)\:\/\/.*?\.m3u8(\?.*)?/i) != -1){
                 _currentPlaybackType = PlaybackType.HLS;
-                broadcastEventExternally("#HLS# : M3U8 detected!");
             }
             else{
                 _currentPlaybackType = PlaybackType.HTTP;
@@ -339,7 +356,7 @@ package com.videojs{
             else if(_preload){
                 _provider.load();
             }
-        }
+		}
 
 
         public function get poster():String{

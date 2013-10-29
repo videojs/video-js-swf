@@ -56,7 +56,8 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 		private var _maxAllowedIndex:int = 0;
 		private var _numDynamicStreams:int = 1;
 
-		private var _useBandwidthDetection:Boolean = false;
+		private var _readyForAdaptiveSwitching:Boolean = false;
+		private var _useViewportEnabledAdvancedSwitching:Boolean = true;
 		private var _currentBandwidth:int = 0; // This should be in kbps
 
         private var _secondsOfRetention:Number = 30; // The amount of video that we should download ahead of the current play point
@@ -76,19 +77,18 @@ import com.videojs.providers.hls.structs.M3U8TagType;
             _auditTimer.addEventListener(TimerEvent.TIMER, onAuditTimerTick);
             _manifestReloadTimer = new Timer(_manifestReloadInterval, 0);
             _manifestReloadTimer.addEventListener(TimerEvent.TIMER, onManifestReloadTimerTick);
+			Console.log('New ManifestManager');
         }
 
 		/* --- ADD MBR Support Start --- */
 
-		public function set useBandwidthDetection(value:Boolean):void
-		{
-			_model.broadcastEventExternally("ManifestManager.useBWDetection:" + value);
-			_useBandwidthDetection = value;
+		public function set readyForAdaptiveSwitching(value:Boolean):void {
+			Console.log('ReadyForAdaptiveSwitching', value);
+			_readyForAdaptiveSwitching = value;
 		}
 
-		public function get useBandwidthDetection():Boolean
-		{
-			return _useBandwidthDetection;
+		public function get readyForAdaptiveSwitching():Boolean {
+			return _readyForAdaptiveSwitching;
 		}
 
 		public function get isDynamicStream():Boolean {
@@ -127,29 +127,36 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			return _currentBitrate;
 		}
 
-		public function switchTo(pIndex:int):void {
-			_model.broadcastEventExternally("USER SWITCH REQUEST: " + pIndex);
-			_currentIndex = pIndex;
+		public function get renditions():Vector.<HLSRendition> {
+			return _renditions;
+		}
 
-			for each( var o:Object in renditions)
+		public function switchTo(pIndex:int):void {
+			Console.log("USER SWITCH REQUEST: " + pIndex);
+
+			_currentIndex = pIndex;
+			_currentRendition = _renditions[_currentIndex];
+
+			for each( var rend:HLSRendition in renditions)
 			{
-				Console.log(renditions.indexOf(o), o.url);
-				if( renditions.indexOf(o) == pIndex )
+				Console.log(renditions.indexOf(rend), rend.url);
+				if( renditions.indexOf(rend) == pIndex )
 				{
-					_manifestURI = o.url;
-					_currentBitrate = o.bw;
+					_manifestURI = rend.url;
+					_currentBitrate = rend.bandwidth;
 					_model.broadcastEventExternally(HLSEvent.RENDITION_SELECTED, pIndex);
                 }
 			}
 
 			setSwitching(true);
-			init();
+			init(_currentIndex);
 
 		}
 
 		private function setSwitching( value:Boolean ):void
 		{
 			_switching = value;
+			_readyForAdaptiveSwitching = false;
 
 			if( value )
 			{
@@ -161,8 +168,13 @@ import com.videojs.providers.hls.structs.M3U8TagType;
             }
 		}
 
+		public function getRenditionByIndex( index:int ):HLSRendition {
+			return (_renditions && _renditions.length <= index) ? _renditions[index] : null;
+		}
 
 		/* --- ADD MBR Support End --- */
+
+
 
         public function get segmentParser():SegmentParser{
             return _segmentParser;
@@ -222,8 +234,9 @@ import com.videojs.providers.hls.structs.M3U8TagType;
             }
         }
 
-        public function init():void{
-            _maxSegmentDuration = -1;
+        public function init(initialIndex:int=0):void{
+            _initialIndex = initialIndex;
+			_maxSegmentDuration = -1;
             _totalDuration = 0;
             _endlistEncountered = false;
 			_lastKnownSequenceID = -1;
@@ -597,8 +610,6 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
                     _endlistEncountered = true;
 
-					Console.warn('done, what is duration?', _totalDuration, __calculatedDuration);
-
 					if( ( __calculatedDuration > 0 && _totalDuration <= 0) && !_switching )
 					{
 						_totalDuration = __calculatedDuration;
@@ -617,8 +628,9 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
         }
 
-        private function parsePlaylist(pPlaylistData:String, pParentURI:String):Array{
-            var __levels:Array = [];
+        private function parsePlaylist(pPlaylistData:String, pParentURI:String):Vector.<HLSRendition> {
+            _renditions = new Vector.<HLSRendition>();
+            //var __levels:Array = [];
 
             var __lines:Array = pPlaylistData.split("\n");
             var __len:uint = __lines.length;
@@ -630,72 +642,72 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			if(pPlaylistData.indexOf(M3U8TagType.STREAM_INF) == -1)
 			{
 				_model.broadcastErrorEventExternally(HLSErrorEvent.INVALID_PLAYLIST, {message: HLSErrorEventMessage.PLAYLIST_EMPTY});
-				return [];
+			} else
+			{
+				while(__currentLine < __len){
+					if(__lines[__currentLine].indexOf(M3U8TagType.STREAM_INF) == 0){
+
+						var __rendition:HLSRendition = new HLSRendition();
+
+						if(__lines[__currentLine].indexOf("BANDWIDTH=") != -1){
+
+							var lineContent:String = __lines[__currentLine] as String;
+							var startIndex:int = __lines[__currentLine].indexOf("BANDWIDTH=") + 10;
+							var endIndex:int = __lines[__currentLine].length-1;
+							var breakIndex:int;
+
+							for( var i:int = startIndex; i < endIndex; i++ )
+							{
+								if(i == endIndex-1)
+								{
+									__rendition.bandwidth = int(lineContent.slice(startIndex));
+								   break;
+								} else if (isNaN(parseInt(lineContent.charAt(i)))){
+								   breakIndex = i;
+									__rendition.bandwidth = int(lineContent.substr(startIndex,breakIndex-startIndex));
+								   break;
+								};
+							};
+
+						} else {
+							// NO BANDWIDTH VALUE
+						}
+
+						var resolutionKey:String = "RESOLUTION=";
+						var resolutionSplit:String = "x";
+
+						if(__lines[__currentLine].indexOf(resolutionKey) != -1){
+							var resolutionIndex:int = __lines[__currentLine].indexOf(resolutionKey) + resolutionKey.length;
+							var resolutionValue:String = __lines[__currentLine].substr(resolutionIndex)
+
+							__rendition.mediaWidth = Number(resolutionValue.split(resolutionSplit)[0]);
+							__rendition.mediaHeight = Number(resolutionValue.split(resolutionSplit)[1]);
+						}
+
+						var __url:String = __lines[__currentLine+1];
+						if(__url.indexOf("http://") == -1 && __url.indexOf("https://") == -1){
+							__rendition.url = __directory + __url;
+						}
+						else{
+							__rendition.url = __url;
+						}
+
+						_renditions.push(__rendition);
+
+						Console.log("Rendition Loaded:", __rendition);
+
+						__currentLine++;
+					}
+					__currentLine++;
+				}
 			}
 
-            while(__currentLine < __len){
-                if(__lines[__currentLine].indexOf(M3U8TagType.STREAM_INF) == 0){
+			Console.log("MBR Manifest Parsed : Renditions Loaded:", _renditions.length.toString());
 
-                    var __level:Object = {};
-                    __level.bw = 0;
-                    __level.url = "";
-
-                    if(__lines[__currentLine].indexOf("BANDWIDTH=") != -1){
-                        // HLS BUG //
-                        // Broken on renditions with data listed AFTER BW in manifest
-                        // i.e. -  #EXT-X-STREAM-INF:PROGRAM-ID=1,BANDWIDTH=240000,RESOLUTION=396x224 //
-                        // reports as 0 instead of 240000 //
-                        // __level.bw = int(__lines[__currentLine].toString().slice(__lines[__currentLine].indexOf("BANDWIDTH=")+10));
-
-                        // Fix //
-                        // iterate through rest of line for next non numeric character or EOL
-                        var lineContent:String = __lines[__currentLine] as String;
-                        var startIndex:int = __lines[__currentLine].indexOf("BANDWIDTH=") + 10;
-                        var endIndex:int = __lines[__currentLine].length-1;
-                        var breakIndex:int;
-
-                        for( var i:int = startIndex; i < endIndex; i++ )
-                        {
-                            if(i == endIndex-1)
-                            {
-                               __level.bw = int(lineContent.slice(startIndex));
-                               break;
-                            } else if (isNaN(parseInt(lineContent.charAt(i)))){
-                               breakIndex = i;
-                               __level.bw = int(lineContent.substr(startIndex,breakIndex-startIndex));
-                               break;
-                            };
-                        };
-
-                        _model.broadcastEventExternally("Rendition Loaded: "+ __levels.length.toString());
-
-                    } else {
-						// NO BANDWIDTH VALUE
-					}
-
-                    var __url:String = __lines[__currentLine+1];
-                    if(__url.indexOf("http://") == -1 && __url.indexOf("https://") == -1){
-                        __level.url = __directory + __url;
-                    }
-                    else{
-                        __level.url = __url;
-                    }
-                    __levels.push(__level);
-                    __currentLine++;
-                }
-                __currentLine++;
-            }
-
-			_model.broadcastEventExternally("MBR Manifest Parsed : Rendition Count: "+ __levels.length.toString());
-
-			renditions = __levels;
-
-            return __levels;
+			return _renditions;
         }
 
-		public var renditions:Array;
-
-        private function getAbsoluteSegmentURI(pURI:String):String{
+		private function getAbsoluteSegmentURI(pURI:String):String{
 
             var __prefix:String;
 
@@ -819,8 +831,10 @@ import com.videojs.providers.hls.structs.M3U8TagType;
         }
 
         private function expireSegmentBySegmentSequenceID(pID:int):void{
-            for(var i:int = 0; i < _segments.length; i++){
-                if((_segments[i] as StreamSegment).sequenceID == pID){
+            for(var i:int = 0; i < _segments.length; i++)
+			{
+                if((_segments[i] as StreamSegment).sequenceID == pID)
+				{
                     (_segments[i] as StreamSegment).expire();
                     (_segments[i] as StreamSegment).removeEventListener(HLSEvent.SEGMENT_LOADED, onSegmentLoaded);
                     _segments.splice(i,1);
@@ -830,34 +844,35 @@ import com.videojs.providers.hls.structs.M3U8TagType;
         }
 
         private function onManifestLoadComplete(e:Event):void{
-
+			Console.log('ManifestLoadComplete');
+			Console.log(_manifestLoader.data.toString());
             // If this .m3u8 is a playlist...
             if(_manifestLoader.data.indexOf(M3U8TagType.STREAM_INF) != -1){
-                // Grab the enclosed manifest URLs
-                var __levels:Array = parsePlaylist(_manifestLoader.data, _manifestURI);
-                // If some exist...
-                if(__levels.length> 0){
+				parsePlaylist(_manifestLoader.data, _manifestURI);
+				if(_renditions.length> 0)
+				{
+					Console.log('got renditions');
+					_numDynamicStreams = _renditions.length;
+					_maxAllowedIndex = _renditions.length - 1;
+					_model.broadcastEventExternally(HLSEvent.DYNAMIC_STREAM_CHANGE, { renditions: _renditions, currentIndex: _currentIndex, maxAllowedIndex: _maxAllowedIndex, numDynamicStreams: _numDynamicStreams} );
+					_manifestURI = _renditions[_initialIndex].url;
+					_currentBitrate = _renditions[_initialIndex].bandwidth;
+					_currentRendition = _renditions[_initialIndex];
 
-					_numDynamicStreams = __levels.length;
-					_maxAllowedIndex = __levels.length - 1;
-					_model.broadcastEventExternally("HLS MBR: isDynamicStreamChange");
-					_model.broadcastEventExternally("HLS MBR: currentIndex:" + _currentIndex);
-					_model.broadcastEventExternally("HLS MBR: maxIndex:" + _maxAllowedIndex);
-					_model.broadcastEventExternally("HLS MBR: numDynamicStreams:" + _numDynamicStreams);
-					_model.broadcastEventExternally(HLSEvent.DYNAMIC_STREAM_CHANGE, { renditions: __levels, currentIndex: _currentIndex, maxAllowedIndex: _maxAllowedIndex, numDynamicStreams: _numDynamicStreams} );
+					Console.log("HLS MBR: isDynamicStreamChange");
+					Console.log("HLS MBR: currentIndex:" + _currentIndex);
+					Console.log("HLS MBR: maxIndex:" + _maxAllowedIndex);
+					Console.log("HLS MBR: numDynamicStreams:" + _numDynamicStreams);
 
-					_manifestURI = __levels[_initialIndex].url;
-					_currentBitrate = __levels[_initialIndex].bw;
 					loadManifest();
                     return;
                 }
                 // If none exist...
                 else{
+					Console.log('got nothing');
                     return;
                 }
             }
-
-
 
             var __isFirst:Boolean = false;
             if(_manifestLoadCount == 0){
@@ -873,7 +888,7 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 			{
 				setSwitching(false);
 				_hlsProviderReference.seekBySeconds(_hlsProviderReference.time);
-				Console.log(_hlsProviderReference.time, _hlsProviderReference.targetSeekTime);
+				Console.log("Seek Completed, Seek to time", _hlsProviderReference.time, _hlsProviderReference.targetSeekTime);
 			}
 
         }
@@ -906,15 +921,15 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
 		private var _lastLoadedSegment:int;
         private var _runningBWvalues:Array = [];
+		private var _runningBW:int = 0;
 
         private function onSegmentLoaded(e:HLSEvent):void{
 			_model.broadcastEventExternally("ManifestManager.onSegmentLoaded():"+(e.target as StreamSegment).sequenceID);
 
-			if(_useBandwidthDetection)
+			if(_readyForAdaptiveSwitching)
 			{
 				if(!e.data.cached)
 				{
-					Console.log('Adding to BW Calculations', e.data.throughput);
 					_runningBWvalues.push(e.data.throughput);
 
 					Console.log('determine rolling avg.', _runningBWvalues.length);
@@ -931,11 +946,56 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
 					if( _runningBWvalues.length >= 3 && _autoSwitch )
 					{
-						_model.broadcastEventExternally('rendition_switch_check');
-						_runningBWvalues = _runningBWvalues.slice(_runningBWvalues.length-3, _runningBWvalues.length);
-					}
 
-					Console.log('=== avg', Number(_totalBW/_runningBWvalues.length).toFixed(0), 'over ' + _runningBWvalues.length + ' items');
+						Console.log("==================");
+						Console.log("Switch Check Start");
+
+						var _proposedIndex:int = -1;
+
+						_runningBWvalues = _runningBWvalues.slice(_runningBWvalues.length-3, _runningBWvalues.length);
+						_runningBW = parseInt(Number(_totalBW/_runningBWvalues.length).toFixed(0));
+
+						// BW OVERRIDES
+						if( _model.bandwidth > 0 )
+						{
+							Console.log("Bandwidth Override Used", _model.bandwidth, "bps");
+							_runningBW = _model.bandwidth;
+						} else if( _model.bitrateLimit > 0 && _model.bitrateLimit < _runningBW)
+						{
+							Console.log("BitrateLimit Override Used", _model.bitrateLimit, "bps");
+							_runningBW = _model.bitrateLimit;
+						}
+
+						_model.broadcastEventExternally('rendition_switch_check', {bandwidthValueUsed: _runningBW, bitrateLimitUsed: (_model.bitrateLimit>0), bandwidthCount: _runningBWvalues.length});
+
+						Console.log('Bandwidth Value Used:', _runningBW);
+						Console.log('Bitrate Limit Used:', (_model.bitrateLimit>0));
+						Console.log('Items Calculated:',_runningBWvalues.length);
+
+						if(_useViewportEnabledAdvancedSwitching)
+						{
+							_proposedIndex = getIndexByBandwidthAndPlayerDimensions(_runningBW, _model.stageRect.width, _model.stageRect.height);
+						} else
+						{
+							_proposedIndex = getIndexByBandwidth(_runningBW);
+						}
+
+						if( !_switching )
+						{
+							Console.warn('Proposed Index:', _proposedIndex);
+							Console.warn('Current Index:', _currentIndex);
+
+							if( _proposedIndex != -1 && _proposedIndex != _currentIndex )
+							{
+								_runningBWvalues = [];
+
+								switchTo( _proposedIndex );
+							}
+						}
+
+						Console.log("Switch Check End");
+						Console.log("==================");
+					}
 				}
 			}
 
@@ -943,7 +1003,6 @@ import com.videojs.providers.hls.structs.M3U8TagType;
 
             if((e.target as StreamSegment).sequenceID == _firstKnownSequenceID){
                 if(_isSeeking){
-                    _isSeeking = false;
                     dispatchEvent(new HLSEvent(HLSEvent.FIRST_SEEK_SEGMENT_LOADED, {}));
                 }
                 else{
@@ -951,8 +1010,94 @@ import com.videojs.providers.hls.structs.M3U8TagType;
                     dispatchEvent(new HLSEvent(HLSEvent.FIRST_SEGMENT_LOADED, {}));
                 }
             }
+
+
         }
+
+		public function getIndexByBandwidth(bandwidth:Number):int
+		{
+			// Algorithm
+			// 1. Determine current rendition
+			// 2. Determine 'best selectable' rendition by smallest delta between reported bw and each rendition with known bw.
+			// 3. Return the rendition index
+
+			if( _renditions && _renditions.length != 0)
+			{
+				var currIndex:int = _currentIndex;
+				var currRendition:HLSRendition = _currentRendition;
+				var responseIndex:int = -1;
+				var deltaValue:Number = -1;
+
+				for each( var rend:HLSRendition in _renditions )
+				{
+					if( deltaValue == -1 || (deltaValue != -1 && (bandwidth-rend.bandwidth) < deltaValue) )
+					{
+						deltaValue = (bandwidth-rend.bandwidth);
+						responseIndex = _renditions.indexOf(rend);
+					}
+				}
+
+				Console.log("Based on BW value:", bandwidth, "should be index", responseIndex );
+
+				return responseIndex;
+
+			} else
+			{
+				Console.warn("Unknown RENDITIONS in getIndexByBandwidth");
+				return -1;
+			}
+
+		}
+
+		public function getIndexByBandwidthAndPlayerDimensions(bandwidth:Number, playerWidth:Number, playerHeight:Number):int
+		{
+			// Algorithm
+			// 1. Determine the appropriate index by bandwidth value --> determineIndexByBandwidth(bandwidth);
+			// 2. If rendition with returned index has a resolution value greater than both
+			// the width and height of the current viewport dimensions, then find a lower index
+			// 3. Return the rendition index
+
+			Console.warn("Determine Factors:", bandwidth, playerWidth, playerHeight);
+
+			if( _renditions != null && _renditions.length != 0 && _currentRendition != null && _currentIndex != -1)
+			{
+				var currRendition:HLSRendition = _currentRendition;
+				var bwAppropriateIndex:int = getIndexByBandwidth(bandwidth);
+				var bwAppropriateRendition:HLSRendition = _renditions[bwAppropriateIndex];
+				var playerWidth:Number = _model.stageRect.width;
+				var playerHeight:Number = _model.stageRect.height;
+				var responseIndex:int = bwAppropriateIndex;
+				var bwDelta:Number = Math.abs(bandwidth-bwAppropriateRendition.bandwidth);
+
+				if( bwAppropriateRendition.mediaWidth > playerWidth || bwAppropriateRendition.mediaHeight > playerHeight )
+				{
+					Console.warn('bwRendition Too big for viewport');
+					Console.warn('look for best viewport sized rendition instead');
+
+					var widthDelta:Number;
+
+					for each( var rend:HLSRendition in _renditions )
+					{
+						if(rend.mediaWidth <= playerWidth && rend.bandwidth < bandwidth)
+						{
+							widthDelta = playerWidth-rend.mediaWidth;
+
+							if(bandwidth-rend.bandwidth<bwDelta)
+							{
+								Console.warn('--', _renditions.indexOf(rend), widthDelta, 'smaller', bandwidth-rend.bandwidth);
+								bwDelta = bandwidth-rend.bandwidth;
+								responseIndex = _renditions.indexOf(rend);
+							}
+						}
+					}
+				}
+
+				return responseIndex;
+			} else
+			{
+				Console.warn("Unknown RENDITIONS in getIndexByBandwidthAndPlayerDimensions");
+				return -1;
+			}
+		}
     }
 }
-
-//_model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));

@@ -12,9 +12,9 @@ public class HLSRendition {
 	public function HLSRendition() {
 		_url = "";
 		_directory = "";
-		_bandwidth = 0;
-		_mediaWidth = 0;
-		_mediaHeight = 0;
+		_bandwidth = -1;
+		_mediaWidth = -1;
+		_mediaHeight = -1;
 		_current = false;
 	}
 

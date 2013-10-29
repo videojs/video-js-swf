@@ -51,8 +51,6 @@ import com.videojs.providers.hls.utils.ManifestManager;
         private var _pauseOnStart:Boolean = false;
         private var _streamEndImminent:Boolean = false;
 
-
-
         private var _model:VideoJSModel;
 
         private static const NETSTREAM_PLAY_BUFFER_START_SIZE:Number = 1;
@@ -481,7 +479,7 @@ import com.videojs.providers.hls.utils.ManifestManager;
                     _ns.bufferTime = NETSTREAM_PLAY_BUFFER_END_SIZE;
 
 					if (_manifestManager && _manifestManager.isDynamicStream) {
-						_manifestManager.useBandwidthDetection = true;
+						_manifestManager.readyForAdaptiveSwitching = true;
 					}
 
                     break;

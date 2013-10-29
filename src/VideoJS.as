@@ -4,8 +4,9 @@ package{
     import com.videojs.events.VideoJSEvent;
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.ExternalErrorEventName;
+	import com.videojs.utils.Console;
 
-    import flash.display.Sprite;
+	import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.events.Event;
@@ -32,7 +33,7 @@ package{
         }
 
         private function init():void{
-            // Allow JS calls from other domains
+			// Allow JS calls from other domains
             Security.allowDomain("*");
             Security.allowInsecureDomain("*");
 
@@ -51,7 +52,7 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0 (HLS 0.1.5)", false, false);
             var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2013 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
@@ -75,7 +76,7 @@ package{
                 ExternalInterface.addCallback("vjs_stop", onStopCalled);
 				// MBR Extention //
 				ExternalInterface.addCallback("vjs_switchTo", onSwitchToCalled);
-            }
+			}
             catch(e:SecurityError){
                 if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
                     throw new SecurityError(e.message);
@@ -95,6 +96,10 @@ package{
         }
 
         private function finish():void{
+
+			if(loaderInfo.parameters.bitrateLimit != undefined) {
+				_app.model.bitrateLimit = parseInt(loaderInfo.parameters.bitrateLimit);
+			}
 
             if(loaderInfo.parameters.mode != undefined){
                 _app.model.mode = loaderInfo.parameters.mode;
@@ -175,6 +180,13 @@ package{
 
             switch(pPropertyName){
 				/* --- ADD MBR Support Start --- */
+				case "bandwidth":
+					return _app.model.bandwidth;
+					break;
+
+				case "bitrateLimit":
+				    return _app.model.bandwidth;
+					break;
 
 				case "isDynamicStream":
 					return _app.model.isDynamicStream;
@@ -296,8 +308,17 @@ package{
         }
 
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
-            switch(pPropertyName){
+            Console.warn("onSetProp", pPropertyName);
+			switch(pPropertyName){
 				/* MBR Cases */
+				case "bandwidth":
+					_app.model.bandwidth = pValue;
+					break;
+
+				case "bitrateLimit":
+					_app.model.bitrateLimit = pValue;
+					break;
+
 				case "autoSwitch":
 					break;
 
@@ -395,6 +416,5 @@ package{
 		private function onSwitchToCalled(pIndex:int):void {
 			_app.model.switchTo(pIndex);
 		}
-
     }
 }

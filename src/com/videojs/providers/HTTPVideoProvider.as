@@ -1,12 +1,13 @@
 package com.videojs.providers{
-    
+
     import com.videojs.VideoJSModel;
     import com.videojs.events.VideoPlaybackEvent;
     import com.videojs.structs.ExternalErrorEventName;
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.PlaybackType;
-    
-    import flash.events.EventDispatcher;
+import com.videojs.utils.Console;
+
+import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
     import flash.external.ExternalInterface;
@@ -15,9 +16,9 @@ package com.videojs.providers{
     import flash.net.NetStream;
     import flash.utils.Timer;
     import flash.utils.getTimer;
-    
+
     public class HTTPVideoProvider extends EventDispatcher implements IProvider{
-        
+
         private var _nc:NetConnection;
         private var _ns:NetStream;
         private var _throughputTimer:Timer;
@@ -29,14 +30,14 @@ package com.videojs.providers{
         private var _pauseOnStart:Boolean = false;
         private var _pausePending:Boolean = false;
         private var _videoReference:Video;
-        
+
         /**
          * When the player is paused, and a seek is executed, the NetStream.time property will NOT update until the decoder encounters a new time tag,
          * which won't happen until playback is resumed. This wrecks havoc with external scrubber logic, so when the player is paused and a seek is requested,
-         * we cache the intended time, and use it IN PLACE OF NetStream's time when the time accessor is hit. 
-         */        
+         * we cache the intended time, and use it IN PLACE OF NetStream's time when the time accessor is hit.
+         */
         private var _pausedSeekValue:Number = -1;
-        
+
         private var _src:Object;
         private var _metadata:Object;
         private var _isPlaying:Boolean = false;
@@ -48,9 +49,9 @@ package com.videojs.providers{
         private var _hasEnded:Boolean = false;
         private var _canPlayThrough:Boolean = false;
         private var _loop:Boolean = false;
-        
+
         private var _model:VideoJSModel;
-        
+
         public function HTTPVideoProvider(){
             _model = VideoJSModel.getInstance();
             _metadata = {};
@@ -62,11 +63,11 @@ package com.videojs.providers{
         public function get loop():Boolean{
             return _loop;
         }
-        
+
         public function set loop(pLoop:Boolean):void{
             _loop = pLoop;
         }
-        
+
         public function get time():Number{
             if(_ns != null){
                 if(_pausedSeekValue != -1){
@@ -80,7 +81,7 @@ package com.videojs.providers{
                 return 0;
             }
         }
-        
+
         public function get duration():Number{
             if(_metadata != null && _metadata.duration != undefined){
                 return Number(_metadata.duration);
@@ -89,7 +90,7 @@ package com.videojs.providers{
                 return 0;
             }
         }
-        
+
         public function get readyState():int{
             // if we have metadata and a known duration
             if(_metadata != null && _metadata.duration != undefined){
@@ -107,7 +108,7 @@ package com.videojs.providers{
                         }
                         // otherwise, we can't be certain that seeking ahead will work
                         else{
-                            return 2;   
+                            return 2;
                         }
                     }
                 }
@@ -121,7 +122,7 @@ package com.videojs.providers{
                 return 0;
             }
         }
-        
+
         public function get networkState():int{
             if(!_loadStarted){
                 return 0;
@@ -138,7 +139,7 @@ package com.videojs.providers{
                 }
             }
         }
-        
+
         public function get buffered():Number{
             if(duration > 0){
                 return (_ns.bytesLoaded / _ns.bytesTotal) * duration;
@@ -147,7 +148,7 @@ package com.videojs.providers{
                 return 0;
             }
         }
-        
+
         public function get bufferedBytesEnd():int{
             if(_loadStarted){
                 return _ns.bytesLoaded;
@@ -156,53 +157,53 @@ package com.videojs.providers{
                 return 0;
             }
         }
-        
+
         public function get bytesLoaded():int{
-            
+
             return 0;
         }
-        
+
         public function get bytesTotal():int{
-            
+
             return 0;
         }
-        
+
         public function get playing():Boolean{
             return _isPlaying;
         }
-        
+
         public function get paused():Boolean{
             return _isPaused;
         }
-        
+
         public function get ended():Boolean{
-            
+
             return false;
         }
-        
+
         public function get seeking():Boolean{
             return _isSeeking;
         }
-        
+
         public function get usesNetStream():Boolean{
             return true;
         }
-        
+
         public function get metadata():Object{
             return _metadata;
         }
-        
+
         public function set src(pSrc:Object):void{
             init(pSrc, false);
         }
-        
+
         public function get srcAsString():String{
             if(_src != null){
                 return _src.url;
             }
             return "";
         }
-        
+
         public function init(pSrc:Object, pAutoplay:Boolean):void{
             _src = pSrc;
             _loadErrored = false;
@@ -212,14 +213,14 @@ package com.videojs.providers{
                 initNetConnection();
             }
         }
-        
+
         public function load():void{
             _pauseOnStart = true;
             _isPlaying = false;
             _isPaused = true;
             initNetConnection();
         }
-        
+
         public function play():void{
             // if this is a fresh playback request
             if(!_loadStarted){
@@ -239,7 +240,7 @@ package com.videojs.providers{
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
             }
         }
-        
+
         public function pause():void{
             if(_isPlaying && !_isPaused){
                 _ns.pause();
@@ -250,7 +251,7 @@ package com.videojs.providers{
                 }
             }
         }
-        
+
         public function resume():void{
             if(_isPlaying && _isPaused){
                 _ns.resume();
@@ -259,7 +260,7 @@ package com.videojs.providers{
                 _model.broadcastEventExternally(ExternalEventName.ON_START);
             }
         }
-        
+
         public function seekBySeconds(pTime:Number):void{
             if(_isPlaying){
                 if(duration != 0 && pTime <= duration){
@@ -279,7 +280,7 @@ package com.videojs.providers{
                 _isBuffering = true;
             }
         }
-        
+
         public function seekByPercent(pPercent:Number):void{
             if(_isPlaying && _metadata.duration != undefined){
                 _isSeeking = true;
@@ -293,11 +294,11 @@ package com.videojs.providers{
                 else{
                     _throughputTimer.stop();
                     _ns.seek(pPercent * _metadata.duration);
-                    
+
                 }
             }
         }
-        
+
         public function stop():void{
             if(_isPlaying){
                 _ns.close();
@@ -308,7 +309,7 @@ package com.videojs.providers{
                 _throughputTimer.reset();
             }
         }
-        
+
         public function attachVideo(pVideo:Video):void{
             _videoReference = pVideo;
         }
@@ -349,7 +350,7 @@ package com.videojs.providers{
                 }
             }
         }
-        
+
         private function initNetConnection():void{
 
             if(_nc != null) {
@@ -367,7 +368,7 @@ package com.videojs.providers{
             _nc.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
             _nc.connect(null);
         }
-        
+
         private function initNetStream():void{
             if(_ns != null){
                 _ns.close();
@@ -380,10 +381,10 @@ package com.videojs.providers{
             _ns.bufferTime = .5;
             _ns.play(_src.path);
             _videoReference.attachNetStream(_ns);
-            
+
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
-        
+
         private function calculateThroughput():void{
             // if it's finished loading, we can kill the calculations and assume it can play through
             if(_ns.bytesLoaded == _ns.bytesTotal){
@@ -409,7 +410,7 @@ package com.videojs.providers{
                 }
             }
         }
-        
+
         private function onNetConnectionStatus(e:NetStatusEvent):void{
             switch(e.info.code){
                 case "NetConnection.Connect.Success":
@@ -417,11 +418,11 @@ package com.videojs.providers{
                     break;
                 case "NetConnection.Connect.Failed":
 
-                    break;    
+                    break;
             }
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_NETCONNECTION_STATUS, {info:e.info}));
         }
-        
+
         private function onNetStreamStatus(e:NetStatusEvent):void{
             switch(e.info.code){
                 case "NetStream.Play.Start":
@@ -446,7 +447,7 @@ package com.videojs.providers{
                     }
                     _loadStarted = true;
                     break;
-                
+
                 case "NetStream.Buffer.Full":
                     _pausedSeekValue = -1;
                     _isBuffering = false;
@@ -460,14 +461,14 @@ package com.videojs.providers{
                         _isPaused = true;
                     }
                     break;
-                
+
                 case "NetStream.Buffer.Empty":
                     _isBuffering = true;
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     break;
-                
+
                 case "NetStream.Play.Stop":
-                    
+
                     if(!_loop){
                         _isPlaying = false;
                         _hasEnded = true;
@@ -477,11 +478,11 @@ package com.videojs.providers{
                     else{
                         _ns.seek(0);
                     }
-                    
+
                     _throughputTimer.stop();
                     _throughputTimer.reset();
                     break;
-                
+
                 case "NetStream.Seek.Notify":
                     _isPlaying = true;
                     _isSeeking = false;
@@ -492,22 +493,22 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    
-                    break;    
-                
+
+                    break;
+
                 case "NetStream.Play.StreamNotFound":
                     _loadErrored = true;
                     _model.broadcastErrorEventExternally(ExternalErrorEventName.SRC_404);
                     break;
-                
+
             }
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_NETSTREAM_STATUS, {info:e.info}));
         }
-        
+
         private function onThroughputTimerTick(e:TimerEvent):void{
             calculateThroughput();
         }
-        
+
         public function onMetaData(pMetaData:Object):void{
             _metadata = pMetaData;
             if(pMetaData.duration != undefined){
@@ -522,15 +523,15 @@ package com.videojs.providers{
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
             _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
         }
-        
+
         public function onCuePoint(pInfo:Object):void{
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_CUE_POINT, {cuepoint:pInfo}));
         }
-        
+
         public function onXMPData(pInfo:Object):void{
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_XMP_DATA, {cuepoint:pInfo}));
         }
-        
+
         public function onPlayStatus(e:Object):void{
 
         }
