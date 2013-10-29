@@ -18,6 +18,7 @@ package com.videojs{
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
     import flash.media.Video;
+    import flash.utils.ByteArray;
     
     public class VideoJSModel extends EventDispatcher{
 
@@ -99,6 +100,10 @@ package com.videojs{
         }
         public function set stageRect(pRect:Rectangle):void{
             _stageRect = pRect;
+        }
+
+        public function appendBuffer(bytes:ByteArray):void{
+            _provider.appendBuffer(bytes);
         }
         
         public function get backgroundColor():Number{

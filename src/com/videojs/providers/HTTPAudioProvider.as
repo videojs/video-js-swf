@@ -13,6 +13,7 @@ package com.videojs.providers{
     import flash.media.SoundChannel;
     import flash.media.Video;
     import flash.net.URLRequest;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
     
@@ -108,6 +109,10 @@ package com.videojs.providers{
             else{
                 return 1;
             }
+        }
+
+        public function appendBuffer(bytes:ByteArray):void{
+            throw "HTTPAudioProvider does not support appendBuffer";
         }
         
         public function get buffered():Number{

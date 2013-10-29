@@ -9,13 +9,13 @@ package com.videojs.providers{
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
-    import flash.external.ExternalInterface;
     import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
-    
+
     public class HTTPVideoProvider extends EventDispatcher implements IProvider{
         
         private var _nc:NetConnection;
@@ -138,6 +138,10 @@ package com.videojs.providers{
                 }
             }
         }
+
+        public function appendBuffer(bytes:ByteArray):void{
+            _ns.appendBytes(bytes);
+        }
         
         public function get buffered():Number{
             if(duration > 0){
@@ -176,8 +180,7 @@ package com.videojs.providers{
         }
         
         public function get ended():Boolean{
-            
-            return false;
+            return _hasEnded;
         }
         
         public function get seeking():Boolean{
@@ -231,6 +234,10 @@ package com.videojs.providers{
             }
             // if the asset is already loading
             else{
+                if (_hasEnded) {
+                  _hasEnded = false;
+                  _ns.seek(0);
+                }
                 _pausePending = false;
                 _ns.resume();
                 _isPaused = false;
@@ -248,6 +255,9 @@ package com.videojs.providers{
                 if(_isBuffering){
                     _pausePending = true;
                 }
+            } else if (_hasEnded) {
+              _hasEnded = false;
+              _ns.seek(0);
             }
         }
         
@@ -380,6 +390,11 @@ package com.videojs.providers{
             _ns.bufferTime = .5;
             _ns.play(_src.path);
             _videoReference.attachNetStream(_ns);
+
+            if (_src.path === null) {
+              _pausePending = true;
+              _loadStarted = true;
+            }
             
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
@@ -462,6 +477,8 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Buffer.Empty":
+                    // should not fire if ended/paused. issue #38
+                    if(!_isPlaying){ return; }
                     _isBuffering = true;
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     break;
@@ -470,8 +487,10 @@ package com.videojs.providers{
                     
                     if(!_loop){
                         _isPlaying = false;
+                        _isPaused = true;
                         _hasEnded = true;
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
+                        _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                         _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
                     }
                     else{
