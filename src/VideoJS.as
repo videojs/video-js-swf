@@ -4,6 +4,7 @@ package{
     import com.videojs.events.VideoJSEvent;
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.ExternalErrorEventName;
+    import com.videojs.Base64;
     
     import flash.display.Sprite;
     import flash.display.StageAlign;
@@ -172,12 +173,8 @@ package{
             }
         }
 
-        private function onAppendBufferCalled(array:*):void{
-            // translate the array from js into bytes
-            var bytes:ByteArray = new ByteArray();
-            for (var i:int = 0; i < array.length; i++) {
-                bytes.writeByte(array[i]);
-            }
+        private function onAppendBufferCalled(base64str:String):void{
+            var bytes:ByteArray = Base64.decode(base64str);
 
             // write the bytes to the provider
             _app.model.appendBuffer(bytes);
