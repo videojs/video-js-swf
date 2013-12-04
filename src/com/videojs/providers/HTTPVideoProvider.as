@@ -248,8 +248,9 @@ package com.videojs.providers{
         }
         
         public function pause():void{
+            _ns.pause();
+
             if(_isPlaying && !_isPaused){
-                _ns.pause();
                 _isPaused = true;
                 _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                 if(_isBuffering){
@@ -484,7 +485,7 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Play.Stop":
-                    
+
                     if(!_loop){
                         _isPlaying = false;
                         _isPaused = true;
