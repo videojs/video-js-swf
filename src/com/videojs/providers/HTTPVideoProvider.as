@@ -124,7 +124,10 @@ package com.videojs.providers{
         
         public function get networkState():int{
             if(!_loadStarted){
-                return 0;
+                // returning NETWORK_LOADING because the provider won't be
+                // loaded unless a source has already been selected.
+                // In html5 sense this means the network is not NETWORK_EMPTY
+                return 2;
             }
             else{
                 if(_loadCompleted){

@@ -119,7 +119,7 @@ package com.videojs.providers{
         
         public function get networkState():int{
             if(!_loadStarted){
-                return 0;
+                return 2;
             }
             else{
                 if(_loadCompleted){
