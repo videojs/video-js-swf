@@ -452,7 +452,6 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     if(_pauseOnStart && _loadStarted == false){
                         _ns.pause();

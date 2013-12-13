@@ -413,7 +413,6 @@ package com.videojs.providers{
             _ns.bufferTime = 1;
             _ns.play(_src.streamURL);
             _videoReference.attachNetStream(_ns);
-            _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
         

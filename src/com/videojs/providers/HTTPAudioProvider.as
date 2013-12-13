@@ -222,7 +222,6 @@ package com.videojs.providers{
                 catch(e:Error){
                     _model.broadcastErrorEventExternally("audioloaderror");
                 }
-                _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                 _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
             }
         }
@@ -280,7 +279,6 @@ package com.videojs.providers{
                     }
                     _soundChannel = _sound.play();
                     _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
-                    _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);    
                 }
             }
