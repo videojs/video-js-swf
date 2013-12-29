@@ -33,6 +33,7 @@ package com.videojs{
             _model.addEventListener(VideoJSEvent.STAGE_RESIZE, onStageResize);
             _model.addEventListener(VideoPlaybackEvent.ON_STREAM_START, onStreamStart);
             _model.addEventListener(VideoPlaybackEvent.ON_META_DATA, onMetaData);
+            _model.addEventListener(VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE, onDimensionUpdate);
             
             _uiBackground = new Sprite();
             _uiBackground.graphics.beginFill(_model.backgroundColor, 1);
@@ -227,6 +228,10 @@ package com.videojs{
         }
         
         private function onMetaData(e:VideoPlaybackEvent):void{        
+            sizeVideoObject();
+        }
+
+        private function onDimensionUpdate(e:VideoPlaybackEvent):void{
             sizeVideoObject();
         }
         

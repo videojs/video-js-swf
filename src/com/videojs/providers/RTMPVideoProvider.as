@@ -558,6 +558,17 @@ package com.videojs.providers{
                     _loadErrored = true;
                     _model.broadcastErrorEventExternally(ExternalErrorEventName.SRC_404);
                     break;
+
+                case "NetStream.Video.DimensionChange":
+                    _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE, {videoWidth: _videoReference.videoWidth, videoHeight: _videoReference.videoHeight}));
+
+                    if(_model.metadata && _videoReference)
+                    {
+                        _model.metadata.width = _videoReference.videoWidth;
+                        _model.metadata.height = _videoReference.videoHeight;
+                    }
+
+                    break;
                 
                 default:
                     if(e.info.level == "error"){
