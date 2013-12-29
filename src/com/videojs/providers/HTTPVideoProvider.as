@@ -59,6 +59,14 @@ package com.videojs.providers{
 
         }
 
+        public function get bufferLength():Number{
+            if( _ns ) {
+                return _ns.bufferLength;
+            } else {
+                return 0;
+            }
+        }
+
         public function get loop():Boolean{
             return _loop;
         }

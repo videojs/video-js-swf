@@ -187,6 +187,9 @@ package{
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
             switch(pPropertyName){
+                case "bufferLength":
+                    return _app.model.bufferLength;
+                    break;
                 case "mode":
                     return _app.model.mode;
                 case "autoplay":
