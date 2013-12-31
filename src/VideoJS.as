@@ -53,8 +53,8 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0", false, false);
-            var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2013 Brightcove, Inc.", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.1", false, false);
+            var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2014 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
             _ctxMenu.customItems.push(_ctxVersion, _ctxAbout);
@@ -187,6 +187,9 @@ package{
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
             switch(pPropertyName){
+                case "bufferLength":
+                    return _app.model.bufferLength;
+                    break;
                 case "mode":
                     return _app.model.mode;
                 case "autoplay":

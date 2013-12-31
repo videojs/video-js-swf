@@ -54,6 +54,10 @@ package com.videojs.providers{
             _throughputTimer = new Timer(250, 0);
             _throughputTimer.addEventListener(TimerEvent.TIMER, onThroughputTimerTick);
         }
+
+        public function get bufferLength():Number{
+            return 0;
+        }
         
         public function get loop():Boolean{
             return _loop;

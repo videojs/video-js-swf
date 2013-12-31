@@ -50,7 +50,14 @@ package com.videojs.providers{
          * this value is unknown or unable to be determined (due to lack of duration data, etc)
          */
         function get buffered():Number;
-        
+
+        /**
+         * Should return a Number that reflects the amount of time (in seconds) of data buffered.
+         * This will be used for HTTP based live streams with DVR and any Media Source/ Data Generation
+         * mode streams where duration is unknown or dynamic.
+         */
+        function get bufferLength():Number;
+
         /**
          * Should return the number of bytes that have been loaded thus far, or 0 if
          * this value is unknown or unable to be calculated (due to streaming, bitrate switching, etc)

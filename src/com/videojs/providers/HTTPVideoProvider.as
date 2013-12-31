@@ -59,6 +59,14 @@ package com.videojs.providers{
 
         }
 
+        public function get bufferLength():Number{
+            if( _ns ) {
+                return _ns.bufferLength;
+            } else {
+                return 0;
+            }
+        }
+
         public function get loop():Boolean{
             return _loop;
         }
@@ -485,7 +493,6 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Play.Stop":
-
                     if(!_loop){
                         _isPlaying = false;
                         _isPaused = true;
@@ -497,7 +504,6 @@ package com.videojs.providers{
                     else{
                         _ns.seek(0);
                     }
-                    
                     _throughputTimer.stop();
                     _throughputTimer.reset();
                     break;
@@ -512,14 +518,22 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    
-                    break;    
+                    break;
                 
                 case "NetStream.Play.StreamNotFound":
                     _loadErrored = true;
                     _model.broadcastErrorEventExternally(ExternalErrorEventName.SRC_404);
                     break;
-                
+
+                case "NetStream.Video.DimensionChange":
+                    _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE, {videoWidth: _videoReference.videoWidth, videoHeight: _videoReference.videoHeight}));
+                    if(_model.metadata && _videoReference)
+                    {
+                        _model.metadata.width = _videoReference.videoWidth;
+                        _model.metadata.height = _videoReference.videoHeight;
+                    }
+                    break;
+
             }
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_NETSTREAM_STATUS, {info:e.info}));
         }
