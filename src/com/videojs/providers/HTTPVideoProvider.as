@@ -493,7 +493,6 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Play.Stop":
-
                     if(!_loop){
                         _isPlaying = false;
                         _isPaused = true;
@@ -505,7 +504,6 @@ package com.videojs.providers{
                     else{
                         _ns.seek(0);
                     }
-                    
                     _throughputTimer.stop();
                     _throughputTimer.reset();
                     break;
@@ -520,8 +518,7 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    
-                    break;    
+                    break;
                 
                 case "NetStream.Play.StreamNotFound":
                     _loadErrored = true;
@@ -530,13 +527,11 @@ package com.videojs.providers{
 
                 case "NetStream.Video.DimensionChange":
                     _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE, {videoWidth: _videoReference.videoWidth, videoHeight: _videoReference.videoHeight}));
-
                     if(_model.metadata && _videoReference)
                     {
                         _model.metadata.width = _videoReference.videoWidth;
                         _model.metadata.height = _videoReference.videoHeight;
                     }
-
                     break;
 
             }

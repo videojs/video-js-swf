@@ -60,7 +60,7 @@ package com.videojs.providers{
         }
 
         public function get bufferLength():Number{
-            if( _ns ) {
+            if(_ns) {
                 return _ns.bufferLength;
             } else {
                 return 0;
@@ -540,7 +540,6 @@ package com.videojs.providers{
                         _isBuffering = true;
                         _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     }
-
                     break;
                 
                 case "NetStream.Play.Stop":
@@ -559,7 +558,6 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    
                     break;
                 
                 case "NetStream.Play.StreamNotFound":
@@ -569,13 +567,11 @@ package com.videojs.providers{
 
                 case "NetStream.Video.DimensionChange":
                     _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE, {videoWidth: _videoReference.videoWidth, videoHeight: _videoReference.videoHeight}));
-
                     if(_model.metadata && _videoReference)
                     {
                         _model.metadata.width = _videoReference.videoWidth;
                         _model.metadata.height = _videoReference.videoHeight;
                     }
-
                     break;
                 
                 default:
@@ -583,7 +579,6 @@ package com.videojs.providers{
                         _model.broadcastErrorEventExternally(e.info.code);
                         _model.broadcastErrorEventExternally(e.info.description);
                     }
-                    
                     break;
             }
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_NETSTREAM_STATUS, {info:e.info}));
