@@ -21,6 +21,7 @@ package com.videojs.events{
         public static const ON_STREAM_REBUFFER_END:String = "VideoPlaybackEvent.ON_STREAM_REBUFFER_END";
         public static const ON_ERROR:String = "VideoPlaybackEvent.ON_ERROR";
         public static const ON_UPDATE:String = "VideoPlaybackEvent.ON_UPDATE";
+        public static const ON_VIDEO_DIMENSION_UPDATE:String = "VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE";
         
         // a flexible container object for whatever data needs to be attached to any of these events
         private var _data:Object;
