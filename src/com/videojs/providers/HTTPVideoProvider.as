@@ -147,8 +147,10 @@ package com.videojs.providers{
             if(duration > 0){
                 return (_ns.bytesLoaded / _ns.bytesTotal) * duration;
             }
-            else{
+            else if (_ns){
                 return _ns.bufferLength + _ns.time;
+            } else{
+                 return 0;
             }
         }
         
