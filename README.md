@@ -20,9 +20,9 @@ Installation
 
 3. Run Connect Server.
 
-    ```bash
+```bash
     grunt connect:dev
-   ```
+```
 
 8. Open your browser at [http://localhost:8000/index.html](http://localhost:8000/index.html) to see a video play.  You can keep using grunt to rebuild the Flash code.
 
