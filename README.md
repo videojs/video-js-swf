@@ -13,9 +13,16 @@ Installation
 
 2. Compile SWF.
 
+Development (places new SWF in build/files):
 
 ```bash
     grunt mxmlc
+   ```
+
+Production/ Distribution (runs mxmlc task and copies SWF to dist/):
+
+```bash
+    grunt dist
    ```
 
 3. Run Connect Server.
