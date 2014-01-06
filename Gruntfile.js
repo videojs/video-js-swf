@@ -2,7 +2,12 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-
+    connect: {
+      dev: {
+        port: 8000,
+        base: 'build/files'
+      }
+    },
     mxmlc: {
       options: {
         // http://livedocs.adobe.com/flex/3/html/help.html?content=compilers_16.html
@@ -113,6 +118,8 @@ module.exports = function (grunt) {
     }
 
   });
+
+  grunt.loadNpmTasks('grunt-connect');
 
   grunt.registerMultiTask('mxmlc', 'Compiling SWF', function () {
     // Merge task-specific and/or target-specific options with these defaults.
