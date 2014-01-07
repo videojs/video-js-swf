@@ -12,7 +12,8 @@
   "homepage": "http://videojs.com",
   "author": "Brightcove",
   "scripts": {
-    "test": "grunt test --verbose"
+    "test": "grunt test --verbose",
+    "postinstall": "grunt dist --verbose"
   },
   "repository": {
     "type": "git",
