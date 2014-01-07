@@ -21,11 +21,11 @@
     "url": "https://github.com/videojs/video-js-swf.git"
   },
   "dependencies": {
+    "async": "~0.2.9",
     "flex-sdk": "4.6.0"
   },
   "devDependencies": {
     "video.js": "4.3.0",
-    "async": "~0.2.9",
     "grunt-cli": "~0.1.0",
     "grunt": "~0.4.0",
     "grunt-connect": "~0.2.0",
