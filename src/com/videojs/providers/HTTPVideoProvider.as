@@ -9,7 +9,8 @@ package com.videojs.providers{
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
-    import flash.media.Video;
+import flash.external.ExternalInterface;
+import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
     import flash.net.NetStreamAppendBytesAction;
@@ -37,7 +38,8 @@ package com.videojs.providers{
          * we cache the intended time, and use it IN PLACE OF NetStream's time when the time accessor is hit. 
          */        
         private var _pausedSeekValue:Number = -1;
-        
+        private var _lastSeekedTime:Number = -1;
+
         private var _src:Object;
         private var _metadata:Object;
         private var _isPlaying:Boolean = false;
@@ -58,7 +60,6 @@ package com.videojs.providers{
             _metadata = {};
             _throughputTimer = new Timer(250, 0);
             _throughputTimer.addEventListener(TimerEvent.TIMER, onThroughputTimerTick);
-
         }
 
         public function get loop():Boolean{
@@ -70,6 +71,11 @@ package com.videojs.providers{
         }
         
         public function get time():Number{
+            if(_ns && _src.path == null && _lastSeekedTime != -1)
+            {
+                return _ns.time + _lastSeekedTime;
+            }
+
             if(_ns != null){
                 if(_pausedSeekValue != -1){
                     return _pausedSeekValue;
@@ -306,11 +312,11 @@ package com.videojs.providers{
                 _isBuffering = true;
             }
 
-            /*
+
             if(_src.path === null) {
-                appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
+                _lastSeekedTime = pTime;
             }
-            */
+
         }
         
         public function seekByPercent(pPercent:Number):void{
