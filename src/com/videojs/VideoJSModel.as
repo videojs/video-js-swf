@@ -18,7 +18,8 @@ package com.videojs{
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
     import flash.media.Video;
-    import flash.utils.ByteArray;
+import flash.net.NetStreamAppendBytesAction;
+import flash.utils.ByteArray;
     
     public class VideoJSModel extends EventDispatcher{
 
@@ -68,7 +69,7 @@ package com.videojs{
         public function get mode():String{
             return _mode;
         }
-        public function set mode(pMode:String):void{
+        public function set mode(pMode:String):void {
             switch(pMode){
                 case PlayerMode.VIDEO:
                     _mode = pMode;
@@ -84,32 +85,54 @@ package com.videojs{
         public function get jsEventProxyName():String{
             return _jsEventProxyName;
         }
-        public function set jsEventProxyName(pName:String):void{
+        public function set jsEventProxyName(pName:String):void {
             _jsEventProxyName = cleanEIString(pName);
         }
         
         public function get jsErrorEventProxyName():String{
             return _jsErrorEventProxyName;
         }
-        public function set jsErrorEventProxyName(pName:String):void{
+        public function set jsErrorEventProxyName(pName:String):void {
             _jsErrorEventProxyName = cleanEIString(pName);
         }
         
         public function get stageRect():Rectangle{
             return _stageRect;
         }
-        public function set stageRect(pRect:Rectangle):void{
+        public function set stageRect(pRect:Rectangle):void {
             _stageRect = pRect;
         }
 
-        public function appendBuffer(bytes:ByteArray):void{
+        public function appendBytesAction(action:String):void {
+            var value:String;
+
+            switch (action.toLowerCase()) {
+                case "endsequence":
+                    value = NetStreamAppendBytesAction.END_SEQUENCE;
+                    break;
+
+                case "resetseek":
+                    value = NetStreamAppendBytesAction.RESET_SEEK;
+                    break;
+
+                case "resetbegin":
+                    value = NetStreamAppendBytesAction.RESET_BEGIN;
+                    break;
+            }
+
+            if(value && _provider && _provider is HTTPVideoProvider) {
+                (_provider as HTTPVideoProvider).appendBytesAction(value);
+            }
+        }
+
+        public function appendBuffer(bytes:ByteArray):void {
             _provider.appendBuffer(bytes);
         }
         
         public function get backgroundColor():Number{
             return _backgroundColor;
         }
-        public function set backgroundColor(pColor:Number):void{
+        public function set backgroundColor(pColor:Number):void {
             if(pColor < 0){
                 _backgroundColor = 0;
             }
@@ -122,7 +145,7 @@ package com.videojs{
         public function get backgroundAlpha():Number{
             return _backgroundAlpha;
         }
-        public function set backgroundAlpha(pAlpha:Number):void{
+        public function set backgroundAlpha(pAlpha:Number):void {
             if(pAlpha < 0){
                 _backgroundAlpha = 0;
             }
@@ -134,7 +157,7 @@ package com.videojs{
         public function get videoReference():Video{
             return _videoReference;
         }
-        public function set videoReference(pVideo:Video):void{
+        public function set videoReference(pVideo:Video):void {
             _videoReference = pVideo;
         }
         
@@ -148,7 +171,7 @@ package com.videojs{
         public function get volume():Number{
             return _volume;
         }
-        public function set volume(pVolume:Number):void{
+        public function set volume(pVolume:Number):void {
             if(pVolume >= 0 && pVolume <= 1){
                 _volume = pVolume;
             }
@@ -177,7 +200,7 @@ package com.videojs{
         public function get autoplay():Boolean{
             return _autoplay;
         }
-        public function set autoplay(pValue:Boolean):void{
+        public function set autoplay(pValue:Boolean):void {
             _autoplay = pValue;
         }
         
@@ -187,7 +210,7 @@ package com.videojs{
             }
             return _src;
         }
-        public function set src(pValue:String):void{
+        public function set src(pValue:String):void {
             _src = pValue;
             _rtmpConnectionURL = "";
             _rtmpStream = "";
@@ -205,7 +228,7 @@ package com.videojs{
         public function get rtmpConnectionURL():String{
             return _rtmpConnectionURL;
         }
-        public function set rtmpConnectionURL(pURL:String):void{
+        public function set rtmpConnectionURL(pURL:String):void {
             _src = "";
             _rtmpConnectionURL = pURL;
         }
@@ -213,7 +236,7 @@ package com.videojs{
         public function get rtmpStream():String{
             return _rtmpStream;
         }
-        public function set rtmpStream(pValue:String):void{
+        public function set rtmpStream(pValue:String):void {
             _src = "";
             _rtmpStream = pValue;
             broadcastEventExternally(ExternalEventName.ON_SRC_CHANGE, _src);
@@ -241,7 +264,7 @@ package com.videojs{
          * @param pValue
          * 
          */        
-        public function set srcFromFlashvars(pValue:String):void{
+        public function set srcFromFlashvars(pValue:String):void {
             _src = pValue;
             _currentPlaybackType = PlaybackType.HTTP
             initProvider();
@@ -257,7 +280,7 @@ package com.videojs{
         public function get poster():String{
             return _poster;
         }
-        public function set poster(pValue:String):void{
+        public function set poster(pValue:String):void {
             _poster = pValue;
             broadcastEvent(new VideoJSEvent(VideoJSEvent.POSTER_SET));
         }
@@ -284,7 +307,7 @@ package com.videojs{
         public function get muted():Boolean{
             return (_volume == 0);
         }
-        public function set muted(pValue:Boolean):void{
+        public function set muted(pValue:Boolean):void {
             if(pValue){
                 var __lastSetVolume:Number = _lastSetVolume;
                 volume = 0;
@@ -320,14 +343,14 @@ package com.videojs{
         public function get preload():Boolean{
             return _preload;
         }
-        public function set preload(pValue:Boolean):void{
+        public function set preload(pValue:Boolean):void {
             _preload = pValue;
         }
         
         public function get loop():Boolean{
             return _loop;
         }
-        public function set loop(pValue:Boolean):void{
+        public function set loop(pValue:Boolean):void {
             _loop = pValue;
         }
         
@@ -410,7 +433,7 @@ package com.videojs{
          * @param e
          * 
          */        
-        public function broadcastEvent(e:Event):void{
+        public function broadcastEvent(e:Event):void {
             dispatchEvent(e); 
         }
         
@@ -419,7 +442,7 @@ package com.videojs{
          * @param args
          * 
          */        
-        public function broadcastEventExternally(... args):void{
+        public function broadcastEventExternally(... args):void {
             if(_jsEventProxyName != ""){
                 if(ExternalInterface.available){
                     var __incomingArgs:* = args as Array;
@@ -434,7 +457,7 @@ package com.videojs{
          * @param args
          * 
          */        
-        public function broadcastErrorEventExternally(... args):void{
+        public function broadcastErrorEventExternally(... args):void {
             if(_jsErrorEventProxyName != ""){
                 if(ExternalInterface.available){
                     var __incomingArgs:* = args as Array;
@@ -448,7 +471,7 @@ package com.videojs{
          * Loads the video in a paused state. 
          * 
          */        
-        public function load():void{
+        public function load():void {
             if(_provider){
                 _provider.load();
             }
@@ -458,7 +481,7 @@ package com.videojs{
          * Loads the video and begins playback immediately.
          * 
          */        
-        public function play():void{
+        public function play():void {
             if(_provider){
                 _provider.play();
             }
@@ -468,7 +491,7 @@ package com.videojs{
          * Pauses video playback. 
          * 
          */        
-        public function pause():void{
+        public function pause():void {
             if(_provider){
                 _provider.pause();
             }
@@ -478,7 +501,7 @@ package com.videojs{
          * Resumes video playback. 
          * 
          */        
-        public function resume():void{
+        public function resume():void {
             if(_provider){
                 _provider.resume();
             }
@@ -489,7 +512,7 @@ package com.videojs{
          * @param pValue
          * 
          */        
-        public function seekBySeconds(pValue:Number):void{
+        public function seekBySeconds(pValue:Number):void {
             if(_provider){
                 _provider.seekBySeconds(pValue);
             }
@@ -500,7 +523,7 @@ package com.videojs{
          * @param pValue A float from 0 to 1 that represents the desired seek percent.
          * 
          */        
-        public function seekByPercent(pValue:Number):void{
+        public function seekByPercent(pValue:Number):void {
             if(_provider){
                 _provider.seekByPercent(pValue);
             }
@@ -510,7 +533,7 @@ package com.videojs{
          * Stops video playback, clears the video element, and stops any loading proceeses.
          * 
          */        
-        public function stop():void{
+        public function stop():void {
             if(_provider){
                 _provider.stop();
             }
@@ -545,7 +568,7 @@ package com.videojs{
 			return pString.replace(/[^A-Za-z0-9_.]/gi, "");
 		}
         
-        private function initProvider():void{
+        private function initProvider():void {
             if(_provider){
                 _provider.die();
                 _provider = null;

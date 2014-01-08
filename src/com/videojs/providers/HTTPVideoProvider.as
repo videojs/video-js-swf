@@ -147,6 +147,12 @@ package com.videojs.providers{
             }
         }
 
+        public function appendBytesAction(action:String):void {
+            if(_ns) {
+                _ns.appendBytesAction(action);
+            }
+        }
+
         public function appendBuffer(bytes:ByteArray):void{
             _ns.appendBytes(bytes);
         }
@@ -300,9 +306,11 @@ package com.videojs.providers{
                 _isBuffering = true;
             }
 
+            /*
             if(_src.path === null) {
-                _ns.appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
+                appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
             }
+            */
         }
         
         public function seekByPercent(pPercent:Number):void{

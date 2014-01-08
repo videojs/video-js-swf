@@ -274,6 +274,9 @@ package{
         
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
             switch(pPropertyName){
+                case "appendBytesAction":
+                    _app.model.appendBytesAction(String(pValue));
+                    break;
                 case "duration":
                     _app.model.duration = Number(pValue);
                     break;
