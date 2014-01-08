@@ -10,7 +10,7 @@ package com.videojs{
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.PlaybackType;
     import com.videojs.structs.PlayerMode;
-    
+
     import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.external.ExternalInterface;
@@ -166,6 +166,12 @@ package com.videojs{
                 return _provider.duration;
             }
             return 0;
+        }
+
+        public function set duration(value:Number):void {
+            if(_provider && _provider is HTTPVideoProvider) {
+                (_provider as HTTPVideoProvider).duration = value;
+            }
         }
         
         public function get autoplay():Boolean{

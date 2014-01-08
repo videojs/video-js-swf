@@ -5,13 +5,14 @@ package com.videojs.providers{
     import com.videojs.structs.ExternalErrorEventName;
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.PlaybackType;
-    
+
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
     import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
+    import flash.net.NetStreamAppendBytesAction;
     import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
@@ -48,6 +49,7 @@ package com.videojs.providers{
         private var _hasEnded:Boolean = false;
         private var _canPlayThrough:Boolean = false;
         private var _loop:Boolean = false;
+        private var _durationOverride:Number;
         
         private var _model:VideoJSModel;
         
@@ -84,10 +86,16 @@ package com.videojs.providers{
         public function get duration():Number{
             if(_metadata != null && _metadata.duration != undefined){
                 return Number(_metadata.duration);
+            } else if( _durationOverride && _durationOverride > 0 ) {
+                return _durationOverride;
             }
             else{
                 return 0;
             }
+        }
+
+        public function set duration(value:Number):void {
+            _durationOverride = value;
         }
         
         public function get readyState():int{
@@ -291,6 +299,10 @@ package com.videojs.providers{
                 _hasEnded = false;
                 _isBuffering = true;
             }
+
+            if(_src.path === null) {
+                _ns.appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
+            }
         }
         
         public function seekByPercent(pPercent:Number):void{
@@ -388,6 +400,7 @@ package com.videojs.providers{
                 _ns = null;
             }
             _ns = new NetStream(_nc);
+            _ns.inBufferSeek = true;
             _ns.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
             _ns.client = this;
             _ns.bufferTime = .5;
@@ -503,7 +516,7 @@ package com.videojs.providers{
                     _throughputTimer.stop();
                     _throughputTimer.reset();
                     break;
-                
+
                 case "NetStream.Seek.Notify":
                     _isPlaying = true;
                     _isSeeking = false;
@@ -514,8 +527,7 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    
-                    break;    
+                    break;
                 
                 case "NetStream.Play.StreamNotFound":
                     _loadErrored = true;
