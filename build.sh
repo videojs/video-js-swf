@@ -40,7 +40,7 @@ fi
 # and now we can get started, echoing out what we're doing
 
 echo "Compiling bin-debug/VideoJS.swf..."
-$flex_sdk/bin/mxmlc ./src/VideoJS.as -o ./bin-debug/VideoJS.swf -target-player=10.3
+$flex_sdk/bin/mxmlc ./src/VideoJS.as -o ./bin-debug/VideoJS.swf -target-player=10.3 -library-path+=libs/HLSProvider.swc
 
 echo "Copying VideoJS.swf to $video_js/src/swf/video-js.swf..."
 cp bin-debug/VideoJS.swf "$video_js/src/swf/video-js.swf"

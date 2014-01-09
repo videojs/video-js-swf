@@ -1,12 +1,120 @@
 package com.videojs.providers{
     
-    import flash.media.Video;
-    import flash.utils.ByteArray;
+  import flash.media.Video;
+  import flash.utils.ByteArray;
+  import flash.net.NetStream;
+
+  import com.videojs.VideoJSModel;  
+  import com.videojs.events.VideoPlaybackEvent;
+  import com.videojs.structs.ExternalErrorEventName;
+  import com.videojs.structs.ExternalEventName;
+
+  import org.mangui.HLS.HLS;
+  import org.mangui.HLS.HLSEvent;
+  import org.mangui.HLS.HLSStates;
+  import org.mangui.HLS.utils.Log;
     
-    public class HLSProvider implements IProvider{
+  public class HLSProvider implements IProvider {
 
         private var _loop:Boolean = false;
+        private var _hls:HLS;
+        private var _src:Object;
+        private var _model:VideoJSModel;
+        private var _videoReference:Video;
+        private var _metadata:Object;
+
+        private var _hlsState:String = HLSStates.IDLE;
+        private var _position:Number = 0;
+        private var _duration:Number = 0;
+        private var _isAutoPlay:Boolean = false;
+        private var _isManifestLoaded:Boolean = false;
+        private var _isPlaying:Boolean = false;
+        private var _isSeeking:Boolean = false;
+        private var _isPaused:Boolean = true;
+        private var _isEnded:Boolean = false;
+
+        private var _bytesLoaded:Number = 0;
+        private var _bytesTotal:Number = 0;
+        private var _bufferedTime:Number = 0;
+
+        public function HLSProvider() {
+          Log.txt("HLSProvider");
+          _hls = new HLS();
+          _model = VideoJSModel.getInstance();
+          _metadata = {};
+          _hls.addEventListener(HLSEvent.PLAYBACK_COMPLETE,_completeHandler);
+          _hls.addEventListener(HLSEvent.ERROR,_errorHandler);
+          _hls.addEventListener(HLSEvent.MANIFEST_LOADED,_manifestHandler);
+          _hls.addEventListener(HLSEvent.MEDIA_TIME,_mediaTimeHandler);
+          _hls.addEventListener(HLSEvent.STATE,_stateHandler);
+          
+          _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_hls.stream as NetStream}));
+          
+        }
+
+        private function _completeHandler(event:HLSEvent):void {
+          _isEnded = true;
+          _isPaused = false;
+          _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {}));
+        };
         
+        private function _errorHandler(event:HLSEvent):void {
+        };
+        
+        private function _manifestHandler(event:HLSEvent):void {
+          _isManifestLoaded = true;
+          _duration = event.levels[0].duration;
+          if(_isAutoPlay) {
+            _hls.stream.play();
+          }
+          _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
+          //sendEvent(HtmlMediaEvent.LOADEDMETADATA);
+          //sendEvent(HtmlMediaEvent.CANPLAY);
+        };
+        
+        private function _mediaTimeHandler(event:HLSEvent):void {
+          _position = event.mediatime.position;          
+          
+          _bufferedTime = event.mediatime.buffer+event.mediatime.position;
+          if(event.mediatime.duration != _duration) {
+            _duration = event.mediatime.duration;
+            _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
+          }
+          //sendEvent(HtmlMediaEvent.PROGRESS);
+          //sendEvent(HtmlMediaEvent.TIMEUPDATE);
+        };
+        
+        private function _stateHandler(event:HLSEvent):void {
+          _hlsState = event.state;
+          Log.txt("state:"+ _hlsState);
+          switch(event.state) {
+              case HLSStates.IDLE:
+                break;
+              case HLSStates.BUFFERING:
+                break;
+              case HLSStates.PLAYING:
+                _isPlaying = true;
+                _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);                
+                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:{}}));
+                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {}));
+                _isPaused = false;
+                _isEnded = false;
+                _isSeeking = false;
+                //_video.visible = true;
+                //sendEvent(HtmlMediaEvent.LOADEDDATA);
+                //sendEvent(HtmlMediaEvent.PLAY);
+                //sendEvent(HtmlMediaEvent.PLAYING);
+                break;
+              case HLSStates.PAUSED:
+                _isPaused = true;
+                _isEnded = false;
+                //sendEvent(HtmlMediaEvent.PAUSE);
+                //sendEvent(HtmlMediaEvent.CANPLAY);
+                break;
+          }
+        };
+
+
         public function get loop():Boolean{
             return _loop;
         }
@@ -19,14 +127,14 @@ package com.videojs.providers{
          * Should return a value that indicates the current playhead position, in seconds.
          */ 
         public function get time():Number {
-          return 0;
+          return _position;
         }
         
         /**
          * Should return a value that indicates the current asset's duration, in seconds.
          */
         public function get duration():Number  {
-          return 0;
+          return _duration;
         }
 
         /**
@@ -34,7 +142,7 @@ package com.videojs.providers{
          * @param  bytes the ByteArray of data to append.
          */
         public function appendBuffer(bytes:ByteArray):void {
-          return;
+          throw "HLSProvider does not support appendBuffer";
         }
         
         /**
@@ -43,6 +151,7 @@ package com.videojs.providers{
          * https://developer.mozilla.org/en/DOM/HTMLMediaElement
          */ 
         public function get readyState():int {
+          Log.txt("HLSProvider.readyState");
           return 0;
         }
         
@@ -52,6 +161,7 @@ package com.videojs.providers{
          * https://developer.mozilla.org/en/DOM/HTMLMediaElement
          */ 
         public function get networkState():int {
+          Log.txt("HLSProvider.networkState");
           return 0;
         }
         
@@ -60,7 +170,7 @@ package com.videojs.providers{
          * this value is unknown or unable to be determined (due to lack of duration data, etc)
          */
         public function get buffered():Number {
-          return 0;
+          return 1000*(_position+_bufferedTime);
         }
         
         /**
@@ -86,13 +196,13 @@ package com.videojs.providers{
         public function get bytesTotal():int{
           return 0;
         }
-        
+       
         /**
          * Should return a boolean value that indicates whether or not the current media
          * asset is playing.
          */
         public function get playing():Boolean {
-          return false;
+          return _isPlaying;
         }
         
         /**
@@ -100,7 +210,7 @@ package com.videojs.providers{
          * asset is paused.
          */
         public function get paused():Boolean {
-          return true;
+          return _isPaused;
         }
         
         /**
@@ -109,7 +219,7 @@ package com.videojs.providers{
          * the same asset.
          */
         public function get ended():Boolean {
-          return false;
+          return _isEnded;
         }
         
         /**
@@ -117,7 +227,7 @@ package com.videojs.providers{
          * asset is in the process of seeking to a new time point.
          */
         public function get seeking():Boolean {
-          return false;
+          return _isSeeking;
         }
         
         /**
@@ -131,14 +241,17 @@ package com.videojs.providers{
          * Should return an object that contains metadata properties, or an empty object if metadata doesn't exist.
          */
         public function get metadata():Object {
-          return null;
+          return _metadata;
         }
         
         /**
          * Should return the most reasonable string representation of the current assets source location.
          */
-        public function get srcAsString():String {
-          return "string";
+        public function get srcAsString():String{
+            if(_src != null){
+                return _src.m3u8;
+            }
+            return "";
         }
         
         /**
@@ -147,13 +260,18 @@ package com.videojs.providers{
          * one example of how this object can be used.
          */
         public function set src(pSrc:Object):void {
-          return;
+          Log.txt("HLSProvider.src");
+          _src = pSrc;
         }
         
         /**
          * Should return the most reasonable string representation of the current assets source location.
          */
         public function init(pSrc:Object, pAutoplay:Boolean):void {
+          Log.txt("HLSProvider.init");
+          _src = pSrc;
+          _isAutoPlay = pAutoplay;
+          load();
           return;
         }
         
@@ -161,49 +279,75 @@ package com.videojs.providers{
          * Called when the media asset should be preloaded, but not played.
          */
         public function load():void {
-          return;
+          if(_src !=null) {
+            Log.txt("HLSProvider.load:"+ _src.m3u8);
+            _isManifestLoaded = false;
+            _hls.load(_src.m3u8);
+          }
         }
-        
+
         /**
          * Called when the media asset should be played immediately.
          */
         public function play():void {
-          return;
+          Log.txt("HLSProvider.play");
+          if(_isManifestLoaded) {
+            if (_hlsState == HLSStates.PAUSED) {
+              _hls.stream.resume();
+              _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+            } else {
+              _hls.stream.play();
+              _model.broadcastEventExternally(ExternalEventName.ON_START);
+            }
+          }
         }
         
         /**
          * Called when the media asset should be paused.
          */
         public function pause():void {
-          return;
+          Log.txt("HLSProvider.pause");
+          _hls.stream.pause();
+          _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
         }
         
         /**
          * Called when the media asset should be resumed from a paused state.
          */
         public function resume():void {
-          return;
+          Log.txt("HLSProvider.resume");
+          _hls.stream.resume();
+          _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
         }
         
         /**
          * Called when the media asset needs to seek to a new time point.
          */
         public function seekBySeconds(pTime:Number):void {
-          return;
+          Log.txt("HLSProvider.seekBySeconds");
+          if(_isManifestLoaded) {
+            _hls.stream.seek(pTime);
+            _isSeeking = true;
+          }
         }
         
         /**
          * Called when the media asset needs to seek to a percentage of its total duration.
          */     
         public function seekByPercent(pPercent:Number):void {
-          return;
+          Log.txt("HLSProvider.seekByPercent");
+          if(_isManifestLoaded) {
+            _hls.stream.seek(pPercent*_duration);
+            _isSeeking = true;
+          }
         }
         
         /**
          * Called when the media asset needs to stop.
          */
         public function stop():void {
-          return;
+          Log.txt("HLSProvider.stop");
+          _hls.stream.close();
         }
         
         /**
@@ -211,6 +355,9 @@ package com.videojs.providers{
          * with an external Video instance without exposing it.
          */
         public function attachVideo(pVideo:Video):void {
+          Log.txt("HLSProvider.attachVideo");
+          _videoReference = pVideo;
+          _videoReference.attachNetStream(_hls.stream);
           return;
         }
         
@@ -218,7 +365,11 @@ package com.videojs.providers{
          * Called when the provider is about to be disposed of.
          */
         public function die():void {
-          return;
+          Log.txt("HLSProvider.die");
+          _hls.stream.close();          
+          if(_videoReference) {
+            _videoReference.clear();            
+          }
         }
     }
 }
