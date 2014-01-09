@@ -6,6 +6,7 @@ package com.videojs{
     import com.videojs.providers.HTTPVideoProvider;
     import com.videojs.providers.IProvider;
     import com.videojs.providers.RTMPVideoProvider;
+    import com.videojs.providers.HLSProvider;
     import com.videojs.structs.ExternalErrorEventName;
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.PlaybackType;
@@ -185,7 +186,14 @@ package com.videojs{
             _src = pValue;
             _rtmpConnectionURL = "";
             _rtmpStream = "";
+            // detect HLS by checking the extension of src
+            if(_src.indexOf(".m3u8") != -1){
+                _currentPlaybackType = PlaybackType.HLS;
+                broadcastEventExternally("#HLS# : M3U8 detected!");
+            }
+            else{
             _currentPlaybackType = PlaybackType.HTTP;
+            }
             broadcastEventExternally(ExternalEventName.ON_SRC_CHANGE, _src);
             initProvider();
             if(_autoplay){
@@ -237,7 +245,13 @@ package com.videojs{
          */        
         public function set srcFromFlashvars(pValue:String):void{
             _src = pValue;
-            _currentPlaybackType = PlaybackType.HTTP
+            // detect HLS by checking the extension of src
+			if(_src.search(/(https?|file)\:\/\/.*?\.m3u8(\?.*)?/i) != -1){
+                _currentPlaybackType = PlaybackType.HLS;
+            }
+            else{
+                _currentPlaybackType = PlaybackType.HTTP;
+            }
             initProvider();
             if(_autoplay){
                 _provider.play();
@@ -566,7 +580,15 @@ package com.videojs{
                         _provider.attachVideo(_videoReference);
                         _provider.init(__src, _autoplay);
                     }
-                    
+                    else if(_currentPlaybackType == PlaybackType.HLS){
+                        __src = {
+                            m3u8: _src
+                        };
+                        _provider = new HLSProvider();
+                        _provider.attachVideo(_videoReference);
+                        _provider.init(__src, _autoplay);
+                    }
+
                     break;
                 case PlayerMode.AUDIO:
                     __src = {
