@@ -1,10 +1,10 @@
 package com.videojs.providers{
-    
+
   import flash.media.Video;
   import flash.utils.ByteArray;
   import flash.net.NetStream;
 
-  import com.videojs.VideoJSModel;  
+  import com.videojs.VideoJSModel;
   import com.videojs.events.VideoPlaybackEvent;
   import com.videojs.structs.ExternalErrorEventName;
   import com.videojs.structs.ExternalEventName;
@@ -13,7 +13,7 @@ package com.videojs.providers{
   import org.mangui.HLS.HLSEvent;
   import org.mangui.HLS.HLSStates;
   import org.mangui.HLS.utils.Log;
-    
+
   public class HLSProvider implements IProvider {
 
         private var _loop:Boolean = false;
@@ -47,9 +47,6 @@ package com.videojs.providers{
           _hls.addEventListener(HLSEvent.MANIFEST_LOADED,_manifestHandler);
           _hls.addEventListener(HLSEvent.MEDIA_TIME,_mediaTimeHandler);
           _hls.addEventListener(HLSEvent.STATE,_stateHandler);
-          
-          _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_hls.stream as NetStream}));
-          
         }
 
         private function _completeHandler(event:HLSEvent):void {
@@ -57,33 +54,32 @@ package com.videojs.providers{
           _isPaused = false;
           _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {}));
         };
-        
+
         private function _errorHandler(event:HLSEvent):void {
         };
-        
+
         private function _manifestHandler(event:HLSEvent):void {
           _isManifestLoaded = true;
           _duration = event.levels[0].duration;
+          _metadata.width = event.levels[0].width;
+          _metadata.height = event.levels[0].height;
+          _hls.setWidth(event.levels[0].width);
           if(_isAutoPlay) {
             _hls.stream.play();
           }
           _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
-          //sendEvent(HtmlMediaEvent.LOADEDMETADATA);
-          //sendEvent(HtmlMediaEvent.CANPLAY);
         };
-        
+
         private function _mediaTimeHandler(event:HLSEvent):void {
-          _position = event.mediatime.position;          
-          
+          _position = event.mediatime.position;
           _bufferedTime = event.mediatime.buffer+event.mediatime.position;
+
           if(event.mediatime.duration != _duration) {
             _duration = event.mediatime.duration;
             _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
           }
-          //sendEvent(HtmlMediaEvent.PROGRESS);
-          //sendEvent(HtmlMediaEvent.TIMEUPDATE);
         };
-        
+
         private function _stateHandler(event:HLSEvent):void {
           _hlsState = event.state;
           Log.txt("state:"+ _hlsState);
@@ -94,22 +90,17 @@ package com.videojs.providers{
                 break;
               case HLSStates.PLAYING:
                 _isPlaying = true;
-                _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);                
+                _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:{}}));
-                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {}));
+                _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
+                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
                 _isPaused = false;
                 _isEnded = false;
                 _isSeeking = false;
-                //_video.visible = true;
-                //sendEvent(HtmlMediaEvent.LOADEDDATA);
-                //sendEvent(HtmlMediaEvent.PLAY);
-                //sendEvent(HtmlMediaEvent.PLAYING);
                 break;
               case HLSStates.PAUSED:
                 _isPaused = true;
                 _isEnded = false;
-                //sendEvent(HtmlMediaEvent.PAUSE);
-                //sendEvent(HtmlMediaEvent.CANPLAY);
                 break;
           }
         };
@@ -118,18 +109,18 @@ package com.videojs.providers{
         public function get loop():Boolean{
             return _loop;
         }
-        
+
         public function set loop(pLoop:Boolean):void{
             _loop = pLoop;
         }
-        
+
         /**
          * Should return a value that indicates the current playhead position, in seconds.
-         */ 
+         */
         public function get time():Number {
           return _position;
         }
-        
+
         /**
          * Should return a value that indicates the current asset's duration, in seconds.
          */
@@ -144,35 +135,33 @@ package com.videojs.providers{
         public function appendBuffer(bytes:ByteArray):void {
           throw "HLSProvider does not support appendBuffer";
         }
-        
+
         /**
          * Should return an interger that reflects the closest parallel to
          * HTMLMediaElement's readyState property, as described here:
          * https://developer.mozilla.org/en/DOM/HTMLMediaElement
-         */ 
+         */
         public function get readyState():int {
-          Log.txt("HLSProvider.readyState");
           return 0;
         }
-        
+
         /**
          * Should return an interger that reflects the closest parallel to
          * HTMLMediaElement's networkState property, as described here:
          * https://developer.mozilla.org/en/DOM/HTMLMediaElement
-         */ 
+         */
         public function get networkState():int {
-          Log.txt("HLSProvider.networkState");
           return 0;
         }
-        
+
         /**
          * Should return the amount of media that has been buffered, in seconds, or 0 if
          * this value is unknown or unable to be determined (due to lack of duration data, etc)
          */
         public function get buffered():Number {
-          return 1000*(_position+_bufferedTime);
+          return _bufferedTime;
         }
-        
+
         /**
          * Should return the number of bytes that have been loaded thus far, or 0 if
          * this value is unknown or unable to be calculated (due to streaming, bitrate switching, etc)
@@ -180,7 +169,7 @@ package com.videojs.providers{
         public function get bufferedBytesEnd():int {
           return 0;
         }
-        
+
         /**
          * Should return the number of bytes that have been loaded thus far, or 0 if
          * this value is unknown or unable to be calculated (due to streaming, bitrate switching, etc)
@@ -188,7 +177,7 @@ package com.videojs.providers{
         public function get bytesLoaded():int {
           return 0;
         }
-        
+
         /**
          * Should return the total bytes of the current asset, or 0 if this value is
          * unknown or unable to be determined (due to streaming, bitrate switching, etc)
@@ -196,54 +185,59 @@ package com.videojs.providers{
         public function get bytesTotal():int{
           return 0;
         }
-       
+
         /**
          * Should return a boolean value that indicates whether or not the current media
          * asset is playing.
          */
         public function get playing():Boolean {
+          Log.txt("HLSProvider.playing:"+_isPlaying);
           return _isPlaying;
         }
-        
+
         /**
          * Should return a boolean value that indicates whether or not the current media
          * asset is paused.
          */
         public function get paused():Boolean {
+          Log.txt("HLSProvider.paused:"+_isPaused);
           return _isPaused;
         }
-        
+
         /**
          * Should return a boolean value that indicates whether or not the current media
          * asset has ended. This value should default to false, and be reset with every seek request within
          * the same asset.
          */
         public function get ended():Boolean {
+          Log.txt("HLSProvider.ended:"+_isEnded);
           return _isEnded;
         }
-        
+
         /**
          * Should return a boolean value that indicates whether or not the current media
          * asset is in the process of seeking to a new time point.
          */
         public function get seeking():Boolean {
+          Log.txt("HLSProvider.seeking:"+_isSeeking);
           return _isSeeking;
         }
-        
+
         /**
          * Should return a boolean value that indicates whether or not this provider uses the NetStream class.
          */
         public function get usesNetStream():Boolean {
           return true;
         }
-        
+
         /**
          * Should return an object that contains metadata properties, or an empty object if metadata doesn't exist.
          */
         public function get metadata():Object {
+          Log.txt("HLSProvider.metadata");
           return _metadata;
         }
-        
+
         /**
          * Should return the most reasonable string representation of the current assets source location.
          */
@@ -253,7 +247,7 @@ package com.videojs.providers{
             }
             return "";
         }
-        
+
         /**
          * Should contain an object that enables the provider to play whatever media it's designed to play.
          * Compare the difference in implementation between HTTPVideoProvider and RTMPVideoProvider to see
@@ -263,18 +257,17 @@ package com.videojs.providers{
           Log.txt("HLSProvider.src");
           _src = pSrc;
         }
-        
+
         /**
          * Should return the most reasonable string representation of the current assets source location.
          */
         public function init(pSrc:Object, pAutoplay:Boolean):void {
-          Log.txt("HLSProvider.init");
           _src = pSrc;
           _isAutoPlay = pAutoplay;
           load();
           return;
         }
-        
+
         /**
          * Called when the media asset should be preloaded, but not played.
          */
@@ -290,18 +283,20 @@ package com.videojs.providers{
          * Called when the media asset should be played immediately.
          */
         public function play():void {
-          Log.txt("HLSProvider.play");
+          Log.txt("HLSProvider.play.state:" + _hlsState);
           if(_isManifestLoaded) {
             if (_hlsState == HLSStates.PAUSED) {
               _hls.stream.resume();
               _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
             } else {
+              _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
               _hls.stream.play();
-              _model.broadcastEventExternally(ExternalEventName.ON_START);
+              //_model.broadcastEventExternally(ExternalEventName.ON_START);
+              //_model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
             }
           }
         }
-        
+
         /**
          * Called when the media asset should be paused.
          */
@@ -310,7 +305,7 @@ package com.videojs.providers{
           _hls.stream.pause();
           _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
         }
-        
+
         /**
          * Called when the media asset should be resumed from a paused state.
          */
@@ -319,7 +314,7 @@ package com.videojs.providers{
           _hls.stream.resume();
           _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
         }
-        
+
         /**
          * Called when the media asset needs to seek to a new time point.
          */
@@ -330,10 +325,10 @@ package com.videojs.providers{
             _isSeeking = true;
           }
         }
-        
+
         /**
          * Called when the media asset needs to seek to a percentage of its total duration.
-         */     
+         */
         public function seekByPercent(pPercent:Number):void {
           Log.txt("HLSProvider.seekByPercent");
           if(_isManifestLoaded) {
@@ -341,7 +336,7 @@ package com.videojs.providers{
             _isSeeking = true;
           }
         }
-        
+
         /**
          * Called when the media asset needs to stop.
          */
@@ -349,26 +344,26 @@ package com.videojs.providers{
           Log.txt("HLSProvider.stop");
           _hls.stream.close();
         }
-        
+
         /**
          * For providers that employ an instance of NetStream, this method is used to connect that NetStream
          * with an external Video instance without exposing it.
          */
         public function attachVideo(pVideo:Video):void {
-          Log.txt("HLSProvider.attachVideo");
           _videoReference = pVideo;
           _videoReference.attachNetStream(_hls.stream);
+          _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_hls.stream as NetStream}));
           return;
         }
-        
+
         /**
          * Called when the provider is about to be disposed of.
          */
         public function die():void {
           Log.txt("HLSProvider.die");
-          _hls.stream.close();          
+          _hls.stream.close();
           if(_videoReference) {
-            _videoReference.clear();            
+            _videoReference.clear();
           }
         }
     }
