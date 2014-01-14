@@ -44,9 +44,11 @@ import flash.utils.ByteArray;
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
         private var _poster:String = "";
-        
+        private var _playerId:String = "";
+        private var _lastSeekedTime:Number = 0;
+
         private static var _instance:VideoJSModel;
-        
+
         public function VideoJSModel(pLock:SingletonLock){
             if (!pLock is SingletonLock) {
                 throw new Error("Invalid Singleton access.  Use VideoJSModel.getInstance()!");
@@ -65,10 +67,27 @@ import flash.utils.ByteArray;
             }
             return _instance;
         }
-        
+
+        public function get lastSeekedTime():Number {
+            return _lastSeekedTime;
+        }
+
+        public function set lastSeekedTime(value:Number):void {
+            _lastSeekedTime = value;
+        }
+
+        public function get playerId():String {
+            return _playerId;
+        }
+
+        public function set playerId(value:String):void {
+            _playerId = value;
+        }
+
         public function get mode():String{
             return _mode;
         }
+
         public function set mode(pMode:String):void {
             switch(pMode){
                 case PlayerMode.VIDEO:
@@ -299,7 +318,12 @@ import flash.utils.ByteArray;
          */        
         public function get time():Number{
             if(_provider){
-                return _provider.time;
+                if(_provider is HTTPVideoProvider && _src == null)
+                {
+                    return (_lastSeekedTime + _provider.time > duration) ? duration : _lastSeekedTime+_provider.time;
+                } else {
+                    return _provider.time;
+                }
             }
             return 0;
         }
@@ -513,6 +537,8 @@ import flash.utils.ByteArray;
          * 
          */        
         public function seekBySeconds(pValue:Number):void {
+            lastSeekedTime = pValue;
+
             if(_provider){
                 _provider.seekBySeconds(pValue);
             }

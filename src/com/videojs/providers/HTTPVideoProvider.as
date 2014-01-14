@@ -9,8 +9,8 @@ package com.videojs.providers{
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
-import flash.external.ExternalInterface;
-import flash.media.Video;
+    import flash.external.ExternalInterface;
+    import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
     import flash.net.NetStreamAppendBytesAction;
@@ -38,7 +38,6 @@ import flash.media.Video;
          * we cache the intended time, and use it IN PLACE OF NetStream's time when the time accessor is hit. 
          */        
         private var _pausedSeekValue:Number = -1;
-        private var _lastSeekedTime:Number = -1;
 
         private var _src:Object;
         private var _metadata:Object;
@@ -71,11 +70,6 @@ import flash.media.Video;
         }
         
         public function get time():Number{
-            if(_ns && _src.path == null && _lastSeekedTime != -1)
-            {
-                return _ns.time + _lastSeekedTime;
-            }
-
             if(_ns != null){
                 if(_pausedSeekValue != -1){
                     return _pausedSeekValue;
@@ -314,9 +308,8 @@ import flash.media.Video;
 
 
             if(_src.path === null) {
-                _lastSeekedTime = pTime;
+                appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
             }
-
         }
         
         public function seekByPercent(pPercent:Number):void{
@@ -468,6 +461,7 @@ import flash.media.Video;
         }
         
         private function onNetStreamStatus(e:NetStatusEvent):void{
+            //ExternalInterface.call('console.log', e.info.code);
             switch(e.info.code){
                 case "NetStream.Play.Start":
                     _pausedSeekValue = -1;
@@ -491,6 +485,13 @@ import flash.media.Video;
                     }
                     _loadStarted = true;
                     break;
+
+                case "NetStream.SeekStart.Notify":
+                    if(_src.path === null) {
+                        appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
+                    }
+                    _model.broadcastEventExternally(ExternalEventName.ON_SEEK_START);
+                    break;
                 
                 case "NetStream.Buffer.Full":
                     _pausedSeekValue = -1;
@@ -511,6 +512,27 @@ import flash.media.Video;
                     if(!_isPlaying){ return; }
                     _isBuffering = true;
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
+
+                    if(_src.path === null)
+                    {
+                        if(_model.time >= _model.duration)
+                        {
+                            if(!_loop) {
+                                _isPlaying = false;
+                                _isPaused = true;
+                                _hasEnded = true;
+                                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
+                                _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
+                                _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
+                            }
+                            else {
+
+                            }
+                            _throughputTimer.stop();
+                            _throughputTimer.reset();
+                        }
+                    }
+
                     break;
                 
                 case "NetStream.Play.Stop":
