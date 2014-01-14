@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+    <meta http-equiv="imagetoolbar" content="no" />
+    <title>VideoJS Workbench</title>
+    <link rel="stylesheet" href="css/reset.css"/> 
+    <link rel="stylesheet" href="css/styles.css"/> 
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script type="text/javascript" src="js/swfobject.js"></script>
+    <script type="text/javascript">
+
+      
+      function init(){
+
+        // control
+        $("#btnPause").click(pauseVideo);
+        $("#btnResume").click(resumeVideo);
+        $("#btnSeek5").click(
+          function(){
+            seekVideo(5);
+          }
+        );
+
+        $(".tab-control").each(
+            function(){
+              var $tabControl = $(this);
+              // tabs
+              $tabControl.find("ul.tabs a").click(
+                function(e){
+                  e.preventDefault();
+                  var $this = $(this);
+                  var targetID = $this.attr("href").substring(1);
+                  $this.parent().siblings().each(
+                    function(){
+                      $(this).find("a").toggleClass("selected", false);
+                    }
+                  );
+                  $this.toggleClass("selected", true);
+                  $tabControl.find("div.tab-content").each(
+                    function(){
+                      if($(this).attr("id") == targetID){
+                        $(this).show();
+                      }
+                      else{
+                        $(this).hide();
+                      }
+                    }
+                  );
+                }
+              );
+              // show the first tab content item, and hide the rest
+              $tabControl.find("div.tab-content").each(
+                function(pIndex, pElement){
+                 if(pIndex != 0){
+                   $(pElement).hide();
+                 }
+                 else{
+                   $(pElement).show();
+                 }
+                }
+              );
+            }
+          );
+
+          // to avoid a bunch of lookups every 100ms, let's cache some elements in horrible
+          // global vars for the properties table
+          $propCurrentSrc = $("#propCurrentSrc");
+          $propCurrentTime = $("#propCurrentTime");
+          $propTime = $("#propTime");
+          $propDefaultPlaybackRate = $("#propDefaultPlaybackRate");
+          $propDuration = $("#propDuration");
+          $propEnded = $("#propEnded");
+          $propPaused = $("#propPaused");
+          $propMuted = $("#propMuted");
+          $propVolume = $("#propVolume");
+          $propSeeking = $("#propSeeking");
+          $propNetworkState = $("#propNetworkState");
+          $propReadyState = $("#propReadyState");
+          $propBufferedBytesStart = $("#propBufferedBytesStart");
+          $propBufferedBytesEnd = $("#propBufferedBytesEnd");
+          $propBytesTotal = $("#propBytesTotal");
+          $propVideoWidth = $("#propVideoWidth");
+          $propVideoHeight = $("#propVideoHeight");
+
+      }
+      
+      function log(msg){
+        try{
+          console.log(msg);
+        }
+        catch(error){}
+      }
+
+      function setupAndPlayback(e) {
+        createSWF(e);
+        setTimeout(waitForSWF, 100);
+      }
+      
+      function waitForSWF() {
+        var vid = $("#videoPlayer")[0];
+        log("Waiting for the SWF to be loaded...");
+        if (vid.hasOwnProperty("vjs_setProperty")) {
+          setProperties();
+          setSource();
+          playVideo();
+        }
+        else {
+          setTimeout(waitForSWF, 100);
+        }
+      }
+
+      function createSWF(e){
+        if (e) {
+          e.preventDefault();
+        }
+
+        var flashvars = {
+          readyFunction: "onSWFReady",
+          eventProxyFunction: "onSWFEvent",
+          errorEventProxyFunction: "onSWFErrorEvent",
+          src: "",
+          autoplay: false,
+          preload: false,
+        };
+
+        var params = {
+          allowScriptAccess: "always",
+          bgcolor: "#000000"
+        };
+      
+        var attributes = {
+          id: "videoPlayer",
+          name: "videoPlayer"
+        };
+      
+        swfobject.embedSWF("../dist/video-js.swf", "videoPlayer", "100%", "100%", "10.3", "", flashvars, params, attributes);
+
+      }
+
+      function onSWFReady(pObjectID){
+        log("Function call: onSWFReady: " + pObjectID);
+
+        setInterval(updatePlayerProperties, 250);
+      }
+
+      function setProperties(e){
+        if (e) {
+          e.preventDefault();
+        }
+        var el = $("#videoPlayer")[0];
+        el.vjs_setProperty("eventProxyFunction", "onSWFEvent");
+        el.vjs_setProperty("errorEventProxyFunction", "onSWFErrorEvent");
+      }
+
+      function setSource(e){
+        if (e) {
+          e.preventDefault();
+        }
+        var el = $("#videoPlayer")[0];
+        el.vjs_src("http://video-js.zencoder.com/oceans-clip.mp4?");
+      }
+
+      function playVideo(e){
+        if (e) {
+          e.preventDefault();
+        }
+        var el = $("#videoPlayer")[0];
+        el.vjs_play();
+      }
+
+      function pauseVideo(e){
+        var el = $("#videoPlayer")[0];
+        el.vjs_pause();
+      }
+
+      function resumeVideo(e){
+        var el = $("#videoPlayer")[0];
+        el.vjs_resume();
+      }
+
+      function seekVideo(seconds){
+        var el = $("#videoPlayer")[0];
+        el.vjs_setProperty("currentTime", seconds);
+      }
+
+      function replay(){
+        var el = $("#videoPlayer")[0];
+        el.vjs_pause();
+        el.vjs_setProperty('currentTime', 0);
+        el.vjs_pause();
+      }
+
+      function onSWFEvent(swfID, eventName){
+        var $el = $("#events");
+        var time = new Date();
+        $el.append(pad2(time.getHours()) + ":" + pad2(time.getMinutes()) + ":" + pad2(time.getSeconds()) + " - " + eventName + "<br/>");
+        $el[0].scrollTop = $el[0].scrollHeight;
+
+        if(eventName == "playing" || eventName == "resume"){
+          $("#control").show();
+        }
+        else if(eventName == "ended"){
+          replay();
+        }
+      }
+
+      function onSWFErrorEvent(swfID,eventName){
+        var $el = $("#errorEvents");
+        var time = new Date();
+        $el.append(pad2(time.getHours()) + ":" + pad2(time.getMinutes()) + ":" + pad2(time.getSeconds()) + " - " + eventName + "<br/>");
+        $el[0].scrollTop = $el[0].scrollHeight;
+      }
+
+      function pad2(num) {
+         return (num < 10 ? '0' : '') + num;
+      }
+
+      function updatePlayerProperties(){
+
+        var el = $("#videoPlayer")[0];
+        
+        $propCurrentSrc.html(el.vjs_getProperty("currentSrc"));
+        $propCurrentTime.html(el.vjs_getProperty("currentTime"));
+        $propTime.html(el.vjs_getProperty("time"));
+        $propDefaultPlaybackRate.html(el.vjs_getProperty("defaultPlaybackRate"));
+        $propDuration.html(el.vjs_getProperty("duration")); // would normally be cached on durationchange
+        $propEnded.html(el.vjs_getProperty("ended").toString());
+        $propPaused.html(el.vjs_getProperty("paused").toString());
+        $propMuted.html(el.vjs_getProperty("muted").toString());
+        $propVolume.html(el.vjs_getProperty("volume"));
+        $propSeeking.html(el.vjs_getProperty("seeking").toString());
+        $propNetworkState.html(el.vjs_getProperty("networkState"));
+        $propReadyState.html(el.vjs_getProperty("readyState"));
+        $propBufferedBytesStart.html(el.vjs_getProperty("bufferedBytesStart"));
+        $propBufferedBytesEnd.html(el.vjs_getProperty("bufferedBytesEnd"));
+        $propBytesTotal.html(el.vjs_getProperty("bytesTotal")); // would normally be cached on metadata
+        $propVideoWidth.html(el.vjs_getProperty("videoWidth"));  // would normally be cached on metadata or playstart
+        $propVideoHeight.html(el.vjs_getProperty("videoHeight")); // would normally be cached on metadata or playstart
+
+
+
+      }
+
+      $(init);
+
+      $(window).load(function() { setupAndPlayback() });
+    </script>
+  </head>
+  <body style="background-color:#BBBBBB; padding:50px;">
+
+    <section id="status">
+      <div class="tab-control">
+              <ul class="tabs clearfix">
+                <li>
+                  <a class="selected" href="#events">Events</a>
+                </li>
+                <li>
+                  <a href="#errorEvents">Error Events</a>
+                </li>
+                <li>
+                  <a href="#properties">Properties</a>
+                </li>
+              </ul>
+              <div class="tab-content" id="events">
+
+              </div>
+              <div class="tab-content" id="errorEvents">
+
+              </div>
+              <div class="tab-content" id="properties">
+                <table id="propertiesTable">
+                  <tr>
+                    <td colspan="2" class="value" id="propCurrentSrc"></td>
+                  </tr>
+                  <tr>
+                    <td class="prop">currentTime</td>
+                    <td class="value" id="propCurrentTime">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">time</td>
+                    <td class="value" id="propTime">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">defaultPlaybackRate</td>
+                    <td class="value" id="propDefaultPlaybackRate">1</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">duration</td>
+                    <td class="value" id="propDuration">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">ended</td>
+                    <td class="value" id="propEnded">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">paused</td>
+                    <td class="value" id="propPaused">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">muted</td>
+                    <td class="value" id="propMuted">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">volume</td>
+                    <td class="value" id="propVolume">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">seeking</td>
+                    <td class="value" id="propSeeking">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">networkState</td>
+                    <td class="value" id="propNetworkState">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">readyState</td>
+                    <td class="value" id="propReadyState">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">bufferedBytesStart</td>
+                    <td class="value" id="propBufferedBytesStart">0</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">bufferedBytesEnd</td>
+                    <td class="value" id="propBufferedBytesEnd">n/a</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">bytesTotal</td>
+                    <td class="value" id="propBytesTotal">0</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">videoWidth</td>
+                    <td class="value" id="propVideoWidth">0</td>
+                  </tr>
+                  <tr>
+                    <td class="prop">videoHeight</td>
+                    <td class="value" id="propVideoHeight">0</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+    </section>
+
+    <section>
+      <div class="row">
+        <div class="span4">
+          <div id="videoPlayerWrapper" style="">
+            <div id="videoPlayer"></div>
+          </div>
+        </div> 
+        <div id="control" class="span2">
+          <h1>Simple Controls</h1>
+          <p>Once playback has started, the SWF's control methods will work:</p>
+          <a id="btnPause" class="button" href="#">pause()</a><br>
+          <a id="btnResume" class="button" href="#">resume()</a><br> 
+          <a id="btnSeek5" class="button" href="#">seek(5)</a><br> 
+        </div>
+      </div>
+    </section>
+  </body>  
+</html>
