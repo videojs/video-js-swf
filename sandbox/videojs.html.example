@@ -10,7 +10,7 @@
 
     <!-- Unless using the CDN hosted version, update the URL to the Flash SWF -->
     <script>
-        videojs.options.flash.swf = "build/files/swf/video-js.swf";
+        videojs.options.flash.swf = "dist/video-js.swf";
     </script>
 
 </head>

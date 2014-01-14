@@ -13,7 +13,7 @@ Installation
 
 2. Compile SWF.
 
-Development (places new SWF in build/files):
+Development (places new SWF in /dist/):
 
 ```bash
     grunt mxmlc

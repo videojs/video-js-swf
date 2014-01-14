@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     connect: {
       dev: {
         port: 8000,
-        base: 'build/files'
+        base: '.'
       }
     },
     mxmlc: {
@@ -112,7 +112,7 @@ module.exports = function (grunt) {
       },
       videojs_swf: {
         files: {
-          'build/files/swf/VideoJS.swf': ['src/VideoJS.as']
+          'dist/video-js.swf': ['src/VideoJS.as']
         }
       }
     }
@@ -186,10 +186,6 @@ module.exports = function (grunt) {
     q.push(this.files);
   });
 
-  grunt.registerTask('dist', 'Creating distribution', function () {
-    grunt.task.run('mxmlc');
-    grunt.file.copy('build/files/swf/VideoJS.swf', 'dist/video-js.swf');
-  });
-
+  grunt.registerTask('dist', ['mxmlc']);
   grunt.registerTask('default', ['dist']);
 };

@@ -5,4 +5,3 @@ bin-debug
 http/node_modules
 node_modules
 dist/*
-build/files/*
