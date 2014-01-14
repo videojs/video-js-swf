@@ -188,7 +188,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('dist', 'Creating distribution', function () {
     grunt.task.run('mxmlc');
-    grunt.file.copy('build/files/swf/VideoJS.swf', 'dist/VideoJS.swf');
+    grunt.file.copy('build/files/swf/VideoJS.swf', 'dist/video-js.swf');
   });
 
+  grunt.registerTask('default', ['dist']);
 };
