@@ -8,6 +8,8 @@ package com.videojs.providers{
   import com.videojs.events.VideoPlaybackEvent;
   import com.videojs.structs.ExternalErrorEventName;
   import com.videojs.structs.ExternalEventName;
+  import com.videojs.structs.ReadyState;
+  import com.videojs.structs.NetworkState;
 
   import org.mangui.HLS.HLS;
   import org.mangui.HLS.HLSEvent;
@@ -24,6 +26,8 @@ package com.videojs.providers{
         private var _metadata:Object;
 
         private var _hlsState:String = HLSStates.IDLE;
+        private var _networkState:Number = NetworkState.NETWORK_EMPTY;
+        private var _readyState:Number = ReadyState.HAVE_NOTHING;
         private var _position:Number = 0;
         private var _duration:Number = 0;
         private var _isAutoPlay:Boolean = false;
@@ -56,10 +60,17 @@ package com.videojs.providers{
         };
 
         private function _errorHandler(event:HLSEvent):void {
+          Log.txt("error!!!!:"+ event.message);
+          _model.broadcastErrorEventExternally(ExternalErrorEventName.SRC_404);
+          _networkState = NetworkState.NETWORK_NO_SOURCE;
+          _readyState = ReadyState.HAVE_NOTHING;
+          stop();
         };
 
         private function _manifestHandler(event:HLSEvent):void {
           _isManifestLoaded = true;
+          _networkState = NetworkState.NETWORK_IDLE;
+          _readyState = ReadyState.HAVE_METADATA;
           _duration = event.levels[0].duration;
           _metadata.width = event.levels[0].width;
           _metadata.height = event.levels[0].height;
@@ -68,6 +79,7 @@ package com.videojs.providers{
             _hls.stream.play();
           }
           _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
+          _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
         };
 
         private function _mediaTimeHandler(event:HLSEvent):void {
@@ -85,10 +97,16 @@ package com.videojs.providers{
           Log.txt("state:"+ _hlsState);
           switch(event.state) {
               case HLSStates.IDLE:
+                _networkState = NetworkState.NETWORK_IDLE;
+                _readyState = ReadyState.HAVE_METADATA;
                 break;
               case HLSStates.BUFFERING:
+                _networkState = NetworkState.NETWORK_LOADING;
+                _readyState = ReadyState.HAVE_CURRENT_DATA;
                 break;
               case HLSStates.PLAYING:
+                _networkState = NetworkState.NETWORK_LOADING;
+                _readyState = ReadyState.HAVE_ENOUGH_DATA;
                 _isPlaying = true;
                 _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:{}}));
@@ -99,6 +117,8 @@ package com.videojs.providers{
                 _isSeeking = false;
                 break;
               case HLSStates.PAUSED:
+                _networkState = NetworkState.NETWORK_LOADING;
+                _readyState = ReadyState.HAVE_ENOUGH_DATA;
                 _isPaused = true;
                 _isEnded = false;
                 break;
@@ -142,7 +162,7 @@ package com.videojs.providers{
          * https://developer.mozilla.org/en/DOM/HTMLMediaElement
          */
         public function get readyState():int {
-          return 0;
+          return _readyState;
         }
 
         /**
@@ -151,7 +171,7 @@ package com.videojs.providers{
          * https://developer.mozilla.org/en/DOM/HTMLMediaElement
          */
         public function get networkState():int {
-          return 0;
+          return _networkState;
         }
 
         /**
@@ -219,7 +239,6 @@ package com.videojs.providers{
          * asset is in the process of seeking to a new time point.
          */
         public function get seeking():Boolean {
-          Log.txt("HLSProvider.seeking:"+_isSeeking);
           return _isSeeking;
         }
 
@@ -285,14 +304,17 @@ package com.videojs.providers{
         public function play():void {
           Log.txt("HLSProvider.play.state:" + _hlsState);
           if(_isManifestLoaded) {
-            if (_hlsState == HLSStates.PAUSED) {
-              _hls.stream.resume();
-              _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-            } else {
-              _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-              _hls.stream.play();
-              //_model.broadcastEventExternally(ExternalEventName.ON_START);
-              //_model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
+            switch(_hlsState) {
+              case HLSStates.IDLE:
+                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                _hls.stream.play();
+                break;
+              case HLSStates.PAUSED:
+                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                _hls.stream.resume();
+                break;
+              default:
+                break;
             }
           }
         }
@@ -343,6 +365,12 @@ package com.videojs.providers{
         public function stop():void {
           Log.txt("HLSProvider.stop");
           _hls.stream.close();
+          _bufferedTime = 0;
+          _duration = 0;
+          _position = 0;
+          _networkState = NetworkState.NETWORK_EMPTY;
+          _readyState = ReadyState.HAVE_NOTHING;
+          _isManifestLoaded = false;
         }
 
         /**
@@ -361,7 +389,8 @@ package com.videojs.providers{
          */
         public function die():void {
           Log.txt("HLSProvider.die");
-          _hls.stream.close();
+          stop();
+
           if(_videoReference) {
             _videoReference.clear();
           }
