@@ -1,9 +1,13 @@
 {
   "name": "videojs-swf",
   "description": "The Flash-fallback video player for video.js (http://videojs.com)",
-  "version": "4.3.0",
+  "version": "7.0.0",
   "copyright": "Copyright 2014 Brightcove, Inc. https://github.com/videojs/video-js-swf/blob/master/LICENSE",
-  "keywords": ["flash", "video", "player"],
+  "keywords": [
+    "flash",
+    "video",
+    "player"
+  ],
   "homepage": "http://videojs.com",
   "author": "Brightcove",
   "scripts": {
@@ -26,6 +30,9 @@
     "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-watch": "~0.1.4",
     "grunt-contrib-qunit": "~0.2.1",
-    "qunitjs": "~1.12.0"
+    "qunitjs": "~1.12.0",
+    "grunt-bumpup": "~0.5.0",
+    "grunt-tagrelease": "~0.3.1",
+    "shelljs": "~0.2.6"
   }
 }

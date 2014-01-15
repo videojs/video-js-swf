@@ -2,6 +2,20 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    bumpup: {
+      options: {
+        updateProps: {
+          pkg: 'package.json'
+        }
+      },
+      file: 'package.json'
+    },
+    tagrelease: {
+      file: 'package.json',
+      commit:  true,
+      message: 'Release %version%',
+      prefix:  'v'
+    },
     connect: {
       dev: {
         port: 8000,
@@ -120,6 +134,11 @@ module.exports = function (grunt) {
   });
 
   grunt.loadNpmTasks('grunt-connect');
+  grunt.loadNpmTasks('grunt-bumpup');
+  grunt.loadNpmTasks('grunt-tagrelease');
+
+  grunt.registerTask('dist', ['mxmlc']);
+  grunt.registerTask('default', ['dist']);
 
   grunt.registerMultiTask('mxmlc', 'Compiling SWF', function () {
     // Merge task-specific and/or target-specific options with these defaults.
@@ -186,6 +205,57 @@ module.exports = function (grunt) {
     q.push(this.files);
   });
 
-  grunt.registerTask('dist', ['mxmlc']);
-  grunt.registerTask('default', ['dist']);
+  /**
+   * How releases work: 
+   * 
+   * Changes come from pullrequests to master or stable.
+   * They are tested then pulled into their base branch.
+   * A change log item is added to "Unreleased".
+   * In a minor/major release, master is merged into stable 
+   *   (possibly by way of a release branch if testing more).
+   *
+   * Check out stable if not already checked out.
+   * Run `grunt release:RELEASE_TYPE` 
+   *   RELEASE_TYPE = major, minor, or patch
+   *   Does the following:
+   *     Bump version
+   *     Build dist
+   *     Force add dist
+   *     Rotate changelog
+   *     Commit changes
+   *     Tag release
+   *
+   *  Staging should be merged back into master.
+   *  Push stable and master to origin.
+   *  Run `npm publish`.
+   */
+  grunt.registerTask('release', 'Bump, build, and tag', function(type) {
+    var shell = require('shelljs');
+
+    // major, minor, patch
+    type = type ? type : 'patch';
+
+    // git is required in add-dist, so check now
+    if (!shell.which('git')) {
+      grunt.fatal('Sorry, this script requires git');
+    }
+
+    if (shell.exec('git checkout stable').code !== 0) {
+      grunt.fatal('`git checkout stable` failed');
+    }
+
+    grunt.task.run('bumpup:' + type); // bump up the package version
+    grunt.task.run('dist');           // build distribution
+    grunt.task.run('add-dist');       // force add the distribution
+    grunt.task.run('tagrelease');     // commit & tag the changes
+  });
+
+  grunt.registerTask('add-dist', 'Force add the built distribution files', function(type) {
+    var shell = require('shelljs');
+
+    if (shell.exec('git add dist --force').code !== 0) {
+      grunt.fatal('`git add dist --force` failed');
+    }
+    grunt.log.writeln('dist directory staged (git add dist --force)');
+  });
 };
