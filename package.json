@@ -10,19 +10,13 @@
   ],
   "homepage": "http://videojs.com",
   "author": "Brightcove",
-  "scripts": {
-    "install": "grunt mxmlc",
-    "postinstall": "grunt dist"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/videojs/video-js-swf.git"
   },
-  "dependencies": {
-    "async": "~0.2.9",
-    "flex-sdk": "4.6.0"
-  },
   "devDependencies": {
+    "async": "~0.2.9",
+    "flex-sdk": "4.6.0",
     "video.js": "4.3.0",
     "grunt-cli": "~0.1.0",
     "grunt": "~0.4.0",
