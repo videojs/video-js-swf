@@ -44,7 +44,6 @@ import flash.utils.ByteArray;
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
         private var _poster:String = "";
-        private var _playerId:String = "";
         private var _lastSeekedTime:Number = 0;
 
         private static var _instance:VideoJSModel;
@@ -74,14 +73,6 @@ import flash.utils.ByteArray;
 
         public function set lastSeekedTime(value:Number):void {
             _lastSeekedTime = value;
-        }
-
-        public function get playerId():String {
-            return _playerId;
-        }
-
-        public function set playerId(value:String):void {
-            _playerId = value;
         }
 
         public function get mode():String{
@@ -120,28 +111,6 @@ import flash.utils.ByteArray;
         }
         public function set stageRect(pRect:Rectangle):void {
             _stageRect = pRect;
-        }
-
-        public function appendBytesAction(action:String):void {
-            var value:String;
-
-            switch (action.toLowerCase()) {
-                case "endsequence":
-                    value = NetStreamAppendBytesAction.END_SEQUENCE;
-                    break;
-
-                case "resetseek":
-                    value = NetStreamAppendBytesAction.RESET_SEEK;
-                    break;
-
-                case "resetbegin":
-                    value = NetStreamAppendBytesAction.RESET_BEGIN;
-                    break;
-            }
-
-            if(value && _provider && _provider is HTTPVideoProvider) {
-                (_provider as HTTPVideoProvider).appendBytesAction(value);
-            }
         }
 
         public function appendBuffer(bytes:ByteArray):void {
@@ -320,7 +289,8 @@ import flash.utils.ByteArray;
             if(_provider){
                 if(_provider is HTTPVideoProvider && _src == null)
                 {
-                    return (_lastSeekedTime + _provider.time > duration) ? duration : _lastSeekedTime+_provider.time;
+                    //ExternalInterface.call('console.log', 'SWF Time', _lastSeekedTime, _provider.time);
+                    return _lastSeekedTime + _provider.time;
                 } else {
                     return _provider.time;
                 }
@@ -537,7 +507,9 @@ import flash.utils.ByteArray;
          * 
          */        
         public function seekBySeconds(pValue:Number):void {
-            lastSeekedTime = pValue;
+            ExternalInterface.call('console.log', 'SWF Received SeekValue', pValue);
+
+            _lastSeekedTime = pValue;
 
             if(_provider){
                 _provider.seekBySeconds(pValue);

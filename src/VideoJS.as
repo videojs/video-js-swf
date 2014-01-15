@@ -53,7 +53,7 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.8", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.9", false, false);
             var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2014 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
@@ -279,12 +279,6 @@ package{
             switch(pPropertyName){
                 case "lastSeekedTime":
                     _app.model.lastSeekedTime = Number(pValue);
-                    break;
-                case "playerId":
-                    _app.model.playerId = String(pValue);
-                    break;
-                case "appendBytesAction":
-                    _app.model.appendBytesAction(String(pValue));
                     break;
                 case "duration":
                     _app.model.duration = Number(pValue);

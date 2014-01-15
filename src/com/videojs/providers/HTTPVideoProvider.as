@@ -14,7 +14,8 @@ package com.videojs.providers{
     import flash.net.NetConnection;
     import flash.net.NetStream;
     import flash.net.NetStreamAppendBytesAction;
-    import flash.utils.ByteArray;
+import flash.net.NetStreamPlayOptions;
+import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
 
@@ -158,12 +159,12 @@ package com.videojs.providers{
         }
         
         public function get buffered():Number{
-            if(duration > 0){
-                return (_ns.bytesLoaded / _ns.bytesTotal) * duration;
-            }
-            else if (_ns){
+            if(_ns && _src.path == null)
+            {
                 return _ns.bufferLength + _ns.time;
-            } else{
+            } else if(duration > 0){
+                return (_ns.bytesLoaded / _ns.bytesTotal) * duration;
+            } else {
                  return 0;
             }
         }
@@ -288,28 +289,24 @@ package com.videojs.providers{
         }
         
         public function seekBySeconds(pTime:Number):void{
-            if(_isPlaying){
-                if(duration != 0 && pTime <= duration){
-                    _isSeeking = true;
-                    _throughputTimer.stop();
-                    if(_isPaused){
-                        _pausedSeekValue = pTime;
-                    }
-                    _ns.seek(pTime);
-                    _isBuffering = true;
+            if(_isPlaying)
+            {
+                _isSeeking = true;
+                _throughputTimer.stop();
+                if(_isPaused)
+                {
+                    _pausedSeekValue = pTime;
                 }
             }
-            else if(_hasEnded){
-                _ns.seek(pTime);
+            else if(_hasEnded)
+            {
                 _isPlaying = true;
                 _hasEnded = false;
-                _isBuffering = true;
             }
 
+            _ns.seek(pTime);
+            _isBuffering = true;
 
-            if(_src.path === null) {
-                appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
-            }
         }
         
         public function seekByPercent(pPercent:Number):void{
@@ -489,6 +486,8 @@ package com.videojs.providers{
                 case "NetStream.SeekStart.Notify":
                     if(_src.path === null) {
                         appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
+                        var nso:NetStreamPlayOptions = new NetStreamPlayOptions();
+                        nso.start = _model.lastSeekedTime;
                     }
                     _model.broadcastEventExternally(ExternalEventName.ON_SEEK_START);
                     break;
@@ -515,7 +514,8 @@ package com.videojs.providers{
 
                     if(_src.path === null)
                     {
-                        if(_model.time >= _model.duration)
+                        ExternalInterface.call('console.log', 'empty buffer', _model.time, '/', _model.duration);
+                        if(_model.time >= _model.duration-.5)
                         {
                             if(!_loop) {
                                 _isPlaying = false;
@@ -587,6 +587,7 @@ package com.videojs.providers{
         }
         
         public function onMetaData(pMetaData:Object):void{
+
             _metadata = pMetaData;
             if(pMetaData.duration != undefined){
                 _isLive = false;
