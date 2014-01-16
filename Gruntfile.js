@@ -2,20 +2,6 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    bumpup: {
-      options: {
-        updateProps: {
-          pkg: 'package.json'
-        }
-      },
-      file: 'package.json'
-    },
-    tagrelease: {
-      file: 'package.json',
-      commit:  true,
-      message: 'Release %version%',
-      prefix:  'v'
-    },
     connect: {
       dev: {
         port: 8000,
@@ -129,13 +115,41 @@ module.exports = function (grunt) {
           'dist/video-js.swf': ['src/VideoJS.as']
         }
       }
+    },
+    bumpup: {
+      options: {
+        updateProps: {
+          pkg: 'package.json'
+        }
+      },
+      file: 'package.json'
+    },
+    tagrelease: {
+      file: 'package.json',
+      commit:  true,
+      message: 'Release %version%',
+      prefix:  'v'
+    },
+    shell: {
+      options: {
+        failOnError: true
+      },
+      'git-add-dist-force': { command: 'git add dist --force' },
+      'git-merge-stable': { command: 'git merge stable' },
+      'git-merge-master': { command: 'git merge master' },
+      'git-checkout-stable': { command: 'git checkout stable' },
+      'git-checkout-master': { command: 'git checkout master' },
+      'git-push-stable': { command: 'git push stable' },
+      'git-push-master': { command: 'git push master' },
+      'git-push-tags': { command: 'git push --tags' }
     }
-
   });
 
   grunt.loadNpmTasks('grunt-connect');
   grunt.loadNpmTasks('grunt-bumpup');
   grunt.loadNpmTasks('grunt-tagrelease');
+  grunt.loadNpmTasks('grunt-npm');
+  grunt.loadNpmTasks('grunt-shell');
 
   grunt.registerTask('dist', ['mxmlc']);
   grunt.registerTask('default', ['dist']);
@@ -145,7 +159,7 @@ module.exports = function (grunt) {
     var childProcess = require('child_process');
     var flexSdk = require('flex-sdk');
     var async = require('async');
-
+    console.log('mx');
     var
       options = this.options,
       done = this.async(),
@@ -230,32 +244,21 @@ module.exports = function (grunt) {
    *  Run `npm publish`.
    */
   grunt.registerTask('release', 'Bump, build, and tag', function(type) {
-    var shell = require('shelljs');
-
     // major, minor, patch
     type = type ? type : 'patch';
 
-    // git is required in add-dist, so check now
-    if (!shell.which('git')) {
-      grunt.fatal('Sorry, this script requires git');
-    }
-
-    if (shell.exec('git checkout stable').code !== 0) {
-      grunt.fatal('`git checkout stable` failed');
-    }
-
-    grunt.task.run('bumpup:' + type); // bump up the package version
-    grunt.task.run('dist');           // build distribution
-    grunt.task.run('add-dist');       // force add the distribution
-    grunt.task.run('tagrelease');     // commit & tag the changes
-  });
-
-  grunt.registerTask('add-dist', 'Force add the built distribution files', function(type) {
-    var shell = require('shelljs');
-
-    if (shell.exec('git add dist --force').code !== 0) {
-      grunt.fatal('`git add dist --force` failed');
-    }
-    grunt.log.writeln('dist directory staged (git add dist --force)');
+    grunt.task.run([
+      'shell:git-checkout-stable',  // must start on the stable branch
+      'bumpup:'+type,               // bump up the package version
+      'dist',                       // build distribution
+      'shell:git-add-dist-force',   // force add the distribution
+      'tagrelease',                 // commit & tag the changes
+      'shell:git-push-stable',
+      'shell:git-push-tags',
+      'npm-publish',
+      'shell:git-checkout-master',
+      'shell:git-merge-stable',
+      'shell:git-push-master'
+    ]);
   });
 };
