@@ -139,8 +139,8 @@ module.exports = function (grunt) {
       'git-merge-master': { command: 'git merge master' },
       'git-checkout-stable': { command: 'git checkout stable' },
       'git-checkout-master': { command: 'git checkout master' },
-      'git-push-stable': { command: 'git push stable' },
-      'git-push-master': { command: 'git push master' },
+      'git-push-stable': { command: 'git push origin stable' },
+      'git-push-master': { command: 'git push origin master' },
       'git-push-tags': { command: 'git push --tags' }
     }
   });
