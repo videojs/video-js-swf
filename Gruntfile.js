@@ -144,6 +144,24 @@ module.exports = function (grunt) {
       'git-push-stable': { command: 'git push origin stable' },
       'git-push-master': { command: 'git push origin master' },
       'git-push-tags': { command: 'git push --tags' }
+    },
+    prompt: {
+      release: {
+        options: {
+          questions: [
+            {
+              config: 'release', // arbitray name or config for any other grunt task
+              type: 'confirm', // list, checkbox, confirm, input, password
+              message: 'You tested and merged the changes into stable?',
+              default: false, // default value if nothing is entered
+              // choices: 'Array|function(answers)',
+              // validate: function(value){ console.log('hi', value); grunt.fatal('test'); return "error"; }, // return true if valid, error message if invalid
+              // filter:  function(value), // modify the answer
+              // when: function(answers) // only ask this question when this function returns true
+            }
+          ]
+        }
+      },
     }
   });
 
@@ -152,6 +170,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-tagrelease');
   grunt.loadNpmTasks('grunt-npm');
   grunt.loadNpmTasks('grunt-shell');
+  grunt.loadNpmTasks('grunt-prompt');
 
   grunt.registerTask('dist', ['mxmlc']);
   grunt.registerTask('default', ['dist']);
@@ -221,7 +240,6 @@ module.exports = function (grunt) {
     q.push(this.files);
   });
 
-
   /**
    * How releases work: 
    * 
@@ -251,6 +269,7 @@ module.exports = function (grunt) {
     type = type ? type : 'patch';
 
     grunt.task.run([
+      'prompt-release',                   // make sure user is ready
       'shell:git-diff-exit-code',         // ensure there's no unadded changes
       'shell:git-diff-cached-exit-code',  // ensure there's no added changes
       'shell:git-checkout-stable',        // must start on the stable branch
@@ -265,5 +284,14 @@ module.exports = function (grunt) {
       'shell:git-merge-stable',
       'shell:git-push-master'
     ]);
+  });
+
+  // Can't bail out when a prompt-confirm returns false, so need this hack
+  // https://github.com/dylang/grunt-prompt/issues/4
+  grunt.registerTask('prompt-release', ['prompt:release', 'prompt-release-check']);
+  grunt.registerTask('prompt-release-check', '', function(type) {
+    if(!grunt.config('release')) {
+      grunt.fatal('Confirmation failed.');
+    }
   });
 };
