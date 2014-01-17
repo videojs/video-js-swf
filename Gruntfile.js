@@ -134,6 +134,8 @@ module.exports = function (grunt) {
       options: {
         failOnError: true
       },
+      'git-diff-exit-code': { command: 'git diff --exit-code' },
+      'git-diff-cached-exit-code': { command: 'git diff --cached --exit-code' },
       'git-add-dist-force': { command: 'git add dist --force' },
       'git-merge-stable': { command: 'git merge stable' },
       'git-merge-master': { command: 'git merge master' },
@@ -219,6 +221,7 @@ module.exports = function (grunt) {
     q.push(this.files);
   });
 
+
   /**
    * How releases work: 
    * 
@@ -248,11 +251,13 @@ module.exports = function (grunt) {
     type = type ? type : 'patch';
 
     grunt.task.run([
-      'shell:git-checkout-stable',  // must start on the stable branch
-      'bumpup:'+type,               // bump up the package version
-      'dist',                       // build distribution
-      'shell:git-add-dist-force',   // force add the distribution
-      'tagrelease',                 // commit & tag the changes
+      'shell:git-diff-exit-code',         // ensure there's no unadded changes
+      'shell:git-diff-cached-exit-code',  // ensure there's no added changes
+      'shell:git-checkout-stable',        // must start on the stable branch
+      'bumpup:'+type,                     // bump up the package version
+      'dist',                             // build distribution
+      'shell:git-add-dist-force',         // force add the distribution
+      'tagrelease',                       // commit & tag the changes
       'shell:git-push-stable',
       'shell:git-push-tags',
       'npm-publish',
