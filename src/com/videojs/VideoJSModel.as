@@ -350,7 +350,7 @@ import flash.utils.ByteArray;
         
         public function get buffered():Number{
             if(_provider){
-                return _provider.buffered;
+                return time + _provider.buffered;
             }
             return 0;
         }

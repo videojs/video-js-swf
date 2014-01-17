@@ -14,7 +14,6 @@ package com.videojs.providers{
     import flash.net.NetConnection;
     import flash.net.NetStream;
     import flash.net.NetStreamAppendBytesAction;
-import flash.net.NetStreamPlayOptions;
 import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
@@ -486,8 +485,6 @@ import flash.utils.ByteArray;
                 case "NetStream.SeekStart.Notify":
                     if(_src.path === null) {
                         appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
-                        var nso:NetStreamPlayOptions = new NetStreamPlayOptions();
-                        nso.start = _model.lastSeekedTime;
                     }
                     _model.broadcastEventExternally(ExternalEventName.ON_SEEK_START);
                     break;
