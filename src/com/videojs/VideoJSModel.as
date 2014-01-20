@@ -348,7 +348,7 @@ package com.videojs{
         
         public function get buffered():Number{
             if(_provider){
-                return time + _provider.buffered;
+                return _lastSeekedTime + _provider.buffered;
             }
             return 0;
         }
