@@ -18,8 +18,7 @@ package com.videojs{
     import flash.media.SoundMixer;
     import flash.media.SoundTransform;
     import flash.media.Video;
-import flash.net.NetStreamAppendBytesAction;
-import flash.utils.ByteArray;
+    import flash.utils.ByteArray;
     
     public class VideoJSModel extends EventDispatcher{
 
@@ -289,7 +288,6 @@ import flash.utils.ByteArray;
             if(_provider){
                 if(_provider is HTTPVideoProvider && _src == null)
                 {
-                    //ExternalInterface.call('console.log', 'SWF Time', _lastSeekedTime, _provider.time);
                     return _lastSeekedTime + _provider.time;
                 } else {
                     return _provider.time;
@@ -507,8 +505,6 @@ import flash.utils.ByteArray;
          * 
          */        
         public function seekBySeconds(pValue:Number):void {
-            ExternalInterface.call('console.log', 'SWF Received SeekValue', pValue);
-
             _lastSeekedTime = pValue;
 
             if(_provider){

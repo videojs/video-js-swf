@@ -158,6 +158,7 @@ import flash.utils.ByteArray;
         }
         
         public function get buffered():Number{
+            // _src.path == null when in data generation mode
             if(_ns && _src.path == null)
             {
                 return _ns.bufferLength + _ns.time;
@@ -457,7 +458,6 @@ import flash.utils.ByteArray;
         }
         
         private function onNetStreamStatus(e:NetStatusEvent):void{
-            //ExternalInterface.call('console.log', e.info.code);
             switch(e.info.code){
                 case "NetStream.Play.Start":
                     _pausedSeekValue = -1;
@@ -511,7 +511,6 @@ import flash.utils.ByteArray;
 
                     if(_src.path === null)
                     {
-                        ExternalInterface.call('console.log', 'empty buffer', _model.time, '/', _model.duration);
                         if(_model.time >= _model.duration-.5)
                         {
                             if(!_loop) {
