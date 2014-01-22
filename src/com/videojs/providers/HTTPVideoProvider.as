@@ -4,17 +4,14 @@ package com.videojs.providers{
     import com.videojs.events.VideoPlaybackEvent;
     import com.videojs.structs.ExternalErrorEventName;
     import com.videojs.structs.ExternalEventName;
-    import com.videojs.structs.PlaybackType;
-
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
-    import flash.external.ExternalInterface;
     import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
     import flash.net.NetStreamAppendBytesAction;
-import flash.utils.ByteArray;
+    import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
 
