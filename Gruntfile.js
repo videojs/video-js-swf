@@ -111,7 +111,6 @@ module.exports = function (grunt) {
         }
       },
       videojs_swf: {
-        version: '1.1.1',
         files: {
           'dist/video-js.swf': ['src/VideoJS.as']
         }
