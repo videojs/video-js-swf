@@ -43,7 +43,6 @@ package com.videojs{
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
         private var _poster:String = "";
-        private var _lastSeekedTime:Number = 0;
 
         private static var _instance:VideoJSModel;
 
@@ -64,14 +63,6 @@ package com.videojs{
                 _instance = new VideoJSModel(new SingletonLock());
             }
             return _instance;
-        }
-
-        public function get lastSeekedTime():Number {
-            return _lastSeekedTime;
-        }
-
-        public function set lastSeekedTime(value:Number):void {
-            _lastSeekedTime = value;
         }
 
         public function get mode():String{
@@ -286,12 +277,7 @@ package com.videojs{
          */        
         public function get time():Number{
             if(_provider){
-                if(_provider is HTTPVideoProvider && _src == null)
-                {
-                    return _lastSeekedTime + _provider.time;
-                } else {
-                    return _provider.time;
-                }
+                return _provider.time;
             }
             return 0;
         }
@@ -348,7 +334,7 @@ package com.videojs{
         
         public function get buffered():Number{
             if(_provider){
-                return _lastSeekedTime + _provider.buffered;
+                return _provider.buffered;
             }
             return 0;
         }
@@ -505,8 +491,6 @@ package com.videojs{
          * 
          */        
         public function seekBySeconds(pValue:Number):void {
-            _lastSeekedTime = pValue;
-
             if(_provider){
                 _provider.seekBySeconds(pValue);
             }

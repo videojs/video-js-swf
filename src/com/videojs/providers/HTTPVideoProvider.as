@@ -27,6 +27,16 @@ package com.videojs.providers{
         private var _loadErrored:Boolean = false;
         private var _pauseOnStart:Boolean = false;
         private var _pausePending:Boolean = false;
+        /**
+         * The number of seconds between the logical start of the stream and the current zero
+         * playhead position of the NetStream. During normal, file-based playback this value should
+         * always be zero. When the NetStream is in data generation mode, seeking during playback
+         * resets the zero point of the stream to the seek target. To recover the playhead position
+         * in the logical stream, this value can be added to the NetStream reported time.
+         *
+         * @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html#play()
+         */
+        private var _startOffset:Number = 0;
         private var _videoReference:Video;
         
         /**
@@ -72,7 +82,7 @@ package com.videojs.providers{
                     return _pausedSeekValue;
                 }
                 else{
-                    return _ns.time;
+                    return _startOffset + _ns.time;
                 }
             }
             else{
@@ -158,7 +168,7 @@ package com.videojs.providers{
             // _src.path == null when in data generation mode
             if(_ns && _src.path == null)
             {
-                return _ns.bufferLength + _ns.time;
+                return _startOffset + _ns.bufferLength + _ns.time;
             } else if(duration > 0){
                 return (_ns.bytesLoaded / _ns.bytesTotal) * duration;
             } else {
@@ -299,6 +309,11 @@ package com.videojs.providers{
             {
                 _isPlaying = true;
                 _hasEnded = false;
+            }
+
+            if(_src.path === null)
+            {
+                _startOffset = pTime;
             }
 
             _ns.seek(pTime);

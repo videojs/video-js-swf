@@ -187,9 +187,6 @@ package{
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
             switch(pPropertyName){
-                case "lastSeekedTime":
-                    return _app.model.lastSeekedTime;
-                    break;
                 case "mode":
                     return _app.model.mode;
                 case "autoplay":
@@ -277,9 +274,6 @@ package{
         
         private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
             switch(pPropertyName){
-                case "lastSeekedTime":
-                    _app.model.lastSeekedTime = Number(pValue);
-                    break;
                 case "duration":
                     _app.model.duration = Number(pValue);
                     break;
