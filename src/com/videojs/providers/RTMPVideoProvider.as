@@ -252,7 +252,9 @@ package com.videojs.providers{
             }
             // video playback ended, seek to beginning
             else if(_hasEnded){
+                _ns.pause();
                 _ns.seek(0);
+                _ns.resume();
                 _isPlaying = true;
                 _isPaused = false;
                 _hasEnded = false;
@@ -521,6 +523,7 @@ package com.videojs.providers{
                     // playback is over
                     if (_hasEnded) {
                         if(!_loop){
+                            pause();
                             _isPlaying = false;
                             _hasEnded = true;
                             _reportEnded = true;
@@ -528,7 +531,9 @@ package com.videojs.providers{
                             _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
                         }
                         else{
+                            _ns.pause();
                             _ns.seek(0);
+                            _ns.resume();
                         }
                     }
                     // other stream buffering
