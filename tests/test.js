@@ -22,7 +22,7 @@ function createSWF(e){
     name: "videoPlayer"+uid
   };
 
-  swfobject.embedSWF("../bin-debug/VideoJS.swf", "videoPlayer"+uid, "100%", "100%", "10.3", "", flashvars, params, attributes);
+  swfobject.embedSWF("../dist/video-js.swf", "videoPlayer"+uid, "100%", "100%", "10.3", "", flashvars, params, attributes);
 }
 
 function swfSetup(){
