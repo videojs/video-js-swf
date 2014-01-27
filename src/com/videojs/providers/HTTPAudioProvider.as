@@ -114,6 +114,10 @@ package com.videojs.providers{
         public function appendBuffer(bytes:ByteArray):void{
             throw "HTTPAudioProvider does not support appendBuffer";
         }
+
+        public function endOfStream():void{
+            throw "HTTPAudioProvider does not support endOfStream";
+        }
         
         public function get buffered():Number{
             if(duration > 0){

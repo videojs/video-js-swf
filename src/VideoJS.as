@@ -5,7 +5,7 @@ package{
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.ExternalErrorEventName;
     import com.videojs.Base64;
-    
+
     import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
@@ -53,8 +53,8 @@ package{
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
 
             // add content-menu version info
-            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.0", false, false);
-            var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2013 Brightcove, Inc.", false, false);
+            var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v4.0.9", false, false);
+            var _ctxAbout:ContextMenuItem = new ContextMenuItem("Copyright © 2014 Brightcove, Inc.", false, false);
             var _ctxMenu:ContextMenu = new ContextMenu();
             _ctxMenu.hideBuiltInItems();
             _ctxMenu.customItems.push(_ctxVersion, _ctxAbout);
@@ -67,6 +67,7 @@ package{
             try{
                 ExternalInterface.addCallback("vjs_appendBuffer", onAppendBufferCalled);
                 ExternalInterface.addCallback("vjs_echo", onEchoCalled);
+                ExternalInterface.addCallback("vjs_endOfStream", onEndOfStreamCalled);
                 ExternalInterface.addCallback("vjs_getProperty", onGetPropertyCalled);
                 ExternalInterface.addCallback("vjs_setProperty", onSetPropertyCalled);
                 ExternalInterface.addCallback("vjs_autoplay", onAutoplayCalled);
@@ -183,6 +184,10 @@ package{
         private function onEchoCalled(pResponse:* = null):*{
             return pResponse;
         }
+
+        private function onEndOfStreamCalled():*{
+            _app.model.endOfStream();
+        }
         
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
@@ -272,8 +277,11 @@ package{
             return null;
         }
         
-        private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{            
+        private function onSetPropertyCalled(pPropertyName:String = "", pValue:* = null):void{
             switch(pPropertyName){
+                case "duration":
+                    _app.model.duration = Number(pValue);
+                    break;
                 case "mode":
                     _app.model.mode = String(pValue);
                     break;
