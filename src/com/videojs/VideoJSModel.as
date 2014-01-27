@@ -106,6 +106,10 @@ package com.videojs{
         public function appendBuffer(bytes:ByteArray):void {
             _provider.appendBuffer(bytes);
         }
+
+        public function endOfStream():void {
+            _provider.endOfStream();
+        }
         
         public function get backgroundColor():Number{
             return _backgroundColor;

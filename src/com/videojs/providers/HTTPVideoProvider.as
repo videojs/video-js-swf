@@ -37,6 +37,12 @@ package com.videojs.providers{
          * @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/NetStream.html#play()
          */
         private var _startOffset:Number = 0;
+        /**
+         * If true, an empty NetStream buffer should be interpreted as the end of the video. This
+         * is probably the case because the video data is being fed to the NetStream dynamically
+         * through appendBuffer, not for traditional file download video.
+         */
+        private var _ending:Boolean = false;
         private var _videoReference:Video;
         
         /**
@@ -162,6 +168,10 @@ package com.videojs.providers{
 
         public function appendBuffer(bytes:ByteArray):void{
             _ns.appendBytes(bytes);
+        }
+
+        public function endOfStream():void{
+            _ending = true;
         }
         
         public function get buffered():Number{
@@ -518,33 +528,28 @@ package com.videojs.providers{
                 case "NetStream.Buffer.Empty":
                     // should not fire if ended/paused. issue #38
                     if(!_isPlaying){ return; }
-                    _isBuffering = true;
-                    _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
 
-                    if(_src.path === null)
-                    {
-                        if(_model.time >= _model.duration-.5)
-                        {
-                            if(!_loop) {
-                                _isPlaying = false;
-                                _isPaused = true;
-                                _hasEnded = true;
-                                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
-                                _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
-                                _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
-                            }
-                            else {
+                    // reaching the end of the buffer after endOfStream has been called means we've
+                    // hit the end of the video
+                    if (_ending) {
+                        _ending = false;
+                        _isPlaying = false;
+                        _isPaused = true;
+                        _hasEnded = true;
+                        _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
+                        _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
+                        _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
 
-                            }
-                            _throughputTimer.stop();
-                            _throughputTimer.reset();
-                        }
+                        _startOffset = 0;
+                        _pausedSeekValue = 0;
+                        break;
                     }
 
+                    _isBuffering = true;
+                    _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     break;
                 
                 case "NetStream.Play.Stop":
-
                     if(!_loop){
                         _isPlaying = false;
                         _isPaused = true;
