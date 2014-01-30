@@ -28,6 +28,7 @@
     "grunt-bumpup": "~0.5.0",
     "grunt-tagrelease": "~0.3.1",
     "grunt-shell": "~0.6.1",
-    "grunt-prompt": "~0.1.2"
+    "grunt-prompt": "~0.1.2",
+    "grunt-npm": "~0.0.2"
   }
 }
