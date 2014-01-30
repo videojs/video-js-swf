@@ -180,7 +180,8 @@ module.exports = function (grunt) {
     var childProcess = require('child_process');
     var flexSdk = require('flex-sdk');
     var async = require('async');
-    console.log('mx');
+    var pkg =  grunt.file.readJSON('package.json');
+
     var
       options = this.options,
       done = this.async(),
@@ -207,9 +208,12 @@ module.exports = function (grunt) {
         cmdLineOpts.push('-output');
         cmdLineOpts.push(f.dest);
       }
+
+      cmdLineOpts.push('-define=CONFIG::version, "' + pkg.version + '"');
       cmdLineOpts.push('--');
       cmdLineOpts.push.apply(cmdLineOpts, srcList);
 
+      grunt.verbose.writeln('package version: ' + pkg.version);
       grunt.verbose.writeln('mxmlc path: ' + flexSdk.bin.mxmlc);
       grunt.verbose.writeln('options: ' + JSON.stringify(cmdLineOpts));
 
