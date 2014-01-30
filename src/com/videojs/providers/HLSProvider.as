@@ -42,7 +42,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.txt("HLSProvider");
+          Log.info("HLSProvider 0.1.0");
           _hls = new HLS();
           _model = VideoJSModel.getInstance();
           _metadata = {};
@@ -60,7 +60,7 @@ package com.videojs.providers{
         };
 
         private function _errorHandler(event:HLSEvent):void {
-          Log.txt("error!!!!:"+ event.message);
+          Log.debug("error!!!!:"+ event.message);
           _model.broadcastErrorEventExternally(ExternalErrorEventName.SRC_404);
           _networkState = NetworkState.NETWORK_NO_SOURCE;
           _readyState = ReadyState.HAVE_NOTHING;
@@ -94,7 +94,7 @@ package com.videojs.providers{
 
         private function _stateHandler(event:HLSEvent):void {
           _hlsState = event.state;
-          Log.txt("state:"+ _hlsState);
+          Log.debug("state:"+ _hlsState);
           switch(event.state) {
               case HLSStates.IDLE:
                 _networkState = NetworkState.NETWORK_IDLE;
@@ -211,7 +211,7 @@ package com.videojs.providers{
          * asset is playing.
          */
         public function get playing():Boolean {
-          Log.txt("HLSProvider.playing:"+_isPlaying);
+          Log.debug("HLSProvider.playing:"+_isPlaying);
           return _isPlaying;
         }
 
@@ -220,7 +220,7 @@ package com.videojs.providers{
          * asset is paused.
          */
         public function get paused():Boolean {
-          Log.txt("HLSProvider.paused:"+_isPaused);
+          Log.debug("HLSProvider.paused:"+_isPaused);
           return _isPaused;
         }
 
@@ -230,7 +230,7 @@ package com.videojs.providers{
          * the same asset.
          */
         public function get ended():Boolean {
-          Log.txt("HLSProvider.ended:"+_isEnded);
+          Log.debug("HLSProvider.ended:"+_isEnded);
           return _isEnded;
         }
 
@@ -253,7 +253,7 @@ package com.videojs.providers{
          * Should return an object that contains metadata properties, or an empty object if metadata doesn't exist.
          */
         public function get metadata():Object {
-          Log.txt("HLSProvider.metadata");
+          Log.debug("HLSProvider.metadata");
           return _metadata;
         }
 
@@ -273,7 +273,7 @@ package com.videojs.providers{
          * one example of how this object can be used.
          */
         public function set src(pSrc:Object):void {
-          Log.txt("HLSProvider.src");
+          Log.debug("HLSProvider.src");
           _src = pSrc;
         }
 
@@ -292,7 +292,7 @@ package com.videojs.providers{
          */
         public function load():void {
           if(_src !=null) {
-            Log.txt("HLSProvider.load:"+ _src.m3u8);
+            Log.debug("HLSProvider.load:"+ _src.m3u8);
             _isManifestLoaded = false;
             _hls.load(_src.m3u8);
           }
@@ -302,7 +302,7 @@ package com.videojs.providers{
          * Called when the media asset should be played immediately.
          */
         public function play():void {
-          Log.txt("HLSProvider.play.state:" + _hlsState);
+          Log.debug("HLSProvider.play.state:" + _hlsState);
           if(_isManifestLoaded) {
             switch(_hlsState) {
               case HLSStates.IDLE:
@@ -323,7 +323,7 @@ package com.videojs.providers{
          * Called when the media asset should be paused.
          */
         public function pause():void {
-          Log.txt("HLSProvider.pause");
+          Log.debug("HLSProvider.pause");
           _hls.stream.pause();
           _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
         }
@@ -332,7 +332,7 @@ package com.videojs.providers{
          * Called when the media asset should be resumed from a paused state.
          */
         public function resume():void {
-          Log.txt("HLSProvider.resume");
+          Log.debug("HLSProvider.resume");
           _hls.stream.resume();
           _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
         }
@@ -341,7 +341,7 @@ package com.videojs.providers{
          * Called when the media asset needs to seek to a new time point.
          */
         public function seekBySeconds(pTime:Number):void {
-          Log.txt("HLSProvider.seekBySeconds");
+          Log.debug("HLSProvider.seekBySeconds");
           if(_isManifestLoaded) {
             _hls.stream.seek(pTime);
             _isSeeking = true;
@@ -352,7 +352,7 @@ package com.videojs.providers{
          * Called when the media asset needs to seek to a percentage of its total duration.
          */
         public function seekByPercent(pPercent:Number):void {
-          Log.txt("HLSProvider.seekByPercent");
+          Log.debug("HLSProvider.seekByPercent");
           if(_isManifestLoaded) {
             _hls.stream.seek(pPercent*_duration);
             _isSeeking = true;
@@ -363,7 +363,7 @@ package com.videojs.providers{
          * Called when the media asset needs to stop.
          */
         public function stop():void {
-          Log.txt("HLSProvider.stop");
+          Log.debug("HLSProvider.stop");
           _hls.stream.close();
           _bufferedTime = 0;
           _duration = 0;
@@ -388,7 +388,7 @@ package com.videojs.providers{
          * Called when the provider is about to be disposed of.
          */
         public function die():void {
-          Log.txt("HLSProvider.die");
+          Log.debug("HLSProvider.die");
           stop();
 
           if(_videoReference) {
