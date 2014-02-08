@@ -69,7 +69,12 @@ package com.videojs.providers{
         
         public function get time():Number{
             if(_ns != null){
-                return _ns.time;
+                if (_model.duration != 0 && _ns.time > _model.duration){
+                    return _model.duration;
+                }
+                else{
+                    return _ns.time;
+                }
             }
             else{
                 return 0;
@@ -243,7 +248,7 @@ package com.videojs.providers{
                 initNetConnection();
             }
             // if the asset is paused
-            else if(_isPaused && !_reportEnded){
+            else if(_isPaused && !_reportEnded && _model.time < _model.duration){
                 _pausePending = false;
                 _ns.resume();
                 _isPaused = false;
@@ -251,7 +256,7 @@ package com.videojs.providers{
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
             }
             // video playback ended, seek to beginning
-            else if(_hasEnded){
+            else if(_hasEnded || _model.time == _model.duration){
                 _ns.pause();
                 _ns.seek(0);
                 _ns.resume();
