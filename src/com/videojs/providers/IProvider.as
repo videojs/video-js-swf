@@ -30,6 +30,13 @@ package com.videojs.providers{
          * @param  bytes the ByteArray of data to append.
          */
         function appendBuffer(bytes:ByteArray):void;
+
+        /**
+         * Indicates that no further bytes will appended to the source
+         * buffer. After this method has been called, reaching the end
+         * of buffered input is equivalent to the end of the media.
+         */
+        function endOfStream():void;
         
         /**
          * Should return an interger that reflects the closest parallel to
