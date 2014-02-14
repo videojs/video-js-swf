@@ -1,9 +1,10 @@
 package com.videojs{
-    
+
     import com.videojs.events.VideoJSEvent;
     import com.videojs.events.VideoPlaybackEvent;
     import com.videojs.structs.ExternalErrorEventName;
-    
+
+    import flash.display.StageScaleMode;
     import flash.display.Bitmap;
     import flash.display.Loader;
     import flash.display.Sprite;
@@ -15,7 +16,7 @@ package com.videojs{
     import flash.media.Video;
     import flash.net.URLRequest;
     import flash.system.LoaderContext;
-    
+
     public class VideoJSView extends Sprite{
         
         private var _uiVideo:Video;
@@ -91,50 +92,80 @@ package com.videojs{
         }
 
         private function sizeVideoObject():void{
-            
+
             var __targetWidth:int, __targetHeight:int;
-            
+
             var __availableWidth:int = _model.stageRect.width;
             var __availableHeight:int = _model.stageRect.height;
-            
+
             var __nativeWidth:int = 100;
-            
+
             if(_model.metadata.width != undefined){
                 __nativeWidth = Number(_model.metadata.width);
             }
-            
+
             if(_uiVideo.videoWidth != 0){
                 __nativeWidth = _uiVideo.videoWidth;
             }
-            
+
             var __nativeHeight:int = 100;
-            
+
             if(_model.metadata.width != undefined){
                 __nativeHeight = Number(_model.metadata.height);
             }
-            
+
             if(_uiVideo.videoWidth != 0){
                 __nativeHeight = _uiVideo.videoHeight;
             }
 
-            // first, size the whole thing down based on the available width
-            __targetWidth = __availableWidth;
-            __targetHeight = __targetWidth * (__nativeHeight / __nativeWidth);
-            
-            if(__targetHeight > __availableHeight){
-                __targetWidth = __targetWidth * (__availableHeight / __targetHeight);
-                __targetHeight = __availableHeight;
-            }
-
-            _uiVideo.width = __targetWidth;
-            _uiVideo.height = __targetHeight;
-            
-            _uiVideo.x = Math.round((_model.stageRect.width - _uiVideo.width) / 2);
-            _uiVideo.y = Math.round((_model.stageRect.height - _uiVideo.height) / 2);
-            
-
+           switch(stage.scaleMode){
+                case StageScaleMode.NO_BORDER:
+                    noBorderFit(_uiVideo, __availableWidth, __availableHeight, __nativeWidth, __nativeHeight);
+                break;
+                case StageScaleMode.EXACT_FIT:
+                    exactFit(_uiVideo, __availableWidth, __availableHeight)
+                break;
+                default:
+                    defaultFit(_uiVideo, __availableWidth, __availableHeight, __nativeWidth, __nativeHeight, __targetWidth, __targetHeight);
+           }
         }
 
+        private function exactFit(toFitObj, availableWidth, availableHeight){
+            toFitObj.width = availableWidth;
+            toFitObj.height = availableHeight;
+            toFitObj.x = 0;
+            toFitObj.y = 0;
+        }
+
+        private function noBorderFit(toFitObj, availableWidth, availableHeight, nativeWidth, nativeHeight){
+            var mod:Number;
+            if(nativeWidth / nativeHeight <  availableWidth / availableHeight){
+              mod = availableWidth / nativeWidth //fit to width
+            }else{
+              mod = availableHeight / nativeHeight //fit to height
+            }
+            toFitObj.width = mod * nativeWidth;
+            toFitObj.height = mod * nativeHeight;
+            toFitObj.x = 0;
+            toFitObj.y = 0;
+        }
+
+        private function defaultFit(toFitObj, availableWidth, availableHeight, nativeWidth, nativeHeight, targetWidth, targetHeight){
+              // first, size the whole thing down based on the available width
+            targetWidth = availableWidth;
+            targetHeight = targetWidth * (nativeHeight / nativeWidth);
+
+            if(targetHeight > availableHeight){
+                targetWidth = targetWidth * (availableHeight / targetHeight);
+                targetHeight = availableHeight;
+            }
+
+            toFitObj.width = targetWidth;
+            toFitObj.height = targetHeight;
+
+            toFitObj.x = Math.round((_model.stageRect.width - toFitObj.width) / 2);
+            toFitObj.y = Math.round((_model.stageRect.height - toFitObj.height) / 2);
+        }
         private function sizePoster():void{
 
             // wrap this stuff in a try block to avoid freezing the call stack on an image
@@ -143,34 +174,28 @@ package com.videojs{
             try{
                 // only do this stuff if there's a loaded poster to operate on
                 if(_uiPosterImage.content != null){
-    
+
                     var __targetWidth:int, __targetHeight:int;
-                
+
                     var __availableWidth:int = _model.stageRect.width;
                     var __availableHeight:int = _model.stageRect.height;
-            
+
                     var __nativeWidth:int = _uiPosterImage.content.width;
                     var __nativeHeight:int = _uiPosterImage.content.height;
 
-                    // first, size the whole thing down based on the available width
-                    __targetWidth = __availableWidth;
-                    __targetHeight = __targetWidth * (__nativeHeight / __nativeWidth);
-            
-                    if(__targetHeight > __availableHeight){
-                        __targetWidth = __targetWidth * (__availableHeight / __targetHeight);
-                        __targetHeight = __availableHeight;
+                    switch(stage.scaleMode){
+                        case StageScaleMode.NO_BORDER:
+                            noBorderFit(_uiPosterImage, __availableWidth, __availableHeight, __nativeWidth, __nativeHeight);
+                        break;
+                        case StageScaleMode.EXACT_FIT:
+                            exactFit(_uiPosterImage, __availableWidth, __availableHeight)
+                        break;
+                        default:
+                            defaultFit(_uiPosterImage, __availableWidth, __availableHeight, __nativeWidth, __nativeHeight, __targetWidth, __targetHeight);
                     }
-            
-            
-                    _uiPosterImage.width = __targetWidth;
-                    _uiPosterImage.height = __targetHeight;
-            
-                    _uiPosterImage.x = Math.round((_model.stageRect.width - _uiPosterImage.width) / 2);
-                    _uiPosterImage.y = Math.round((_model.stageRect.height - _uiPosterImage.height) / 2);
-                }
+              }
             }
             catch(e:Error){
-                
             }
         }
 
@@ -180,9 +205,8 @@ package com.videojs{
             _uiBackground.graphics.drawRect(0, 0, _model.stageRect.width, _model.stageRect.height);
             _uiBackground.graphics.endFill();
         }
-        
+
         private function onStageResize(e:VideoJSEvent):void{
-            
             _uiBackground.graphics.clear();
             _uiBackground.graphics.beginFill(_model.backgroundColor, 1);
             _uiBackground.graphics.drawRect(0, 0, _model.stageRect.width, _model.stageRect.height);
@@ -190,13 +214,12 @@ package com.videojs{
             sizePoster();
             sizeVideoObject();
         }
-        
+
         private function onPosterSet(e:VideoJSEvent):void{
             loadPoster();
         }
-        
+
         private function onPosterLoadComplete(e:Event):void{
-            
             // turning smoothing on for assets that haven't cleared the security sandbox / crossdomain hurdle
             // will result in the call stack freezing, so we need to wrap access to Loader.content
             try{
@@ -212,28 +235,28 @@ package com.videojs{
             if(!_model.playing){
                 _uiPosterImage.visible = true;
             }
-            
+
         }
-        
+
         private function onPosterLoadError(e:IOErrorEvent):void{
             _model.broadcastErrorEventExternally(ExternalErrorEventName.POSTER_IO_ERROR, e.text);
         }
-        
+
         private function onPosterLoadSecurityError(e:SecurityErrorEvent):void{
             _model.broadcastErrorEventExternally(ExternalErrorEventName.POSTER_SECURITY_ERROR, e.text);
         }
-        
+
         private function onStreamStart(e:VideoPlaybackEvent):void{
             _uiPosterImage.visible = false;
         }
-        
-        private function onMetaData(e:VideoPlaybackEvent):void{        
+
+        private function onMetaData(e:VideoPlaybackEvent):void{
             sizeVideoObject();
         }
 
         private function onDimensionUpdate(e:VideoPlaybackEvent):void{
             sizeVideoObject();
         }
-        
+
     }
 }

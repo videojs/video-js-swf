@@ -155,7 +155,6 @@ package{
         private function onAddedToStage(e:Event):void{
             stage.addEventListener(MouseEvent.CLICK, onStageClick);
             stage.addEventListener(Event.RESIZE, onStageResize);
-            stage.scaleMode = StageScaleMode.NO_SCALE;
             stage.align = StageAlign.TOP_LEFT;
             _stageSizeTimer.start();
         }
