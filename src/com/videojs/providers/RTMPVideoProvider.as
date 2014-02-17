@@ -605,6 +605,13 @@ package com.videojs.providers{
         }
         
         /**
+         * Called from FMS during bandwidth detection
+         */
+        public function onBWCheck(... pRest):Number {
+            return 0;
+        }
+        
+        /**
          * Called from FMS when bandwidth detection is completed.
          */
         public function onBWDone(... pRest):void {        
