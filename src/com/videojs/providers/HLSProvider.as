@@ -85,8 +85,8 @@ package com.videojs.providers{
           _metadata.height = event.levels[0].height;
           _hls.width = event.levels[0].width;
           if(_isAutoPlay || _looping) {
-            _hls.stream.play();
             _looping = false;
+            play();
           }
           _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
           _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
