@@ -19,6 +19,7 @@ package com.videojs.providers{
   public class HLSProvider implements IProvider {
 
         private var _loop:Boolean = false;
+        private var _looping:Boolean = false;
         private var _hls:HLS;
         private var _src:Object;
         private var _model:VideoJSModel;
@@ -42,7 +43,8 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.1.0");
+          Log.info("HLSProvider 0.3.4");
+          //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
           _model = VideoJSModel.getInstance();
           _metadata = {};
@@ -54,9 +56,16 @@ package com.videojs.providers{
         }
 
         private function _completeHandler(event:HLSEvent):void {
-          _isEnded = true;
-          _isPaused = false;
-          _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {}));
+          if(!_loop){
+            _isEnded = true;
+            _isPaused = true;
+            _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {}));
+            _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
+            _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
+          } else {
+            _looping = true;
+            load();
+          }
         };
 
         private function _errorHandler(event:HLSEvent):void {
@@ -74,12 +83,13 @@ package com.videojs.providers{
           _duration = event.levels[0].duration;
           _metadata.width = event.levels[0].width;
           _metadata.height = event.levels[0].height;
-          _hls.setWidth(event.levels[0].width);
-          if(_isAutoPlay) {
+          _hls.width = event.levels[0].width;
+          if(_isAutoPlay || _looping) {
             _hls.stream.play();
+            _looping = false;
           }
+          _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
           _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
-          _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
         };
 
         private function _mediaTimeHandler(event:HLSEvent):void {
@@ -100,27 +110,43 @@ package com.videojs.providers{
                 _networkState = NetworkState.NETWORK_IDLE;
                 _readyState = ReadyState.HAVE_METADATA;
                 break;
-              case HLSStates.BUFFERING:
-                _networkState = NetworkState.NETWORK_LOADING;
-                _readyState = ReadyState.HAVE_CURRENT_DATA;
-                break;
-              case HLSStates.PLAYING:
-                _networkState = NetworkState.NETWORK_LOADING;
-                _readyState = ReadyState.HAVE_ENOUGH_DATA;
+              case HLSStates.PLAYING_BUFFERING:
                 _isPlaying = true;
-                _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
-                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:{}}));
-                _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
-                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
                 _isPaused = false;
                 _isEnded = false;
                 _isSeeking = false;
+                _networkState = NetworkState.NETWORK_LOADING;
+                _readyState = ReadyState.HAVE_CURRENT_DATA;
+                _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                 break;
-              case HLSStates.PAUSED:
+              case HLSStates.PLAYING:
+                _isPlaying = true;
+                _isPaused = false;
+                _isEnded = false;
+                _isSeeking = false;
                 _networkState = NetworkState.NETWORK_LOADING;
                 _readyState = ReadyState.HAVE_ENOUGH_DATA;
+                _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
+                _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
+                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:{}}));
+                _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
+                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
+                break;
+              case HLSStates.PAUSED:
                 _isPaused = true;
                 _isEnded = false;
+                _isSeeking = false;
+                _networkState = NetworkState.NETWORK_LOADING;
+                _readyState = ReadyState.HAVE_ENOUGH_DATA;
+                _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
+                _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
+                break;
+              case HLSStates.PAUSED_BUFFERING:
+                _isPaused = true;
+                _isEnded = false;
+                _networkState = NetworkState.NETWORK_LOADING;
+                _readyState = ReadyState.HAVE_CURRENT_DATA;
+                _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                 break;
           }
         };
@@ -294,6 +320,9 @@ package com.videojs.providers{
           if(_src !=null) {
             Log.debug("HLSProvider.load:"+ _src.m3u8);
             _isManifestLoaded = false;
+            _position = 0;
+            _duration = 0;
+            _bufferedTime = 0;
             _hls.load(_src.m3u8);
           }
         }
@@ -310,6 +339,7 @@ package com.videojs.providers{
                 _hls.stream.play();
                 break;
               case HLSStates.PAUSED:
+              case HLSStates.PAUSED_BUFFERING:
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                 _hls.stream.resume();
                 break;
@@ -343,8 +373,10 @@ package com.videojs.providers{
         public function seekBySeconds(pTime:Number):void {
           Log.debug("HLSProvider.seekBySeconds");
           if(_isManifestLoaded) {
-            _hls.stream.seek(pTime);
             _isSeeking = true;
+            _position = pTime;
+            _bufferedTime = _position;
+            _hls.stream.seek(pTime);
           }
         }
 
@@ -354,8 +386,10 @@ package com.videojs.providers{
         public function seekByPercent(pPercent:Number):void {
           Log.debug("HLSProvider.seekByPercent");
           if(_isManifestLoaded) {
-            _hls.stream.seek(pPercent*_duration);
             _isSeeking = true;
+            _position = pPercent*_duration;
+            _bufferedTime = _position;
+            _hls.stream.seek(pPercent*_duration);
           }
         }
 
