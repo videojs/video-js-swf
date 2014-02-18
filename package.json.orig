@@ -29,7 +29,10 @@
     "grunt-tagrelease": "~0.3.1",
     "grunt-shell": "~0.6.1",
     "grunt-prompt": "~0.1.2",
-    "grunt-npm": "~0.0.2",
+<<<<<<< HEAD
+    "grunt-npm": "~0.0.2"
+=======
     "chg": "~0.1.5"
+>>>>>>> feature/changelog
   }
 }
