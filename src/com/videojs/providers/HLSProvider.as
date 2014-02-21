@@ -43,7 +43,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.3.4");
+          Log.info("HLSProvider 0.3.7");
           //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
           _model = VideoJSModel.getInstance();
@@ -90,6 +90,7 @@ package com.videojs.providers{
           }
           _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
           _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
+          _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
         };
 
         private function _mediaTimeHandler(event:HLSEvent):void {
