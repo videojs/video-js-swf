@@ -3,6 +3,7 @@ package com.videojs.providers{
   import flash.media.Video;
   import flash.utils.ByteArray;
   import flash.net.NetStream;
+  import flash.events.Event;
 
   import com.videojs.VideoJSModel;
   import com.videojs.events.VideoPlaybackEvent;
@@ -25,6 +26,8 @@ package com.videojs.providers{
         private var _model:VideoJSModel;
         private var _videoReference:Video;
         private var _metadata:Object;
+        private var _mediaWidth:Number;
+        private var _mediaHeight:Number;
 
         private var _hlsState:String = HLSStates.IDLE;
         private var _networkState:Number = NetworkState.NETWORK_EMPTY;
@@ -43,7 +46,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.3.7");
+          Log.info("HLSProvider 0.4.1");
           //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
           _model = VideoJSModel.getInstance();
@@ -152,6 +155,21 @@ package com.videojs.providers{
           }
         };
 
+        private function _onFrame(event:Event):void
+        {
+          var newWidth:Number = _videoReference.videoWidth;
+          var newHeight:Number =  _videoReference.videoHeight;
+          if  (newWidth != 0 && 
+               newHeight != 0 && 
+               newWidth != _mediaWidth && 
+               newHeight != _mediaHeight)
+          {
+            _mediaWidth = newWidth;
+            _mediaHeight = newHeight;
+            Log.info("video size changed to ("+newWidth+","+newHeight+")");
+            _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE, {videoWidth: newWidth, videoHeight: newHeight}));
+          }
+        }
 
         public function get loop():Boolean{
             return _loop;
@@ -415,6 +433,7 @@ package com.videojs.providers{
         public function attachVideo(pVideo:Video):void {
           _videoReference = pVideo;
           _videoReference.attachNetStream(_hls.stream);
+          _videoReference.addEventListener(Event.ENTER_FRAME, _onFrame);
           _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_hls.stream as NetStream}));
           return;
         }
