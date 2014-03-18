@@ -46,7 +46,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.4.1");
+          Log.info("HLSProvider 0.5.4");
           //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
           _model = VideoJSModel.getInstance();
@@ -86,7 +86,6 @@ package com.videojs.providers{
           _duration = event.levels[0].duration;
           _metadata.width = event.levels[0].width;
           _metadata.height = event.levels[0].height;
-          _hls.width = event.levels[0].width;
           if(_isAutoPlay || _looping) {
             _looping = false;
             play();
