@@ -93,6 +93,7 @@ package com.videojs.providers{
           _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
           _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _duration);
           _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
+          _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
         };
 
         private function _mediaTimeHandler(event:HLSEvent):void {
@@ -132,8 +133,6 @@ package com.videojs.providers{
                 _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
                 _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:{}}));
-                _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
-                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
                 break;
               case HLSStates.PAUSED:
                 _isPaused = true;
