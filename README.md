@@ -6,48 +6,34 @@ Installation
 ============
 
 1. Install Node Packages.
-
 ```bash
     npm install
    ```
-
 2. Compile SWF.
-
 Development (places new SWF in /dist/):
-
 ```bash
     grunt mxmlc
    ```
-
 Production/ Distribution (runs mxmlc task and copies SWF to dist/):
-
 ```bash
     grunt dist
    ```
-
 3. Run Connect Server.
-
 ```bash
     grunt connect:dev
 ```
-
-8. Open your browser at [http://localhost:8000/index.html](http://localhost:8000/index.html) to see a video play.  You can keep using grunt to rebuild the Flash code.
+4. Open your browser at [http://localhost:8000/index.html](http://localhost:8000/index.html) to see a video play.  You can keep using grunt to rebuild the Flash code.
 
 
 Running Unit and Integration Tests
 ===========
 
-** Notes - We should drop all of this for grunt based / Karma testing.
+** Note - We want to drop all of this for grunt based / Karma testing.
 
 For unit tests, this project uses [FlexUnit](http://flexunit.org/). The unit tests can be found in [project root]/src/com/videojs/test/
 
 For integration tests, this project uses [qunit](http://qunitjs.com/). The integration tests can be found in [project root]/test
 
-In order to run all of the tests, run test.sh.
-
-    ./test.sh
-
-A copy of the SWF produced for the unit tests will be compiled into the bin-debug folder.  Both the unit and integration tests will attempt to run with the 'open' command, or an instruction will be given on how to run them manually.
+In order to run all of the tests, use the links at  [http://localhost:8000/index.html](http://localhost:8000/index.html)
 
 There are very few tests.  Adding to them is a fantastic and much appreciated way to contribute.
-
