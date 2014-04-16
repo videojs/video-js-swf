@@ -77,6 +77,11 @@ package com.videojs.providers{
         function get bytesTotal():int;
         
         /**
+         * Should return a video start time
+         */
+        function get startOffsetTime():Number;
+        
+        /**
          * Should return a boolean value that indicates whether or not the current media
          * asset is playing.
          */
