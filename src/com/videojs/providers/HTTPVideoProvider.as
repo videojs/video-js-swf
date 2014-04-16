@@ -205,6 +205,10 @@ package com.videojs.providers{
             return 0;
         }
         
+        public function get startOffsetTime():Number{
+            return _startOffset;
+        }
+        
         public function get playing():Boolean{
             return _isPlaying;
         }
