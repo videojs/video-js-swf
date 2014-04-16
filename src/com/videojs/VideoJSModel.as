@@ -368,6 +368,18 @@ package com.videojs{
         }
         
         /**
+         * Return a video start time.
+         * @return 
+         * 
+         */
+        public function get startOffsetTime():Number{
+            if(_provider){
+                return _provider.startOffsetTime;
+            }
+            return 0;
+        }
+        
+        /**
          * Returns the pixel width of the currently playing video as interpreted by the decompressor.
          * @return 
          * 
@@ -411,10 +423,9 @@ package com.videojs{
 
         /**
          * Allows this model to act as a centralized event bus to which other classes can subscribe.
-         *  
          * @param e
          * 
-         */        
+         */
         public function broadcastEvent(e:Event):void {
             dispatchEvent(e); 
         }
