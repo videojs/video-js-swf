@@ -49,6 +49,7 @@ package com.videojs.providers{
           Log.info("HLSProvider 0.5.7");
           //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
+          _hls.flushLiveURLCache=true;
           _model = VideoJSModel.getInstance();
           _metadata = {};
           _hls.addEventListener(HLSEvent.PLAYBACK_COMPLETE,_completeHandler);
