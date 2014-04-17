@@ -46,7 +46,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.5.4");
+          Log.info("HLSProvider 0.5.7");
           //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
           _model = VideoJSModel.getInstance();
