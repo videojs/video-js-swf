@@ -46,7 +46,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.5.7");
+          Log.info("HLSProvider 0.6.1");
           //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
           _hls.flushLiveURLCache=true;
@@ -73,7 +73,7 @@ package com.videojs.providers{
         };
 
         private function _errorHandler(event:HLSEvent):void {
-          Log.debug("error!!!!:"+ event.message);
+          Log.debug("error!!!!:"+ event.error.msg);
           _model.broadcastErrorEventExternally(ExternalErrorEventName.SRC_404);
           _networkState = NetworkState.NETWORK_NO_SOURCE;
           _readyState = ReadyState.HAVE_NOTHING;
