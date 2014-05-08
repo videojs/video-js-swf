@@ -512,18 +512,18 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Buffer.Full":
-                    _isBuffering = false;
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
                     _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
                     if(_pausePending){
                         _pausePending = false;
                         _ns.pause();
                         _isPaused = true;
-                    } else {
+                    } else if (_isBuffering) {
                         _pausedSeekValue = -1;
                         _isPlaying = true;
                         _model.broadcastEventExternally(ExternalEventName.ON_START);
                     }
+                    _isBuffering = false;
                     break;
                 
                 case "NetStream.Buffer.Empty":
