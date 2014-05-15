@@ -276,7 +276,9 @@ package com.videojs.providers{
                 _ns.resume();
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-                _model.broadcastEventExternally(ExternalEventName.ON_START);
+                if (!_isBuffering) {
+                    _model.broadcastEventExternally(ExternalEventName.ON_START);
+                }
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
             }
         }
@@ -301,7 +303,9 @@ package com.videojs.providers{
                 _ns.resume();
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-                _model.broadcastEventExternally(ExternalEventName.ON_START);
+                if (!_isBuffering) {
+                    _model.broadcastEventExternally(ExternalEventName.ON_START);
+                }
             }
         }
         
@@ -514,13 +518,13 @@ package com.videojs.providers{
                 case "NetStream.Buffer.Full":
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
                     _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
+                    _pausedSeekValue = -1;
+                    _isPlaying = true;
                     if(_pausePending){
                         _pausePending = false;
                         _ns.pause();
                         _isPaused = true;
                     } else if (_isBuffering) {
-                        _pausedSeekValue = -1;
-                        _isPlaying = true;
                         _model.broadcastEventExternally(ExternalEventName.ON_START);
                     }
                     _isBuffering = false;
