@@ -559,7 +559,7 @@ package com.videojs{
             // We need to determine which provider to load, based on the values of our exposed properties.
             switch(_mode){
                 case PlayerMode.VIDEO:
-                    
+                    broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                     if(_currentPlaybackType == PlaybackType.HTTP){
                         __src = {
                             path: _src
@@ -580,6 +580,7 @@ package com.videojs{
                     
                     break;
                 case PlayerMode.AUDIO:
+                    broadcastEventExternally(ExternalEventName.ON_LOAD_START);
                     __src = {
                         path:_src
                     };

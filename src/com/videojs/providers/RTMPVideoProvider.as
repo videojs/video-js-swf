@@ -119,7 +119,7 @@ package com.videojs.providers{
         
         public function get networkState():int{
             if(!_loadStarted){
-                return 0;
+                return 2;
             }
             else{
                 if(_loadCompleted){
@@ -417,7 +417,6 @@ package com.videojs.providers{
             _ns.bufferTime = 1;
             _ns.play(_src.streamURL);
             _videoReference.attachNetStream(_ns);
-            _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
         
