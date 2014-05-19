@@ -14,7 +14,7 @@ package com.videojs.providers{
 
   import org.mangui.HLS.HLS;
   import org.mangui.HLS.HLSEvent;
-  import org.mangui.HLS.HLSStates;
+  import org.mangui.HLS.HLSPlayStates;
   import org.mangui.HLS.utils.Log;
 
   public class HLSProvider implements IProvider {
@@ -29,7 +29,7 @@ package com.videojs.providers{
         private var _mediaWidth:Number;
         private var _mediaHeight:Number;
 
-        private var _hlsState:String = HLSStates.IDLE;
+        private var _hlsState:String = HLSPlayStates.IDLE;
         private var _networkState:Number = NetworkState.NETWORK_EMPTY;
         private var _readyState:Number = ReadyState.HAVE_NOTHING;
         private var _position:Number = 0;
@@ -46,7 +46,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.6.1");
+          Log.info("HLSProvider 0.7.0");
           //Log.LOG_DEBUG_ENABLED = true;
           _hls = new HLS();
           _hls.flushLiveURLCache=true;
@@ -56,7 +56,7 @@ package com.videojs.providers{
           _hls.addEventListener(HLSEvent.ERROR,_errorHandler);
           _hls.addEventListener(HLSEvent.MANIFEST_LOADED,_manifestHandler);
           _hls.addEventListener(HLSEvent.MEDIA_TIME,_mediaTimeHandler);
-          _hls.addEventListener(HLSEvent.STATE,_stateHandler);
+          _hls.addEventListener(HLSEvent.PLAYBACK_STATE,_stateHandler);
         }
 
         private function _completeHandler(event:HLSEvent):void {
@@ -111,11 +111,11 @@ package com.videojs.providers{
           _hlsState = event.state;
           Log.debug("state:"+ _hlsState);
           switch(event.state) {
-              case HLSStates.IDLE:
+              case HLSPlayStates.IDLE:
                 _networkState = NetworkState.NETWORK_IDLE;
                 _readyState = ReadyState.HAVE_METADATA;
                 break;
-              case HLSStates.PLAYING_BUFFERING:
+              case HLSPlayStates.PLAYING_BUFFERING:
                 _isPlaying = true;
                 _isPaused = false;
                 _isEnded = false;
@@ -124,7 +124,7 @@ package com.videojs.providers{
                 _readyState = ReadyState.HAVE_CURRENT_DATA;
                 _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                 break;
-              case HLSStates.PLAYING:
+              case HLSPlayStates.PLAYING:
                 _isPlaying = true;
                 _isPaused = false;
                 _isEnded = false;
@@ -135,7 +135,7 @@ package com.videojs.providers{
                 _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:{}}));
                 break;
-              case HLSStates.PAUSED:
+              case HLSPlayStates.PAUSED:
                 _isPaused = true;
                 _isEnded = false;
                 _isSeeking = false;
@@ -144,7 +144,7 @@ package com.videojs.providers{
                 _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
                 _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
                 break;
-              case HLSStates.PAUSED_BUFFERING:
+              case HLSPlayStates.PAUSED_BUFFERING:
                 _isPaused = true;
                 _isEnded = false;
                 _networkState = NetworkState.NETWORK_LOADING;
@@ -352,12 +352,12 @@ package com.videojs.providers{
           Log.debug("HLSProvider.play.state:" + _hlsState);
           if(_isManifestLoaded) {
             switch(_hlsState) {
-              case HLSStates.IDLE:
+              case HLSPlayStates.IDLE:
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                 _hls.stream.play();
                 break;
-              case HLSStates.PAUSED:
-              case HLSStates.PAUSED_BUFFERING:
+              case HLSPlayStates.PAUSED:
+              case HLSPlayStates.PAUSED_BUFFERING:
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                 _hls.stream.resume();
                 break;
