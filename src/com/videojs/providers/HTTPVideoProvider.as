@@ -173,6 +173,11 @@ package com.videojs.providers{
         public function endOfStream():void{
             _ending = true;
         }
+
+        public function abort():void{
+            // flush the netstream buffers
+            _ns.seek(time);
+        }
         
         public function get buffered():Number{
             // _src.path == null when in data generation mode
@@ -321,13 +326,15 @@ package com.videojs.providers{
                 _hasEnded = false;
             }
 
+            _isBuffering = true;
+
             if(_src.path === null)
             {
                 _startOffset = pTime;
+                return;
             }
 
             _ns.seek(pTime);
-            _isBuffering = true;
 
         }
         
