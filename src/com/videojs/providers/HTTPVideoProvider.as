@@ -1,5 +1,5 @@
 package com.videojs.providers{
-    
+
     import com.videojs.VideoJSModel;
     import com.videojs.events.VideoPlaybackEvent;
     import com.videojs.structs.ExternalErrorEventName;
@@ -402,6 +402,10 @@ package com.videojs.providers{
         }
         
         private function initNetConnection():void{
+            // the video element triggers loadstart as soon as the resource selection algorithm selects a source
+            // this is somewhat later than that moment but relatively close
+            ExternalInterface.call('console.trace');
+            _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
 
             if(_nc != null) {
                 try {
@@ -491,8 +495,6 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
-                    _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     if(_pauseOnStart && _loadStarted == false){
                         _ns.pause();
                         _isPaused = true;
