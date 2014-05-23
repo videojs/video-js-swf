@@ -118,6 +118,10 @@ package com.videojs.providers{
         public function endOfStream():void{
             throw "HTTPAudioProvider does not support endOfStream";
         }
+
+        public function abort():void{
+            throw "HTTPAudioProvider does not support abort";
+        }
         
         public function get buffered():Number{
             if(duration > 0){

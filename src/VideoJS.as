@@ -71,6 +71,8 @@ package{
                 ExternalInterface.addCallback("vjs_appendBuffer", onAppendBufferCalled);
                 ExternalInterface.addCallback("vjs_echo", onEchoCalled);
                 ExternalInterface.addCallback("vjs_endOfStream", onEndOfStreamCalled);
+                ExternalInterface.addCallback("vjs_abort", onAbortCalled);
+
                 ExternalInterface.addCallback("vjs_getProperty", onGetPropertyCalled);
                 ExternalInterface.addCallback("vjs_setProperty", onSetPropertyCalled);
                 ExternalInterface.addCallback("vjs_autoplay", onAutoplayCalled);
@@ -190,6 +192,10 @@ package{
 
         private function onEndOfStreamCalled():*{
             _app.model.endOfStream();
+        }
+
+        private function onAbortCalled():*{
+            _app.model.abort();
         }
         
         private function onGetPropertyCalled(pPropertyName:String = ""):*{

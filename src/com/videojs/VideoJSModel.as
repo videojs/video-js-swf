@@ -110,6 +110,10 @@ package com.videojs{
         public function endOfStream():void {
             _provider.endOfStream();
         }
+
+        public function abort():void {
+            _provider.abort();
+        }
         
         public function get backgroundColor():Number{
             return _backgroundColor;

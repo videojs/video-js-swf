@@ -141,6 +141,10 @@ package com.videojs.providers{
         public function endOfStream():void{
             throw "RTMPVideoProvider does not support endOfStream";
         }
+
+        public function abort():void{
+            throw "RTMPVideoProvider does not support abort";
+        }
         
         public function get buffered():Number{
             if(duration > 0){

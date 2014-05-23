@@ -37,6 +37,12 @@ package com.videojs.providers{
          * of buffered input is equivalent to the end of the media.
          */
         function endOfStream():void;
+
+        /**
+         * Aborts any data currently in the buffer and resets the decoder.
+         * @see https://dvcs.w3.org/hg/html-media/raw-file/tip/media-source/media-source.html#widl-SourceBuffer-abort-void
+         */
+        function abort():void;
         
         /**
          * Should return an interger that reflects the closest parallel to
