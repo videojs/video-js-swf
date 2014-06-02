@@ -350,7 +350,7 @@ package{
         }
 
         private function openExternalMSObject(pSrc:*):void{
-          ExternalInterface.call('videojs.MediaSource.open("' +pSrc+ '", "' +ExternalInterface.objectID+ '")');
+          ExternalInterface.call('videojs.MediaSource.open', pSrc, ExternalInterface.objectID);
         }
         
         private function onSrcCalled(pSrc:* = ""):void{
