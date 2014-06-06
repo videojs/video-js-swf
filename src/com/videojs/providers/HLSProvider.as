@@ -14,6 +14,7 @@ package com.videojs.providers{
 
   import org.mangui.HLS.HLS;
   import org.mangui.HLS.HLSEvent;
+  import org.mangui.HLS.HLSSettings;
   import org.mangui.HLS.HLSPlayStates;
   import org.mangui.HLS.utils.Log;
 
@@ -46,10 +47,10 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.7.0");
-          //Log.LOG_DEBUG_ENABLED = true;
+          Log.info("HLSProvider 0.7.1");
+          //HLSSettings.logDebug = true;
           _hls = new HLS();
-          _hls.flushLiveURLCache=true;
+          HLSSettings.flushLiveURLCache=true;
           _model = VideoJSModel.getInstance();
           _metadata = {};
           _hls.addEventListener(HLSEvent.PLAYBACK_COMPLETE,_completeHandler);
