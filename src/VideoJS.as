@@ -258,6 +258,9 @@ package{
                 case "readyState":
                     return _app.model.readyState;
                     break;
+                case "bufferTime":
+                    return _app.model.bufferTime;
+                    break;
                 case "buffered":
                     return _app.model.buffered;
                     break;
@@ -334,6 +337,9 @@ package{
                     break;
                 case "rtmpStream":
                     _app.model.rtmpStream = String(pValue);
+                    break;
+                case "bufferTime":
+                    _app.model.bufferTime = Number(pValue);
                     break;
                 default:
                     _app.model.broadcastErrorEventExternally(ExternalErrorEventName.PROPERTY_NOT_FOUND, pPropertyName);

@@ -24,6 +24,8 @@ package com.videojs.providers{
         private var _rtmpRetryTimer:Timer;
         private var _ncRTMPRetryThreshold:int = 3;
         private var _ncRTMPCurrentRetry:int = 0;
+        private var _initialBufferTime:int = 1;
+        private var _expandedBufferTime:int = 5;
         private var _throughputTimer:Timer;
         private var _currentThroughput:int = 0; // in B/sec
         private var _loadStartTimestamp:int;
@@ -49,7 +51,7 @@ package com.videojs.providers{
         private var _loop:Boolean = false;
         
         private var _model:VideoJSModel;
-        
+
         public function RTMPVideoProvider(){
             _model = VideoJSModel.getInstance();
             _metadata = {};
@@ -161,6 +163,18 @@ package com.videojs.providers{
             }
             else{
                 return 0;
+            }
+        }
+
+        public function get bufferTime():Number{
+            return _ns.bufferTime;
+        }
+
+        public function set bufferTime(pBufferTime:Number):void{
+            if(pBufferTime <= 0){
+                _ns.bufferTime = 0;
+            } else {
+                _ns.bufferTime = pBufferTime;
             }
         }
         
@@ -418,7 +432,7 @@ package com.videojs.providers{
             _ns = new NetStream(_nc);
             _ns.addEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
             _ns.client = this;
-            _ns.bufferTime = 1;
+            _ns.bufferTime = _initialBufferTime;
             _ns.play(_src.streamURL);
             _videoReference.attachNetStream(_ns);
             _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
@@ -486,6 +500,7 @@ package com.videojs.providers{
                 case "NetStream.Play.Reset":
                     break;
                 case "NetStream.Play.Start":
+                    _ns.bufferTime = _initialBufferTime;
                     _canPlayThrough = false;
                     _hasEnded = false;
                     _reportEnded = false;
@@ -518,6 +533,12 @@ package com.videojs.providers{
                         _pausePending = false;
                         _ns.pause();
                         _isPaused = true;
+                    }
+                    if(_ns.bufferTime == _initialBufferTime){
+                        _ns.bufferTime = _expandedBufferTime;
+                    }
+                    else{
+                        _ns.bufferTime = _ns.bufferTime * 2;
                     }
                     break;
                 
@@ -552,6 +573,7 @@ package com.videojs.providers{
                 case "NetStream.Seek.Notify":
                     _isPlaying = true;
                     _isSeeking = false;
+                    _ns.bufferTime = _initialBufferTime;
                     _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_SEEK_COMPLETE, {info:e.info}));
                     _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);

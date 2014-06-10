@@ -123,6 +123,14 @@ package com.videojs.providers{
             throw "HTTPAudioProvider does not support abort";
         }
         
+        public function get bufferTime():Number{
+            throw "HTTPAudioProvider does not support bufferTime";
+        }
+
+        public function set bufferTime(pBufferTime:Number):void{
+            throw "HTTPAudioProvider does not support bufferTime";
+        }
+
         public function get buffered():Number{
             if(duration > 0){
                 return (bytesLoaded / bytesTotal) * duration;

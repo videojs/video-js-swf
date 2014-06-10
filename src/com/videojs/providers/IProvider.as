@@ -71,6 +71,16 @@ package com.videojs.providers{
         function get bufferedBytesEnd():int;
         
         /**
+         * Should return a value that indicates current buffer time before playing the stream, in seconds.
+         */
+        function get bufferTime():Number;
+        
+        /**
+         * See above.
+         */
+        function set bufferTime(pBufferTime:Number):void;
+        
+        /**
          * Should return the number of bytes that have been loaded thus far, or 0 if
          * this value is unknown or unable to be calculated (due to streaming, bitrate switching, etc)
          */
