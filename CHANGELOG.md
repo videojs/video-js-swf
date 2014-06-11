@@ -6,6 +6,15 @@ _(none)_
 
 --------------------
 
+## 4.4.1 (2014-06-11)
+* Ignore unnecessary files from npm packaging ([view](https://github.com/videojs/video-js-swf/pull/87))
+* Fixed bug triggering `playing` ([view](https://github.com/videojs/video-js-swf/pull/90))
+* Fixed bug with the timing of `loadstart` ([view](https://github.com/videojs/video-js-swf/pull/93))
+* Added support for clearing the NetStream while in Data Generation Mode ([view](https://github.com/videojs/video-js-swf/pull/93))
+* Fixed silent exception when opening MediaSources ([view](https://github.com/videojs/video-js-swf/pull/97))
+
+--------------------
+
 ## 4.4.0 (2014-02-18)
 * Added changelog
 * Added support for using NetStream in Data Generation Mode ([view](https://github.com/videojs/video-js-swf/pull/80))
