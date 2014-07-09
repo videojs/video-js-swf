@@ -12,11 +12,11 @@ package com.videojs.providers{
   import com.videojs.structs.ReadyState;
   import com.videojs.structs.NetworkState;
 
-  import org.mangui.HLS.HLS;
-  import org.mangui.HLS.HLSEvent;
-  import org.mangui.HLS.HLSSettings;
-  import org.mangui.HLS.HLSPlayStates;
-  import org.mangui.HLS.utils.Log;
+  import org.mangui.hls.HLS;
+  import org.mangui.hls.HLSEvent;
+  import org.mangui.hls.HLSSettings;
+  import org.mangui.hls.HLSPlayStates;
+  import org.mangui.hls.utils.Log;
 
   public class HLSProvider implements IProvider {
 
@@ -47,7 +47,7 @@ package com.videojs.providers{
         private var _bufferedTime:Number = 0;
 
         public function HLSProvider() {
-          Log.info("HLSProvider 0.7.1");
+          Log.info("flashls 0.1.0");
           //HLSSettings.logDebug = true;
           _hls = new HLS();
           HLSSettings.flushLiveURLCache=true;

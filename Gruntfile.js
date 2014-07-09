@@ -208,7 +208,7 @@ module.exports = function (grunt) {
         cmdLineOpts.push('-output');
         cmdLineOpts.push(f.dest);
       }
-      cmdLineOpts.push('-library-path+=libs/HLSProvider.swc');
+      cmdLineOpts.push('-library-path+=libs/flashls.swc');
       cmdLineOpts.push('-define=CONFIG::version, "' + pkg.version + '"');
       cmdLineOpts.push('--');
       cmdLineOpts.push.apply(cmdLineOpts, srcList);
