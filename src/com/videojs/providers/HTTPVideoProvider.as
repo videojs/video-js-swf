@@ -415,8 +415,8 @@ package com.videojs.providers{
         private function initNetConnection():void{
             // the video element triggers loadstart as soon as the resource selection algorithm selects a source
             // this is somewhat later than that moment but relatively close
-            _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
             _loadStarted = true;
+            _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
 
             if(_nc != null) {
                 try {
