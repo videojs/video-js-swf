@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed networkState reporting to be more accurate after loadstart ([view](https://github.com/videojs/video-js-swf/pull/106))
+_(none)_
 
 --------------------
+
+## 4.4.2 (2014-07-11)
+* Fixed networkState reporting to be more accurate after loadstart ([view](https://github.com/videojs/video-js-swf/pull/106))
 
 ## 4.4.1 (2014-06-11)
 * Ignore unnecessary files from npm packaging ([view](https://github.com/videojs/video-js-swf/pull/87))
