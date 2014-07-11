@@ -416,6 +416,7 @@ package com.videojs.providers{
             // the video element triggers loadstart as soon as the resource selection algorithm selects a source
             // this is somewhat later than that moment but relatively close
             _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
+            _loadStarted = true;
 
             if(_nc != null) {
                 try {
@@ -449,7 +450,6 @@ package com.videojs.providers{
 
             if (_src.path === null) {
               _pausePending = true;
-              _loadStarted = true;
             }
             
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
@@ -513,7 +513,6 @@ package com.videojs.providers{
                         _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));
                     }
-                    _loadStarted = true;
                     break;
 
                 case "NetStream.SeekStart.Notify":
