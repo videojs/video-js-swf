@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fixed networkState reporting to be more accurate after loadstart ([view](https://github.com/videojs/video-js-swf/pull/106))
 
 --------------------
 
