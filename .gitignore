@@ -6,3 +6,8 @@ http/node_modules
 node_modules
 dist/*
 build
+
+*.orig
+
+sandbox/*
+!sandbox/*.example

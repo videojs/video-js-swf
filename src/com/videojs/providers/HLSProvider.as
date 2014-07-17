@@ -14,6 +14,7 @@ package com.videojs.providers{
 
   import org.mangui.hls.HLS;
   import org.mangui.hls.HLSEvent;
+  import org.mangui.hls.HLSTypes;
   import org.mangui.hls.HLSSettings;
   import org.mangui.hls.HLSPlayStates;
   import org.mangui.hls.utils.Log;
@@ -190,7 +191,11 @@ package com.videojs.providers{
          * Should return a value that indicates the current asset's duration, in seconds.
          */
         public function get duration():Number  {
-          return _duration;
+          if(_hls.type == HLSTypes.VOD) {
+            return _duration;
+          } else {
+            return -1;
+          }
         }
 
         /**
@@ -449,5 +454,15 @@ package com.videojs.providers{
             _videoReference.clear();
           }
         }
+        
+
+        public function endOfStream():void{
+            throw "HLSProvider does not support endOfStream";
+        }
+
+        public function abort():void{
+            throw "HLSProvider does not support abort";
+        }        
+        
     }
 }

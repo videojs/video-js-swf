@@ -4,13 +4,13 @@
     <title>Video.js | HTML5 Video Player</title>
 
     <!-- Change URLs to wherever Video.js files will be hosted -->
-    <link href="node_modules/video.js/video-js.css" rel="stylesheet" type="text/css">
+    <link href="../node_modules/video.js/dist/video-js/video-js.css" rel="stylesheet" type="text/css">
     <!-- video.js must be in the <head> for older IEs to work. -->
-    <script src="node_modules/video.js/video.js"></script>
+    <script src="../node_modules/video.js/dist/video-js/video.js"></script>
 
     <!-- Unless using the CDN hosted version, update the URL to the Flash SWF -->
     <script>
-        videojs.options.flash.swf = "dist/video-js.swf";
+        videojs.options.flash.swf = "../dist/video-js.swf";
     </script>
 
 </head>

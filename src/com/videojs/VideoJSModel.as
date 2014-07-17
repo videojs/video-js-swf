@@ -106,6 +106,14 @@ package com.videojs{
         public function appendBuffer(bytes:ByteArray):void{
             _provider.appendBuffer(bytes);
         }
+
+        public function endOfStream():void {
+            _provider.endOfStream();
+        }
+
+        public function abort():void {
+            _provider.abort();
+        }
         
         public function get backgroundColor():Number{
             return _backgroundColor;
@@ -167,6 +175,12 @@ package com.videojs{
                 return _provider.duration;
             }
             return 0;
+        }
+
+        public function set duration(value:Number):void {
+            if(_provider && _provider is HTTPVideoProvider) {
+                (_provider as HTTPVideoProvider).duration = value;
+            }
         }
         
         public function get autoplay():Boolean{
