@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Rebuild with Flash target-player 10.3 and swf-version 12. (Fix for [#113](https://github.com/videojs/video-js-swf/issues/113))
+_(none)_
 
 --------------------
+
+## 4.4.3 (2014-08-14)
+* Rebuild with Flash target-player 10.3 and swf-version 12. (Fix for [#113](https://github.com/videojs/video-js-swf/issues/113))
 
 ## 4.4.2 (2014-07-11)
 * Fixed networkState reporting to be more accurate after loadstart ([view](https://github.com/videojs/video-js-swf/pull/106))
