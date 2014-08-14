@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Rebuild with Flash target-player 10.3 and swf-version 12. (Fix for [#113](https://github.com/videojs/video-js-swf/issues/113))
 
 --------------------
 
