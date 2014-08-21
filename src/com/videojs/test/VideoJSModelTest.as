@@ -30,5 +30,18 @@ package com.videojs.test
 			VideoJSModel.getInstance().volume = 0.5;
 			Assert.assertEquals(0.5, VideoJSModel.getInstance().volume);
 		}
+
+		[Test]
+		public function test_bufferTime():void
+		{
+			VideoJSModel.getInstance().bufferTime = -1;
+			Assert.assertEquals(0, VideoJSModel.getInstance().bufferTime);
+
+			VideoJSModel.getInstance().bufferTime = 2;
+			Assert.assertEquals(2, VideoJSModel.getInstance().bufferTime);
+
+			VideoJSModel.getInstance().bufferTime = 0.5;
+			Assert.assertEquals(0.5, VideoJSModel.getInstance().bufferTime);
+		}
 	}
 }

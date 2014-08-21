@@ -200,6 +200,17 @@ package com.videojs.providers{
             }
         }
         
+        public function get bufferTime():Number{
+            return _ns.bufferTime;
+        }
+
+        public function set bufferTime(pBufferTime:Number):void{
+            if(pBufferTime <= 0){
+                _ns.bufferTime = 0;
+            } else {
+                _ns.bufferTime = pBufferTime;
+            }
+        }
         public function get bytesLoaded():int{
             
             return 0;

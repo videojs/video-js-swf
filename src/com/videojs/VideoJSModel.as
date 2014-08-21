@@ -358,6 +358,18 @@ package com.videojs{
             }
             return 0;
         }
+
+        public function get bufferTime():Number{
+            if(_provider){
+                return _provider.bufferTime;
+            }
+            return 0;
+        }
+        public function set bufferTime(pBufferTime:Number):void {
+            if(_provider){
+                _provider.bufferTime = pBufferTime;
+            }
+        }
         
         /**
          * Returns the total size of the current video, in bytes.
