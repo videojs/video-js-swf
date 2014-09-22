@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Added sanitizing of the src param ([view](https://github.com/videojs/video-js-swf/pull/120))
 
 --------------------
 
