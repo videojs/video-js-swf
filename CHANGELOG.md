@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Added sanitizing of the src param ([view](https://github.com/videojs/video-js-swf/pull/120))
+_(none)_
 
 --------------------
+
+## 4.4.4 (2014-09-22)
+* Added sanitizing of the src param ([view](https://github.com/videojs/video-js-swf/pull/120))
 
 ## 4.4.3 (2014-08-14)
 * Rebuild with Flash target-player 10.3 and swf-version 12. (Fix for [#113](https://github.com/videojs/video-js-swf/issues/113))
