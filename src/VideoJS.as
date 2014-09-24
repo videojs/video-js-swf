@@ -350,7 +350,13 @@ package{
         }
 
         private function openExternalMSObject(pSrc:*):void{
-          ExternalInterface.call('videojs.MediaSource.open', _app.model.cleanEIString(pSrc), ExternalInterface.objectID);
+          var cleanSrc:String
+          if (/^blob:vjs-media-source\/\d+$/.test(pSrc)) {
+            cleanSrc = pSrc;
+          } else {
+            cleanSrc = _app.model.cleanEIString(pSrc);
+          }
+          ExternalInterface.call('videojs.MediaSource.open', cleanSrc, ExternalInterface.objectID);
         }
         
         private function onSrcCalled(pSrc:* = ""):void{
