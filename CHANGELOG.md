@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.4.5 (2014-09-25)
+_(none)_
+
 ## 4.4.4 (2014-09-22)
 * Added sanitizing of the src param ([view](https://github.com/videojs/video-js-swf/pull/120))
 
