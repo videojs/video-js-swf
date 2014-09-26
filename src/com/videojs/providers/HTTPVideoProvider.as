@@ -27,7 +27,6 @@ package com.videojs.providers{
         private var _loadErrored:Boolean = false;
         private var _pauseOnStart:Boolean = false;
         private var _pausePending:Boolean = false;
-        private var _autoplay:Boolean = false;
         private var _onmetadadataFired:Boolean = false;
 
         /**
@@ -254,9 +253,8 @@ package com.videojs.providers{
             _loadErrored = false;
             _loadStarted = false;
             _loadCompleted = false;
-            _autoplay = pAutoplay;
             if (_model.preload) {
-                this.load();
+              initNetConnection();
             }
         }
         
@@ -512,7 +510,7 @@ package com.videojs.providers{
                     _throughputTimer.reset();
                     _throughputTimer.start();
 
-                    if(!_pauseOnStart || _autoplay){
+                    if(!_pauseOnStart || _model.autoplay){
                         _ns.resume();
                         _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));

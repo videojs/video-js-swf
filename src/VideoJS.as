@@ -307,6 +307,8 @@ package{
                 case "errorEventProxyFunction":
                     _app.model.jsErrorEventProxyName = String(pValue);
                     break;
+                case "autoplay":
+                    _app.model.autoplay = _app.model.humanToBoolean(pValue);
                 case "preload":
                     _app.model.preload = _app.model.humanToBoolean(pValue);
                     break;
