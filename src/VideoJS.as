@@ -119,8 +119,8 @@ package{
                 _app.model.autoplay = true;
             }
             
-            if(loaderInfo.parameters.preload != "none"){
-                _app.model.preload = true;
+            if(loaderInfo.parameters.preload === "none"){
+                _app.model.preload = false;
             }
             
             if(loaderInfo.parameters.poster != undefined && loaderInfo.parameters.poster != ""){
