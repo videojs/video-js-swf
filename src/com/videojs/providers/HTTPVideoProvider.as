@@ -513,9 +513,7 @@ package com.videojs.providers{
                     _throughputTimer.start();
 
                     if(!_pauseOnStart || _autoplay){
-                        if(_autoplay){
-                          _ns.resume();
-                        }
+                        _ns.resume();
                         _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));
                     }
