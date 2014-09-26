@@ -119,7 +119,7 @@ package{
                 _app.model.autoplay = true;
             }
             
-            if(loaderInfo.parameters.preload != undefined && loaderInfo.parameters.preload == "true"){
+            if(loaderInfo.parameters.preload != "none"){
                 _app.model.preload = true;
             }
             
