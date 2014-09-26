@@ -28,7 +28,7 @@ package com.videojs.providers{
         private var _pauseOnStart:Boolean = false;
         private var _pausePending:Boolean = false;
         private var _autoplay:Boolean = false;
-        private var _loadeddataFired:Boolean = false;
+        private var _onmetadadataFired:Boolean = false;
 
         /**
          * The number of seconds between the logical start of the stream and the current zero
@@ -249,6 +249,7 @@ package com.videojs.providers{
         }
         
         public function init(pSrc:Object, pAutoplay:Boolean):void{
+            _onmetadadataFired = false;
             _src = pSrc;
             _loadErrored = false;
             _loadStarted = false;
@@ -528,9 +529,6 @@ package com.videojs.providers{
                     break;
                 
                 case "NetStream.Buffer.Full":
-                    if(!_loadeddataFired){
-                      _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
-                    }
                     _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
                     _pausedSeekValue = -1;
                     _isPlaying = true;
@@ -619,6 +617,10 @@ package com.videojs.providers{
         }
         
         public function onMetaData(pMetaData:Object):void{
+            if (_onmetadadataFired) {
+              return;
+            }
+
             _metadata = pMetaData;
             if(pMetaData.duration != undefined){
                 _isLive = false;
@@ -632,11 +634,8 @@ package com.videojs.providers{
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
             _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
 
-            // if we have some data in the buffer, fire loadeddata event
-            if(_ns.bufferLength > 0){
-              _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
-              _loadeddataFired = true;
-            }
+            _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
+            _onmetadadataFired = true;
         }
         
         public function onCuePoint(pInfo:Object):void{
