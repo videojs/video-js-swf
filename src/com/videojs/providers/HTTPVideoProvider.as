@@ -275,10 +275,22 @@ package com.videojs.providers{
             else{
                 if (_hasEnded) {
                   _hasEnded = false;
-                  _ns.seek(0);
+                  if(_ns) {
+                    try {
+                      _ns.seek(0);
+                    } catch (err: Error) {
+
+                    }
+                  }
                 }
                 _pausePending = false;
-                _ns.resume();
+                if(_ns) {
+                  try {
+                    _ns.resume();
+                  } catch (err: Error) {
+
+                  }
+                }
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                 if (!_isBuffering) {
@@ -289,7 +301,14 @@ package com.videojs.providers{
         }
         
         public function pause():void{
-            _ns.pause();
+
+            if(_ns) {
+              try {
+                _ns.pause();
+              } catch (err:Error) {
+
+              }
+            }
 
             if(_isPlaying && !_isPaused){
                 _isPaused = true;
@@ -299,13 +318,26 @@ package com.videojs.providers{
                 }
             } else if (_hasEnded) {
               _hasEnded = false;
-              _ns.seek(0);
+
+              if(_ns) {
+                try {
+                  _ns.seek(0);
+                } catch (err: Error) {
+
+                }
+              }
             }
         }
         
         public function resume():void{
             if(_isPlaying && _isPaused){
-                _ns.resume();
+                if(_ns) {
+                  try {
+                    _ns.resume();
+                  } catch (err: Error) {
+
+                  }
+                }
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                 if (!_isBuffering) {
@@ -338,31 +370,41 @@ package com.videojs.providers{
                 return;
             }
 
-            _ns.seek(pTime);
+            if(_ns) {
+              try {
+                _ns.seek(pTime);
+              } catch (err: Error) {
 
+              }
+            }
         }
         
         public function seekByPercent(pPercent:Number):void{
             if(_isPlaying && _metadata.duration != undefined){
                 _isSeeking = true;
-                if(pPercent < 0){
+                if(pPercent < 0 && _ns){
                     _ns.seek(0);
                 }
                 else if(pPercent > 1){
                     _throughputTimer.stop();
-                    _ns.seek((pPercent / 100) * _metadata.duration);
+                    if(_ns) {
+                      _ns.seek((pPercent / 100) * _metadata.duration);
+                    }
                 }
                 else{
                     _throughputTimer.stop();
-                    _ns.seek(pPercent * _metadata.duration);
-                    
+                    if(_ns) {
+                      _ns.seek(pPercent * _metadata.duration);
+                    }
                 }
             }
         }
         
         public function stop():void{
             if(_isPlaying){
-                _ns.close();
+                if (_ns) {
+                  _ns.close();
+                }
                 _isPlaying = false;
                 _hasEnded = true;
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {}));
