@@ -27,6 +27,8 @@ package com.videojs.providers{
         private var _loadErrored:Boolean = false;
         private var _pauseOnStart:Boolean = false;
         private var _pausePending:Boolean = false;
+        private var _autoplay:Boolean = false;
+
         /**
          * The number of seconds between the logical start of the stream and the current zero
          * playhead position of the NetStream. During normal, file-based playback this value should
@@ -250,8 +252,9 @@ package com.videojs.providers{
             _loadErrored = false;
             _loadStarted = false;
             _loadCompleted = false;
-            if(pAutoplay){
-                initNetConnection();
+            _autoplay = pAutoplay;
+            if (_model.preload) {
+                this.load();
             }
         }
         
@@ -446,6 +449,7 @@ package com.videojs.providers{
             _ns.client = this;
             _ns.bufferTime = .5;
             _ns.play(_src.path);
+            _ns.pause();
             _videoReference.attachNetStream(_ns);
 
             if (_src.path === null) {
@@ -505,11 +509,11 @@ package com.videojs.providers{
                     _loadStartTimestamp = getTimer();
                     _throughputTimer.reset();
                     _throughputTimer.start();
-                    if(_pauseOnStart && _loadStarted == false){
-                        _ns.pause();
-                        _isPaused = true;
-                    }
-                    else{
+
+                    if(!_pauseOnStart || _autoplay){
+                        if(_autoplay){
+                          _ns.resume();
+                        }
                         _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));
                     }
