@@ -123,7 +123,7 @@ package com.videojs.providers{
                     // if we don't know if the asset can play through without buffering
                     else{
                         // if the buffer is full, we assume we can seek a head at least a keyframe
-                        if(_ns.bufferLength >= _ns.bufferTime){
+                        if(_ns && _ns.bufferLength >= _ns.bufferTime){
                             return 3;
                         }
                         // otherwise, we can't be certain that seeking ahead will work
