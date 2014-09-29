@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-
-* Buffering and playback event fixes ([view](https://github.com/videojs/video-js-swf/pull/122))
+_(none)_
 
 --------------------
+
+## 4.5.0 (2014-09-29)
+
+* Buffering and playback event fixes ([view](https://github.com/videojs/video-js-swf/pull/122))
 
 ## 4.4.5 (2014-09-25)
 * Fixed sanitation of URLs to special case blob URLs ([view](https://github.com/videojs/video-js-swf/pull/121))
