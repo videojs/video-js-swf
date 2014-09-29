@@ -37,7 +37,7 @@ package com.videojs{
         private var _backgroundAlpha:Number = 0;
         private var _volume:Number = 1;
         private var _autoplay:Boolean = false;
-        private var _preload:Boolean = false;
+        private var _preload:Boolean = true;
         private var _loop:Boolean = false;
         private var _src:String = "";
         private var _rtmpConnectionURL:String = "";
