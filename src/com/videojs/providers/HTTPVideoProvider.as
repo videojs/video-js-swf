@@ -276,20 +276,12 @@ package com.videojs.providers{
                 if (_hasEnded) {
                   _hasEnded = false;
                   if(_ns) {
-                    try {
-                      _ns.seek(0);
-                    } catch (err: Error) {
-
-                    }
+                    _ns.seek(0);
                   }
                 }
                 _pausePending = false;
                 if(_ns) {
-                  try {
-                    _ns.resume();
-                  } catch (err: Error) {
-
-                  }
+                  _ns.resume();
                 }
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
@@ -301,15 +293,9 @@ package com.videojs.providers{
         }
         
         public function pause():void{
-
             if(_ns) {
-              try {
-                _ns.pause();
-              } catch (err:Error) {
-
-              }
+              _ns.pause();
             }
-
             if(_isPlaying && !_isPaused){
                 _isPaused = true;
                 _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
@@ -320,11 +306,7 @@ package com.videojs.providers{
               _hasEnded = false;
 
               if(_ns) {
-                try {
-                  _ns.seek(0);
-                } catch (err: Error) {
-
-                }
+                _ns.seek(0);
               }
             }
         }
@@ -332,11 +314,7 @@ package com.videojs.providers{
         public function resume():void{
             if(_isPlaying && _isPaused){
                 if(_ns) {
-                  try {
-                    _ns.resume();
-                  } catch (err: Error) {
-
-                  }
+                  _ns.resume();
                 }
                 _isPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
@@ -371,11 +349,7 @@ package com.videojs.providers{
             }
 
             if(_ns) {
-              try {
-                _ns.seek(pTime);
-              } catch (err: Error) {
-
-              }
+              _ns.seek(pTime);
             }
         }
         
@@ -425,22 +399,14 @@ package com.videojs.providers{
 
             if( _ns )
             {
-                try {
-                    _ns.close();
-                    _ns = null;
-                } catch( err: Error ) {
-
-                }
+                _ns.close();
+                _ns = null;
             }
 
             if( _nc )
             {
-                try {
-                    _nc.close();
-                    _nc = null;
-                } catch( err: Error ) {
-
-                }
+              _nc.close();
+              _nc = null;
             }
 
             if(_throughputTimer)
@@ -460,12 +426,8 @@ package com.videojs.providers{
             _loadStarted = true;
             _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
 
-            if(_nc != null) {
-                try {
-                    _nc.close();
-                } catch( err: Error ) {
-
-                }
+            if(_nc) {
+                _nc.close();
                 _nc.removeEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
                 _nc = null;
             }
@@ -477,7 +439,7 @@ package com.videojs.providers{
         }
         
         private function initNetStream():void{
-            if(_ns != null){
+            if(_ns){
                 _ns.close();
                 _ns.removeEventListener(NetStatusEvent.NET_STATUS, onNetStreamStatus);
                 _ns = null;
