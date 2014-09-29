@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+
+* Buffering and playback event fixes ([view](https://github.com/videojs/video-js-swf/pull/122))
 
 --------------------
 
