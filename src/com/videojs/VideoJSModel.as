@@ -548,13 +548,13 @@ package com.videojs{
             }
         }
 
-    		/**
-    		 * Removes dangerous characters from a user-provided string that will be passed to ExternalInterface.call()
-    		 *
-    		 */
-    		public function cleanEIString(pString:String):String{
-    		    return pString.replace(/[^A-Za-z0-9_.]/gi, "");
-    		}
+        /**
+         * Removes dangerous characters from a user-provided string that will be passed to ExternalInterface.call()
+         *
+         */
+        public function cleanEIString(pString:String):String{
+            return pString.replace(/[^A-Za-z0-9_.]/gi, "");
+        }
 
         /**
          * Recursive function to sanitize an object (or array) before passing to ExternalInterface.call()
