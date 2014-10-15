@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed an issue where changing the source immediately after seeking could cause an error ([view](https://github.com/videojs/video-js-swf/pull/125))
-* Added sanitation for all data that might be passed through the external interface ([view](https://github.com/videojs/video-js-swf/pull/127))
+_(none)_
 
 --------------------
+
+## 4.5.1 (2014-10-15)
+* Fixed an issue where changing the source immediately after seeking could cause an error ([view](https://github.com/videojs/video-js-swf/pull/125))
+* Added sanitation for all data that might be passed through the external interface ([view](https://github.com/videojs/video-js-swf/pull/127))
 
 ## 4.5.0 (2014-09-29)
 * Buffering and playback event fixes ([view](https://github.com/videojs/video-js-swf/pull/122))
