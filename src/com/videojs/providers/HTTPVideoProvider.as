@@ -455,29 +455,32 @@ package com.videojs.providers{
         }
         
         private function calculateThroughput():void{
-            // if it's finished loading, we can kill the calculations and assume it can play through
-            if(_ns.bytesLoaded == _ns.bytesTotal){
-                _canPlayThrough = true;
-                _loadCompleted = true;
-                _throughputTimer.stop();
-                _throughputTimer.reset();
-                _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY_THROUGH);
-            }
-            // if it's still loading, but we know its duration, we can check to see if the current transfer rate
-            // will sustain uninterrupted playback - this requires the duration to be known, which is currently
-            // only accessible via metadata, which isn't parsed until the Flash Player encounters the metadata atom
-            // in the file itself, which means that this logic will only work if the asset is playing - preload
-            // won't ever cause this logic to run :(
-            else if(_ns.bytesTotal > 0 && _metadata != null && _metadata.duration != undefined){
-                _currentThroughput = _ns.bytesLoaded / ((getTimer() - _loadStartTimestamp) / 1000);
-                var __estimatedTimeToLoad:Number = (_ns.bytesTotal - _ns.bytesLoaded) * _currentThroughput;
-                if(__estimatedTimeToLoad <= _metadata.duration){
-                    _throughputTimer.stop();
-                    _throughputTimer.reset();
-                    _canPlayThrough = true;
-                    _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY_THROUGH);
-                }
-            }
+          // If there is no NetStream, the rest of the calculation is moot.
+          if(_ns){
+              // if it's finished loading, we can kill the calculations and assume it can play through
+              if(_ns.bytesLoaded == _ns.bytesTotal){
+                  _canPlayThrough = true;
+                  _loadCompleted = true;
+                  _throughputTimer.stop();
+                  _throughputTimer.reset();
+                  _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY_THROUGH);
+              }
+              // if it's still loading, but we know its duration, we can check to see if the current transfer rate
+              // will sustain uninterrupted playback - this requires the duration to be known, which is currently
+              // only accessible via metadata, which isn't parsed until the Flash Player encounters the metadata atom
+              // in the file itself, which means that this logic will only work if the asset is playing - preload
+              // won't ever cause this logic to run :(
+              else if(_ns.bytesTotal > 0 && _metadata != null && _metadata.duration != undefined){
+                  _currentThroughput = _ns.bytesLoaded / ((getTimer() - _loadStartTimestamp) / 1000);
+                  var __estimatedTimeToLoad:Number = (_ns.bytesTotal - _ns.bytesLoaded) * _currentThroughput;
+                  if(__estimatedTimeToLoad <= _metadata.duration){
+                      _throughputTimer.stop();
+                      _throughputTimer.reset();
+                      _canPlayThrough = true;
+                      _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY_THROUGH);
+                  }
+              }
+          }
         }
         
         private function onNetConnectionStatus(e:NetStatusEvent):void{
