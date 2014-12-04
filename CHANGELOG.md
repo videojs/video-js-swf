@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fixed an issue where Flash would crash when switching sources quickly ([view](https://github.com/videojs/video-js-swf/pull/131))
 
 --------------------
 
@@ -40,4 +40,3 @@ _(none)_
 * Fixed bugs with buffered and duration reporting on non-linear streams ([view](https://github.com/videojs/video-js-swf/pull/80))
 * Added refined seeking for use on non-linear streams ([view](https://github.com/videojs/video-js-swf/pull/80))
 * Extended endOfStream for use with Media Sources API ([view](https://github.com/videojs/video-js-swf/pull/80))
-
