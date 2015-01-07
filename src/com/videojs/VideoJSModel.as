@@ -410,7 +410,7 @@ package com.videojs{
             if(_provider){
                 return _provider.paused;
             }
-            return false;
+            return true;
         }
 
         /**
