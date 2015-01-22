@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Paused should be true before a source has been set by default
 
 --------------------
 
