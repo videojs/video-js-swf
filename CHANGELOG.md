@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Paused should be true before a source has been set by default
+_(none)_
 
 --------------------
+
+## 4.5.3 (2015-01-22)
+* Paused should be true before a source has been set by default
 
 ## 4.5.2 (2014-12-04)
 * Fixed an issue where Flash would crash when switching sources quickly ([view](https://github.com/videojs/video-js-swf/pull/131))
