@@ -170,7 +170,10 @@ package com.videojs.providers{
         }
         
         public function get bytesTotal():int{
-            
+            return 0;
+        }
+        
+        public function get startOffsetTime():Number{
             return 0;
         }
         

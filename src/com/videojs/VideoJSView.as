@@ -20,7 +20,7 @@ package com.videojs{
         
         private var _uiVideo:Video;
         private var _uiPosterContainer:Sprite;
-            private var _uiPosterImage:Loader;
+        private var _uiPosterImage:Loader;
         private var _uiBackground:Sprite;
         
         private var _model:VideoJSModel;

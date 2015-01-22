@@ -143,6 +143,14 @@ package{
                 _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
               }
             }
+
+            if(loaderInfo.parameters.pseudoStreamStartParam != undefined && loaderInfo.parameters.pseudoStreamStartParam != ""){
+              _app.model.pseudoStreamStartParam = String(loaderInfo.parameters.pseudoStreamStartParam);
+            }
+            
+            if(loaderInfo.parameters.pseudoStreamStartParamType != undefined && loaderInfo.parameters.pseudoStreamStartParamType != ""){
+                _app.model.pseudoStreamStartParamType = String(loaderInfo.parameters.pseudoStreamStartParamType);
+            }
             
             if(loaderInfo.parameters.readyFunction != undefined){
                 try{
@@ -270,6 +278,9 @@ package{
                 case "bytesTotal":
                     return _app.model.bytesTotal;
                     break;
+                case "startOffsetTime":
+                    return _app.model.startOffsetTime;
+                    break;
                 case "videoWidth":
                     return _app.model.videoWidth;
                     break;
@@ -336,6 +347,12 @@ package{
                     break;
                 case "rtmpStream":
                     _app.model.rtmpStream = String(pValue);
+                    break;
+                case "pseudoStreamStartParam":
+                    _app.model.pseudoStreamStartParam = String(pValue);
+                    break;
+                case "pseudoStreamStartParamType":
+                    _app.model.pseudoStreamStartParamType = String(pValue);
                     break;
                 default:
                     _app.model.broadcastErrorEventExternally(ExternalErrorEventName.PROPERTY_NOT_FOUND, pPropertyName);
