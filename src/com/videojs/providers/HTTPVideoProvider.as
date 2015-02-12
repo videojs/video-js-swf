@@ -300,9 +300,6 @@ package com.videojs.providers{
                 if(_isBuffering){
                     _pausePending = true;
                 }
-            } else if (_hasEnded) {
-              _hasEnded = false;
-              _ns.seek(0);
             }
         }
         
