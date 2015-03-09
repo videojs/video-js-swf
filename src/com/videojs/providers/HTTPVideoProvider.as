@@ -289,9 +289,9 @@ package com.videojs.providers{
         }
         
         public function pause():void{
+            var alreadyPaused = _isPaused;
             _ns.pause();
-
-            if(_isPlaying && !_isPaused){
+            if(!alreadyPaused){
                 _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                 if(_isBuffering){
                     _pausePending = true;
