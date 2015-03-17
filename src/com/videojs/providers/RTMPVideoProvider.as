@@ -77,7 +77,10 @@ package com.videojs.providers{
         }
         
         public function get duration():Number{
-            if(_metadata != null && _metadata.duration != undefined){
+            if (_isLive) {
+				return -1;
+			}
+			else if(_metadata != null && _metadata.duration != undefined){
                 return Number(_metadata.duration);
             }
             else{
