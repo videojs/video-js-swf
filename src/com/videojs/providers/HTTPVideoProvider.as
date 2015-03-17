@@ -56,7 +56,7 @@ package com.videojs.providers{
 
         private var _src:Object;
         private var _metadata:Object;
-        private var _isPlaying:Boolean = false;
+        private var _playbackStarted:Boolean = false;
         private var _isPaused:Boolean = true;
         private var _isBuffering:Boolean = false;
         private var _isSeeking:Boolean = false;
@@ -117,7 +117,7 @@ package com.videojs.providers{
             // if we have metadata and a known duration
             if(_metadata != null && _metadata.duration != undefined){
                 // if playback has begun
-                if(_isPlaying){
+                if(_playbackStarted){
                     // if the asset can play through without rebuffering
                     if(_canPlayThrough){
                         return 4;
@@ -213,7 +213,7 @@ package com.videojs.providers{
         }
         
         public function get playing():Boolean{
-            return _isPlaying;
+            return _playbackStarted;
         }
         
         public function get paused():Boolean{
@@ -260,7 +260,7 @@ package com.videojs.providers{
         
         public function load():void{
             _pauseOnStart = true;
-            _isPlaying = false;
+            _playbackStarted = false;
             initNetConnection();
         }
         
@@ -268,7 +268,7 @@ package com.videojs.providers{
             // if this is a fresh playback request
             if(!_loadStarted){
                 _pauseOnStart = false;
-                _isPlaying = false;
+                _playbackStarted = false;
                 _metadata = {};
                 initNetConnection();
             }
@@ -291,7 +291,7 @@ package com.videojs.providers{
         public function pause():void{
             var alreadyPaused = _isPaused;
             _ns.pause();
-            if(!alreadyPaused){
+            if(_playbackStarted && !alreadyPaused){
                 _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                 if(_isBuffering){
                     _pausePending = true;
@@ -300,7 +300,7 @@ package com.videojs.providers{
         }
         
         public function resume():void{
-            if(_isPlaying && _isPaused){
+            if(_playbackStarted && _isPaused){
                 _ns.resume();
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                 if (!_isBuffering) {
@@ -310,7 +310,7 @@ package com.videojs.providers{
         }
         
         public function seekBySeconds(pTime:Number):void{
-            if(_isPlaying)
+            if(_playbackStarted)
             {
                 _isSeeking = true;
                 _throughputTimer.stop();
@@ -321,7 +321,7 @@ package com.videojs.providers{
             }
             else if(_hasEnded)
             {
-                _isPlaying = true;
+                _playbackStarted = true;
                 _hasEnded = false;
             }
 
@@ -338,7 +338,7 @@ package com.videojs.providers{
         }
         
         public function seekByPercent(pPercent:Number):void{
-            if(_isPlaying && _metadata.duration != undefined){
+            if(_playbackStarted && _metadata.duration != undefined){
                 _isSeeking = true;
                 if(pPercent < 0){
                     _ns.seek(0);
@@ -356,9 +356,9 @@ package com.videojs.providers{
         }
         
         public function stop():void{
-            if(_isPlaying){
+            if(_playbackStarted){
                 _ns.close();
-                _isPlaying = false;
+                _playbackStarted = false;
                 _hasEnded = true;
                 _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {}));
                 _throughputTimer.stop();
@@ -524,7 +524,7 @@ package com.videojs.providers{
                 
                 case "NetStream.Buffer.Full":
                     _pausedSeekValue = -1;
-                    _isPlaying = true;
+                    _playbackStarted = true;
                     if(_pausePending){
                         _pausePending = false;
                         _ns.pause();
@@ -537,13 +537,13 @@ package com.videojs.providers{
                 
                 case "NetStream.Buffer.Empty":
                     // should not fire if ended/paused. issue #38
-                    if(!_isPlaying){ return; }
+                    if(!_playbackStarted){ return; }
 
                     // reaching the end of the buffer after endOfStream has been called means we've
                     // hit the end of the video
                     if (_ending) {
                         _ending = false;
-                        _isPlaying = false;
+                        _playbackStarted = false;
                         _isPaused = true;
                         _hasEnded = true;
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
@@ -561,7 +561,7 @@ package com.videojs.providers{
                 
                 case "NetStream.Play.Stop":
                     if(!_loop){
-                        _isPlaying = false;
+                        _playbackStarted = false;
                         _hasEnded = true;
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
                         _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
@@ -576,7 +576,7 @@ package com.videojs.providers{
                     break;
 
                 case "NetStream.Seek.Notify":
-                    _isPlaying = true;
+                    _playbackStarted = true;
                     _isSeeking = false;
                     _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_SEEK_COMPLETE, {info:e.info}));
                     _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
