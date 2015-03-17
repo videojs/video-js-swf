@@ -2,7 +2,9 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Improved handling of the paused state, and the loadstart and canplay events ([view](https://github.com/videojs/video-js-swf/pull/139))
+* Fixed a potential XSS issue with the swf event callbacks ([view](https://github.com/videojs/video-js-swf/pull/143))
+* Prevented pause from firing after eneded ([view](https://github.com/videojs/video-js-swf/pull/144))
 
 --------------------
 
