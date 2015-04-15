@@ -72,6 +72,7 @@ package{
                 ExternalInterface.addCallback("vjs_echo", onEchoCalled);
                 ExternalInterface.addCallback("vjs_endOfStream", onEndOfStreamCalled);
                 ExternalInterface.addCallback("vjs_abort", onAbortCalled);
+                ExternalInterface.addCallback("vjs_discontinuity", onDiscontinuityCalled);
 
                 ExternalInterface.addCallback("vjs_getProperty", onGetPropertyCalled);
                 ExternalInterface.addCallback("vjs_setProperty", onSetPropertyCalled);
@@ -203,6 +204,10 @@ package{
 
         private function onAbortCalled():*{
             _app.model.abort();
+        }
+
+        private function onDiscontinuityCalled():*{
+            _app.model.discontinuity();
         }
 
         private function onGetPropertyCalled(pPropertyName:String = ""):*{

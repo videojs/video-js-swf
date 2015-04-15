@@ -115,6 +115,10 @@ package com.videojs{
             _provider.abort();
         }
 
+        public function discontinuity():void {
+            _provider.discontinuity();
+        }
+
         public function get backgroundColor():Number{
             return _backgroundColor;
         }
