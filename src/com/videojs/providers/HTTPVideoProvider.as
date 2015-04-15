@@ -16,7 +16,7 @@ package com.videojs.providers{
     import flash.utils.getTimer;
 
     public class HTTPVideoProvider extends EventDispatcher implements IProvider{
-        
+
         private var _nc:NetConnection;
         private var _ns:NetStream;
         private var _throughputTimer:Timer;
@@ -483,7 +483,6 @@ package com.videojs.providers{
                     initNetStream();
                     break;
                 case "NetConnection.Connect.Failed":
-
                     break;    
             }
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_NETCONNECTION_STATUS, {info:e.info}));
@@ -548,7 +547,7 @@ package com.videojs.providers{
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
                         _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                         _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
-
+                        appendBytesAction(NetStreamAppendBytesAction.END_SEQUENCE);
                         _startOffset = 0;
                         _pausedSeekValue = 0;
                         break;
