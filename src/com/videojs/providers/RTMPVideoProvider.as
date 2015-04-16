@@ -145,6 +145,10 @@ package com.videojs.providers{
         public function abort():void{
             throw "RTMPVideoProvider does not support abort";
         }
+
+        public function discontinuity():void{
+            throw "RTMPVideoProvider does not support discontinuities";
+        }
         
         public function get buffered():Number{
             if(duration > 0){
