@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Add vjs_discontinuity ([view](https://github.com/videojs/video-js-swf/pull/150))
+* Don't call resume() on NetstreamPlayStart ([view](https://github.com/videojs/video-js-swf/pull/147))
 
 --------------------
 
