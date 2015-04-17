@@ -43,6 +43,13 @@ package com.videojs.providers{
          * @see https://dvcs.w3.org/hg/html-media/raw-file/tip/media-source/media-source.html#widl-SourceBuffer-abort-void
          */
         function abort():void;
+
+        /**
+         * Indicates the next bytes of content will have timestamp
+         * values that are not contiguous with the current playback
+         * timeline.
+         */
+        function discontinuity():void;
         
         /**
          * Should return an interger that reflects the closest parallel to

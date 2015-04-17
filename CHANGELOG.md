@@ -6,6 +6,10 @@ _(none)_
 
 --------------------
 
+## 4.6.0 (2015-04-16)
+* Add vjs_discontinuity ([view](https://github.com/videojs/video-js-swf/pull/150))
+* Don't call resume() on NetstreamPlayStart ([view](https://github.com/videojs/video-js-swf/pull/147))
+
 ## 4.5.4 (2015-03-17)
 * Improved handling of the paused state, and the loadstart and canplay events ([view](https://github.com/videojs/video-js-swf/pull/139))
 * Fixed a potential XSS issue with the swf event callbacks ([view](https://github.com/videojs/video-js-swf/pull/143))
