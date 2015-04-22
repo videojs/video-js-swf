@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @bclwhitaker append END_SEQUENCE properly in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/152))
+_(none)_
 
 --------------------
+
+## 4.6.1 (2015-04-22)
+* @bclwhitaker append END_SEQUENCE properly in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/152))
 
 ## 4.6.0 (2015-04-16)
 * Add vjs_discontinuity ([view](https://github.com/videojs/video-js-swf/pull/150))
