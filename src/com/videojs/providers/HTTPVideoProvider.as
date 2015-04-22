@@ -192,6 +192,7 @@ package com.videojs.providers{
 
         public function endOfStream():void{
             _ending = true;
+            appendBytesAction(NetStreamAppendBytesAction.END_SEQUENCE);
         }
 
         public function abort():void{
@@ -572,7 +573,6 @@ package com.videojs.providers{
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
                         _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                         _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
-
                         _startOffset = 0;
                         _pausedSeekValue = 0;
                         break;
