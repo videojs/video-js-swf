@@ -321,8 +321,12 @@ package{
                     break;
                 case "autoplay":
                     _app.model.autoplay = _app.model.humanToBoolean(pValue);
+                    if (_app.model.autoplay) {
+                        _app.model.preload = _app.model.humanToBoolean(pValue);
+                    }
+                    break;
                 case "preload":
-                    _app.model.preload = _app.model.humanToBoolean(pValue);
+                    _app.model.preload = String(pValue) == "auto" || _app.model.humanToBoolean(pValue);
                     break;
                 case "poster":
                     _app.model.poster = String(pValue);
