@@ -115,9 +115,9 @@
         e.preventDefault();
 
         var flashvars = {
-          readyFunction: "onSWFReady",
-          eventProxyFunction: "onSWFEvent",
-          errorEventProxyFunction: "onSWFErrorEvent",
+          // readyFunction: "onSWFReady",
+          // eventProxyFunction: "onSWFEvent",
+          // errorEventProxyFunction: "onSWFErrorEvent",
           src: "",
           autoplay: false,
           preload: false,
@@ -160,8 +160,8 @@
       function setProperties(e){
         e.preventDefault();
         var el = $("#videoPlayer")[0];
-        el.vjs_setProperty("eventProxyFunction", "onSWFEvent");
-        el.vjs_setProperty("errorEventProxyFunction", "onSWFErrorEvent");
+        // el.vjs_setProperty("eventProxyFunction", "onSWFEvent");
+        // el.vjs_setProperty("errorEventProxyFunction", "onSWFErrorEvent");
         el.vjs_setProperty("poster", "img/testPattern_ussr_480x360.png");
       }
 
@@ -255,6 +255,12 @@
 
 
       }
+
+      var videojs = {};
+      videojs.Flash = {};
+      videojs.Flash.onEvent = onSWFEvent;
+      videojs.Flash.onError = onSWFErrorEvent;
+      videojs.Flash.onReady = onSWFReady;
 
       $(init);
 
