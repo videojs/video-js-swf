@@ -16,6 +16,7 @@ package com.videojs.providers{
     import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.getTimer;
+    import flash.external.ExternalInterface;
 
 
     public class HTTPAudioProvider implements IProvider{
@@ -34,9 +35,7 @@ package com.videojs.providers{
 
         private var _sound:Sound;
         private var _soundChannel:SoundChannel;
-        private var _audioPlaybackStarted:Boolean = false;
-        private var _audioPlaybackStopped:Boolean = false;
-        private var _audioPlaybackPaused:Boolean = false;
+        private var _audioPlaybackPaused:Boolean = true;
         private var _audioIsSeeking:Boolean = false;
         private var _audioPlaybackHasEnded:Boolean = false;
         private var _audioBytesLoaded:int = 0;
@@ -64,16 +63,11 @@ package com.videojs.providers{
         }
 
         public function get time():Number{
-            if(_audioPlaybackStarted){
-                if(_soundChannel != null){
-                    return _soundChannel.position / 1000;
-                }
-                else{
-                    return 0;
-                }
+            if(_soundChannel){
+                return _soundChannel.position / 1000;
             }
             else{
-                return 0;
+                return _audioPausePoint / 1000;
             }
         }
 
@@ -85,7 +79,7 @@ package com.videojs.providers{
             if(_canPlayThroughDispatched){
                 return 4;
             }
-            else if(_audioPlaybackStarted){
+            else if(_loadCompleted){
                 return 3;
             }
             else if(_loadStarted){
@@ -147,11 +141,11 @@ package com.videojs.providers{
         }
 
         public function get playing():Boolean{
-            return _audioPlaybackStarted;
+            return _soundChannel != null;
         }
 
         public function get paused():Boolean{
-            return _audioPlaybackPaused;
+            return _audioPlaybackPaused || _audioPlaybackHasEnded;
         }
 
         public function get ended():Boolean{
@@ -183,50 +177,44 @@ package com.videojs.providers{
 
         public function init(pSrc:Object, pAutoplay:Boolean):void{
             _src = pSrc;
-            _loadErrored = false;
-            _loadStarted = false;
-            _loadCompleted = false;
             if(pAutoplay){
                play();
             }
         }
 
         public function load():void{
-
             _preloadInitiated = true;
 
-            if(_src != ""){
+            // if we're already playing
+            if(_soundChannel){
+                _stop();
+                _throughputTimer.stop();
+                _throughputTimer.reset();
+            }
 
-                // if we're already playing
-                if(_audioPlaybackStarted){
-                    _soundChannel.stop();
-                    _soundChannel = null;
-                    _throughputTimer.stop();
-                    _throughputTimer.reset();
-                }
-                else{
-                    if(_sound == null){
-                        _sound = new Sound();
-                        _sound.addEventListener(IOErrorEvent.IO_ERROR, onSoundLoadError);
-                        _sound.addEventListener(ProgressEvent.PROGRESS, onSoundProgress);
-                        _sound.addEventListener(Event.COMPLETE, onSoundLoadComplete);
-                        _sound.addEventListener(Event.OPEN, onSoundOpen);
-                        _sound.addEventListener(Event.ID3, onID3Loaded);
-                    }
-                }
+            if(_sound == null){
+                _sound = new Sound();
+                _sound.addEventListener(IOErrorEvent.IO_ERROR, onSoundLoadError);
+                _sound.addEventListener(ProgressEvent.PROGRESS, onSoundProgress);
+                _sound.addEventListener(Event.COMPLETE, onSoundLoadComplete);
+                _sound.addEventListener(Event.OPEN, onSoundOpen);
+                _sound.addEventListener(Event.ID3, onID3Loaded);
+            }
 
-                // load the asset
-                _audioPlaybackStarted = false;
-                _audioPlaybackStopped = false;
-                _audioPlaybackPaused = false;
-                _audioPlaybackHasEnded = false;
-                _audioBytesLoaded = 0;
-                _audioBytesTotal = 0;
-                _audioDuration = 0;
-                _audioPausePoint = 0;
-                _estimatedDurations = 0;
-                _canPlayThroughDispatched = false;
-                _loadErrored = false;
+            // initialize the asset
+            _audioPlaybackPaused = true;
+            _audioPlaybackHasEnded = false;
+            _audioBytesLoaded = 0;
+            _audioBytesTotal = 0;
+            _audioDuration = 0;
+            _audioPausePoint = 0;
+            _estimatedDurations = 0;
+            _canPlayThroughDispatched = false;
+            _loadErrored = false;
+            _loadStarted = false;
+            _loadCompleted = false;
+
+            if(_src){
                 var __request:URLRequest = new URLRequest(_src.path);
                 try{
                     _sound.load(__request);
@@ -240,87 +228,56 @@ package com.videojs.providers{
         }
 
         public function play():void{
-
-            if(_src != ""){
-
-                if(_preloadInitiated){
-                    _preloadInitiated = false;
-                    _soundChannel = _sound.play();
-                    _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
-                }
-                else{
-                    // if we're already playing
-                    if(_audioPlaybackStarted){
-                        // if we're paused
-                        if(_audioPlaybackPaused){
-                            resume();
-                        }
-                        else{
-                            _soundChannel.stop();
-                            _soundChannel = null;
-                            _throughputTimer.stop();
-                            _throughputTimer.reset();
-                        }
-                    }
-                    else{
-                        _sound = new Sound();
-                        _sound.addEventListener(IOErrorEvent.IO_ERROR, onSoundLoadError);
-                        _sound.addEventListener(ProgressEvent.PROGRESS, onSoundProgress);
-                        _sound.addEventListener(Event.COMPLETE, onSoundLoadComplete);
-                        _sound.addEventListener(Event.OPEN, onSoundOpen);
-                        _sound.addEventListener(Event.ID3, onID3Loaded);
-                    }
-
-                    // play the asset
-                    _audioPlaybackStarted = false;
-                    _audioPlaybackStopped = false;
-                    _audioPlaybackPaused = false;
-                    _audioPlaybackHasEnded = false;
-                    _audioBytesLoaded = 0;
-                    _audioBytesTotal = 0;
-                    _audioDuration = 0;
-                    _audioPausePoint = 0;
-                    _estimatedDurations = 0;
-                    _canPlayThroughDispatched = false;
-                    _loadErrored = false;
-                    var __request:URLRequest = new URLRequest(_src.path);
-                    try{
-                        _sound.load(__request);
-                    }
-                    catch(e:Error){
-                        _model.broadcastErrorEventExternally("audioloaderror");
-                    }
-                    _soundChannel = _sound.play();
-                    _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
-                    _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
-                    _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
-                }
+            if(_soundChannel) {
+                return;
             }
+
+            if(_preloadInitiated){
+                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                _soundChannel = _sound.play(_audioPausePoint);
+                _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
+                _audioPlaybackPaused = false;
+                _model.broadcastEventExternally(ExternalEventName.ON_START);
+                return;
+            }
+
+            load();
+            play();
         }
 
         public function pause():void{
-            if(_audioPlaybackStarted){
+            if(_soundChannel){
                 _audioPausePoint = _soundChannel.position;
-                _soundChannel.stop();
-                _audioPlaybackPaused = true;
+                _stop();
                 _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
             }
         }
 
         public function resume():void{
-            if(_audioPlaybackStarted && _audioPlaybackPaused){
-                _soundChannel = _sound.play(_audioPausePoint);
-                _audioPlaybackPaused = false;
+            if(_audioPlaybackPaused){
+                _stop();
                 _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                _soundChannel = _sound.play(_audioPausePoint);
+                _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
+                _audioPlaybackPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_START);
+            }
+        }
+
+        public function stop():void{
+            if(_soundChannel){
+                _stop();
+                _audioPausePoint = 0;
+                _audioPlaybackHasEnded = false;
+                _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
             }
         }
 
         public function seekBySeconds(pTime:Number):void{
             if(_audioDuration > 0){
-                _soundChannel.stop();
+                _stop();
                 _soundChannel = _sound.play(int(pTime * 1000));
-                _audioPlaybackStarted = true;
+                _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
                 _audioPlaybackHasEnded = false;
                 _audioPlaybackPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
@@ -328,45 +285,32 @@ package com.videojs.providers{
         }
 
         public function seekByPercent(pPercent:Number):void{
-            if(_audioPlaybackStarted && _audioDuration > 0){
-                _soundChannel.stop();
+            if(_audioDuration > 0){
+                _stop();
                 _soundChannel = _sound.play(pPercent * _audioDuration);
-                _audioPlaybackStarted = true;
+                _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
                 _audioPlaybackHasEnded = false;
                 _audioPlaybackPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
             }
         }
 
-        public function stop():void{
-            if(_audioPlaybackStarted){
-                _soundChannel.stop();
-                _audioPlaybackStarted = false;
-                _audioPlaybackStopped = true;
-                _audioPlaybackPaused = false;
-            }
-        }
-
         public function attachVideo(pVideo:Video):void{}
 
-        public function die():void
-        {
-            if(_soundChannel)
-            {
+        public function die():void{
+            if(_soundChannel){
                 try{
-                    stop();
-                    _soundChannel = null;
-                } catch( err:Error ) {
+                    _stop();
+                }catch(err:Error){
 
                 }
             }
 
-            if(_throughputTimer)
-            {
-                try {
+            if(_throughputTimer){
+                try{
                     _throughputTimer.stop();
                     _throughputTimer = null;
-                } catch( err: Error ) {
+                }catch(err: Error){
 
                 }
             }
@@ -413,13 +357,13 @@ package com.videojs.providers{
         }
 
         private function onSoundOpen(e:Event):void{
+            _loadStarted = true;
             _loadStartTimestamp = getTimer();
             _throughputTimer.start();
-            _audioPlaybackStarted = true;
-            _model.broadcastEventExternally(ExternalEventName.ON_START);
         }
 
         private function onSoundLoadComplete(e:Event):void{
+            _loadCompleted = true;
             _throughputTimer.stop();
             _throughputTimer.reset();
             doLoadCalculations();
@@ -427,16 +371,16 @@ package com.videojs.providers{
 
         private function onSoundPlayComplete(e:Event):void{
             if(!_loop){
-                _audioPlaybackStarted = false;
                 _audioPlaybackHasEnded = true;
                 _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
             }
             else{
                 // if we know the duration
                 if(_audioDuration > 0){
-                    _soundChannel.stop();
+                    _stop();
                     _soundChannel = _sound.play(0);
-                    _audioPlaybackStarted = true;
+                    _soundChannel.addEventListener(Event.SOUND_COMPLETE, onSoundPlayComplete);
+                    _audioPlaybackPaused = false;
                 }
             }
         }
@@ -451,6 +395,14 @@ package com.videojs.providers{
                 id3:_sound.id3
             }
             _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
+        }
+
+        private function _stop():void{
+            if(_soundChannel){
+                _soundChannel.stop();
+                _soundChannel = null;
+                _audioPlaybackPaused = true;
+            }
         }
     }
 }
