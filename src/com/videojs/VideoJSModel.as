@@ -37,7 +37,7 @@ package com.videojs{
         private var _backgroundAlpha:Number = 0;
         private var _volume:Number = 1;
         private var _autoplay:Boolean = false;
-        private var _preload:Boolean = true;
+        private var _preload:String = "auto";
         private var _loop:Boolean = false;
         private var _src:String = "";
         private var _rtmpConnectionURL:String = "";
@@ -210,7 +210,7 @@ package com.videojs{
             if(_autoplay){
                 _provider.play();
             }
-            else if(_preload){
+            else if(_preload == "auto"){
                 _provider.load();
             }
         }
@@ -261,7 +261,7 @@ package com.videojs{
             if(_autoplay){
                 _provider.play();
             }
-            else if(_preload){
+            else if(_preload == "auto"){
                 _provider.load();
             }
         }
@@ -330,10 +330,10 @@ package com.videojs{
 
         }
 
-        public function get preload():Boolean{
+        public function get preload():String{
             return _preload;
         }
-        public function set preload(pValue:Boolean):void {
+        public function set preload(pValue:String):void {
             _preload = pValue;
         }
 
