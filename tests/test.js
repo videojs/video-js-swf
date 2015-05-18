@@ -8,7 +8,7 @@ function createSWF(e){
     errorEventProxyFunction: "onSWFErrorEvent",
     src: "http://video-js.zencoder.com/oceans-clip.mp4",
     autoplay: false,
-    preload: true,
+    preload: 'auto',
     poster: "http://video-js.zencoder.com/oceans-clip.png"
   };
 
