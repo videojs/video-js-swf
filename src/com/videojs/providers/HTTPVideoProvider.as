@@ -278,7 +278,7 @@ package com.videojs.providers{
             _loadErrored = false;
             _loadStarted = false;
             _loadCompleted = false;
-            if (_model.preload) {
+            if (_model.preload == "auto") {
               initNetConnection();
             }
         }
