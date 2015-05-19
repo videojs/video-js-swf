@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @bc-bbay the preload attribute should be a string, not a boolean ([view](https://github.com/videojs/video-js-swf/pull/160))
+* @Wellming fix manual tests ([view](https://github.com/videojs/video-js-swf/pull/154))
 
 --------------------
 
