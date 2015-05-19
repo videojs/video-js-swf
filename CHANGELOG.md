@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @bc-bbay the preload attribute should be a string, not a boolean ([view](https://github.com/videojs/video-js-swf/pull/160))
-* @Wellming fix manual tests ([view](https://github.com/videojs/video-js-swf/pull/154))
+_(none)_
 
 --------------------
+
+## 4.7.0 (2015-05-19)
+* @bc-bbay the preload attribute should be a string, not a boolean ([view](https://github.com/videojs/video-js-swf/pull/160))
+* @Wellming fix manual tests ([view](https://github.com/videojs/video-js-swf/pull/154))
 
 ## 4.6.1 (2015-04-22)
 * @bclwhitaker append END_SEQUENCE properly in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/152))
