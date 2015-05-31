@@ -298,19 +298,17 @@ package com.videojs.providers{
                 initNetConnection();
             }
             // if the asset is already loading
-            else{
-                if (_hasEnded) {
-                  _hasEnded = false;
-                  _ns.seek(0);
-                }
-                _pausePending = false;
-                _ns.resume();
-                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-                if (!_isBuffering) {
-                    _model.broadcastEventExternally(ExternalEventName.ON_START);
-                }
-                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
+            if (_hasEnded) {
+              _hasEnded = false;
+              _ns.seek(0);
             }
+            _pausePending = false;
+            _ns.resume();
+            _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+            if (!_isBuffering) {
+                _model.broadcastEventExternally(ExternalEventName.ON_START);
+            }
+            _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
         }
 
         public function pause():void{
