@@ -43,7 +43,6 @@ package com.videojs.providers{
         private var _loadStarted:Boolean = false;
         private var _loadCompleted:Boolean = false;
         private var _loadErrored:Boolean = false;
-        private var _pauseOnStart:Boolean = false;
         private var _pausePending:Boolean = false;
         private var _onmetadadataFired:Boolean = false;
 
@@ -283,32 +282,35 @@ package com.videojs.providers{
             }
         }
 
-        public function load():void{
-            _pauseOnStart = true;
-            _playbackStarted = false;
-            initNetConnection();
+        public function load():void {
+            if(!_loadStarted){
+                _playbackStarted = false;
+                initNetConnection();
+            }
         }
 
         public function play():void{
             // if this is a fresh playback request
             if(!_loadStarted){
-                _pauseOnStart = false;
-                _playbackStarted = false;
                 _metadata = {};
-                initNetConnection();
+                _model.addEventListener(VideoPlaybackEvent.ON_STREAM_READY, function():void{
+                    play();
+                });
+                load();
+            } else {
+                // if the asset is already loading
+                if (_hasEnded) {
+                  _hasEnded = false;
+                  _ns.seek(0);
+                }
+                _pausePending = false;
+                _ns.resume();
+                _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
+                if (!_isBuffering) {
+                    _model.broadcastEventExternally(ExternalEventName.ON_START);
+                }
+                _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
             }
-            // if the asset is already loading
-            if (_hasEnded) {
-              _hasEnded = false;
-              _ns.seek(0);
-            }
-            _pausePending = false;
-            _ns.resume();
-            _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
-            if (!_isBuffering) {
-                _model.broadcastEventExternally(ExternalEventName.ON_START);
-            }
-            _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {}));
         }
 
         public function pause():void{
@@ -467,7 +469,6 @@ package com.videojs.providers{
             if (_src.path === null) {
               _pausePending = true;
             }
-
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
 
@@ -531,7 +532,7 @@ package com.videojs.providers{
                     _throughputTimer.reset();
                     _throughputTimer.start();
 
-                    if(!_pauseOnStart || _model.autoplay){
+                    if(_model.autoplay){
                         _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));
                     }
