@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fixed an issue where playback required two clisk to start when preload was not auto
 
 --------------------
 
