@@ -631,7 +631,11 @@ package com.videojs.providers{
         }
 
         public function onMetaData(pMetaData:Object):void{
-            if (_onmetadadataFired) {
+            if (_onmetadadataFired &&
+                    (pMetaData.width == undefined ||
+                     _metadata.width == pMetaData.width) &&
+                    (pMetaData.height == undefined ||
+                     _metadata.height == pMetaData.height)) {
               return;
             }
 
