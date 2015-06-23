@@ -2,10 +2,13 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed an issue where playback required two clisk to start when preload was not auto
-* @qpSHiNqp fix issue that would cause incorrect aspect ratios for some videos ([view](https://github.com/videojs/video-js-swf/pull/165))
+_(none)_
 
 --------------------
+
+## 4.7.1 (2015-06-23)
+* Fixed an issue where playback required two clisk to start when preload was not auto
+* @qpSHiNqp fix issue that would cause incorrect aspect ratios for some videos ([view](https://github.com/videojs/video-js-swf/pull/165))
 
 ## 4.7.0 (2015-05-19)
 * @bc-bbay the preload attribute should be a string, not a boolean ([view](https://github.com/videojs/video-js-swf/pull/160))
