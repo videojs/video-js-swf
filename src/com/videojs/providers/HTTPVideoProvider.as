@@ -398,6 +398,8 @@ package com.videojs.providers{
         public function die():void{
             if(_videoReference)
             {
+                // Clears the image currently displayed in the Video object.
+                _videoReference.clear();
                 _videoReference.attachNetStream(null);
             }
 
