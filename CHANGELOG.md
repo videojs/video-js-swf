@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * Fixed an issue where playback required two clisk to start when preload was not auto
+* @qpSHiNqp fix issue that would cause incorrect aspect ratios for some videos ([view](https://github.com/videojs/video-js-swf/pull/165))
 
 --------------------
 
