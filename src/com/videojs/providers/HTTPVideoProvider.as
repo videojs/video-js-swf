@@ -631,10 +631,6 @@ package com.videojs.providers{
         }
 
         public function onMetaData(pMetaData:Object):void{
-            if (_onmetadadataFired) {
-              return;
-            }
-
             _metadata = pMetaData;
             if(pMetaData.duration != undefined){
                 _isLive = false;
@@ -646,10 +642,14 @@ package com.videojs.providers{
                 _canSeekAhead = false;
             }
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
-            _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
-            _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
 
-            _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
+            // the first time metadata is encountered, trigger loadedmetadata, canplay, and loadeddata
+            if (!_onmetadadataFired) {
+                _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
+                _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
+                _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
+            }
+
             _onmetadadataFired = true;
         }
 
