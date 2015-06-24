@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fixed an issue where an image from previous video could flash briefly while a new video is loaded ([view](https
 
 --------------------
 
