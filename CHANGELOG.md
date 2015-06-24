@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed an issue where an image from previous video could flash briefly while a new video is loaded ([view](https
+* Fixed an issue where an image from previous video could flash briefly while a new video is loaded ([view](https://github.com/videojs/video-js-swf/pull/167))
 
 --------------------
 
