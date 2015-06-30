@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fixed an issue where an image from previous video could flash briefly while a new video is loaded ([view](https://github.com/videojs/video-js-swf/pull/167))
+_(none)_
 
 --------------------
+
+## 4.7.2 (2015-06-30)
+* Fixed an issue where an image from previous video could flash briefly while a new video is loaded ([view](https://github.com/videojs/video-js-swf/pull/167))
 
 ## 4.7.1 (2015-06-23)
 * Fixed an issue where playback required two clisk to start when preload was not auto
