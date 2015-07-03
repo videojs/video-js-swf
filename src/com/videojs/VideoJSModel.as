@@ -617,11 +617,22 @@ package com.videojs{
 
                     break;
                 case PlayerMode.AUDIO:
-                    __src = {
-                        path:_src
-                    };
-                    _provider = new HTTPAudioProvider();
-                    _provider.init(__src, _autoplay);
+                    if(_currentPlaybackType == PlaybackType.HTTP) {
+                        __src = {
+                            path: _src
+                        };
+                        _provider = new HTTPAudioProvider();
+                        _provider.init(__src, _autoplay);
+                    }
+                    else if(_currentPlaybackType == PlaybackType.RTMP){
+                        __src = {
+                            connectionURL: _rtmpConnectionURL,
+                            streamURL: _rtmpStream
+                        };
+                        _provider = new RTMPVideoProvider();
+                        _provider.attachVideo(_videoReference);
+                        _provider.init(__src, _autoplay);
+                    }
                     break;
                 default:
                     broadcastEventExternally(ExternalErrorEventName.UNSUPPORTED_MODE);
