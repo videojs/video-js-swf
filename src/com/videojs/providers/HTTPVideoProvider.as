@@ -544,7 +544,6 @@ package com.videojs.providers{
                     if(_src.path === null) {
                         appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
                     }
-                    _model.broadcastEventExternally(ExternalEventName.ON_SEEK_START);
                     break;
 
                 case "NetStream.Buffer.Full":
