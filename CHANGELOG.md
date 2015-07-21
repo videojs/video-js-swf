@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 5.0.0-rc0 (2015-07-21)
+* Let javascript fire "seeking" instead of handling it in the SWF ([view](https://github.com/videojs/video-js-swf/pull/171))
+
 ## 4.7.2 (2015-06-30)
 * Fixed an issue where an image from previous video could flash briefly while a new video is loaded ([view](https://github.com/videojs/video-js-swf/pull/167))
 
