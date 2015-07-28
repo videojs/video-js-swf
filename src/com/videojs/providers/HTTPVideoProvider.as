@@ -429,9 +429,11 @@ package com.videojs.providers{
         }
 
         private function initNetConnection():void{
-            // the video element triggers loadstart as soon as the resource selection algorithm selects a source
+            // The video element triggers loadstart as soon as the resource selection algorithm selects a source
             // this is somewhat later than that moment but relatively close
-            if (!_loadStarted) {
+            // We check _src.path as it will be null when in data generation mode and we do not
+            // want to trigger loadstart in that case (it will be handled by the tech)
+            if (!_loadStarted && _src.path != null) {
                 _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
             }
             _loadStarted = true;
@@ -644,7 +646,11 @@ package com.videojs.providers{
 
             // the first time metadata is encountered, trigger loadedmetadata, canplay, and loadeddata
             if (!_onmetadadataFired) {
-                _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
+                // _src.path will be null when in data generation mode and loadedmetadata will be
+                // triggered by the tech
+                if (_src.path != null) {
+                    _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
+                }
                 _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
                 _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
             }
