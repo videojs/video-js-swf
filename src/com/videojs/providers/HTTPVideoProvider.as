@@ -301,7 +301,6 @@ package com.videojs.providers{
                 // if the asset is already loading
                 if (_hasEnded) {
                   _hasEnded = false;
-                  _ns.seek(0);
                 }
                 _pausePending = false;
                 _ns.resume();
@@ -574,8 +573,6 @@ package com.videojs.providers{
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
                         _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                         _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
-                        _startOffset = 0;
-                        _pausedSeekValue = 0;
                         break;
                     }
 
@@ -602,6 +599,7 @@ package com.videojs.providers{
                 case "NetStream.Seek.Notify":
                     _playbackStarted = true;
                     _isSeeking = false;
+                    _hasEnded = false;
                     _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_SEEK_COMPLETE, {info:e.info}));
                     _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
