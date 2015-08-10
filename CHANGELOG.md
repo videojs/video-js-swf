@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @bc-bbay fix seeking after the video has ended ([view](https://github.com/videojs/video-js-swf/pull/175))
+* @imbcmdth don't trigger loadstart or loadedmetadata in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/173))
 
 --------------------
 
