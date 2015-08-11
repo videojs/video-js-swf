@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* revert [#173](https://github.com/videojs/video-js-swf/pull/173)
 
 --------------------
 
