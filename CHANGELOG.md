@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* revert [#173](https://github.com/videojs/video-js-swf/pull/173)
+_(none)_
 
 --------------------
+
+## 4.7.4 (2015-08-11)
+* revert [#173](https://github.com/videojs/video-js-swf/pull/173)
 
 ## 4.7.3 (2015-08-10)
 * @bc-bbay fix seeking after the video has ended ([view](https://github.com/videojs/video-js-swf/pull/175))
