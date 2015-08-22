@@ -205,16 +205,14 @@ package com.videojs.providers{
             appendBuffer(FLV_HEADER);
         }
 
-        public function get buffered():Number{
-            // _src.path == null when in data generation mode
-            if(_ns && _src.path == null)
-            {
-                return _startOffset + _ns.bufferLength + _ns.time;
-            } else if(duration > 0){
-                return (_ns.bytesLoaded / _ns.bytesTotal) * duration;
-            } else {
-                 return 0;
+        public function get buffered():Array{
+            if(_ns) {
+                return [[
+                    _startOffset + _ns.time + _ns.backBufferLength,
+                    _startOffset + _ns.time + _ns.bufferLength
+                ]];
             }
+            return [];
         }
 
         public function get bufferedBytesEnd():int{
@@ -546,6 +544,11 @@ package com.videojs.providers{
                     break;
 
                 case "NetStream.Buffer.Full":
+                    if (_isSeeking) {
+                        _isSeeking = false;
+                        _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
+                    }
+
                     _pausedSeekValue = -1;
                     _playbackStarted = true;
                     if(_pausePending){
@@ -597,10 +600,8 @@ package com.videojs.providers{
 
                 case "NetStream.Seek.Notify":
                     _playbackStarted = true;
-                    _isSeeking = false;
                     _hasEnded = false;
                     _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_SEEK_COMPLETE, {info:e.info}));
-                    _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     _currentThroughput = 0;
                     _loadStartTimestamp = getTimer();

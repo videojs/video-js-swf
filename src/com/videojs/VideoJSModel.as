@@ -344,11 +344,11 @@ package com.videojs{
             _loop = pValue;
         }
 
-        public function get buffered():Number{
+        public function get buffered():Array{
             if(_provider){
                 return _provider.buffered;
             }
-            return 0;
+            return [];
         }
 
         /**
