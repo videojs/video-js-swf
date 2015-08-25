@@ -554,6 +554,14 @@ package com.videojs.providers{
                     break;
 
                 case "NetStream.Buffer.Full":
+                    // NetStream.Seek.Notify fires as soon as the
+                    // Netstream's internal buffer has been flushed
+                    // but HTML should wait to fire "seeked" until
+                    // enough data is available to resume
+                    // playback. NetStream.Buffer.Full is the first
+                    // moment enough video data is available to begin
+                    // playback.
+                    // see https://github.com/videojs/video-js-swf/pull/180
                     if (_isSeeking) {
                         _isSeeking = false;
                         _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
