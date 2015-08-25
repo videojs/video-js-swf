@@ -207,10 +207,20 @@ package com.videojs.providers{
 
         public function get buffered():Array{
             if(_ns) {
-                return [[
-                    _startOffset + _ns.time + _ns.backBufferLength,
-                    _startOffset + _ns.time + _ns.bufferLength
-                ]];
+                if (_src.path === null) {
+                    // data generation mode
+                    return [[
+                        _startOffset + _ns.time - _ns.backBufferLength,
+                        _startOffset + _ns.time + _ns.bufferLength
+                    ]];
+                } else if (duration > 0) {
+                    // this calculation is not completely accurate for
+                    // many videos (variable bitrate encodings, for
+                    // instance) but NetStream.bufferLength does not seem
+                    // to return the full amount of buffered time for
+                    // progressive download videos.
+                    return [[0, (_ns.bytesLoaded / _ns.bytesTotal) * duration]];
+                }
             }
             return [];
         }
