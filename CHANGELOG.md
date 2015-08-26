@@ -6,6 +6,12 @@ _(none)_
 
 --------------------
 
+## 5.0.0-rc1 (2015-07-27)
+* Don't fire loadstart or loadedmetadata in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/178))
+* Remove unused poster support ([view](https://github.com/videojs/video-js-swf/pull/182))
+* Expose buffered as ranges, not just an end point ([view](https://github.com/videojs/video-js-swf/pull/180))
+* Do not seek to to the beginning after a video ends ([view](https://github.com/videojs/video-js-swf/pull/172))
+
 ## 5.0.0-rc0 (2015-07-21)
 * Let javascript fire "seeking" instead of handling it in the SWF ([view](https://github.com/videojs/video-js-swf/pull/171))
 
