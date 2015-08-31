@@ -6,6 +6,9 @@ _(none)_
 
 --------------------
 
+## 4.7.5 (2015-08-31)
+* @dmlap remove poster emulation ([view](https://github.com/videojs/video-js-swf/pull/183))
+
 ## 4.7.4 (2015-08-11)
 * revert [#173](https://github.com/videojs/video-js-swf/pull/173)
 
