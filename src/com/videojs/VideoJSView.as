@@ -10,17 +10,20 @@ package com.videojs{
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
+    import flash.events.StageVideoEvent;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
     import flash.media.Video;
+    import flash.media.StageVideo;
+    import flash.net.NetStream;
     import flash.net.URLRequest;
     import flash.system.LoaderContext;
 
     public class VideoJSView extends Sprite{
 
         private var _uiVideo:Video;
+        private var _stageVideo:StageVideo;
         private var _uiBackground:Sprite;
-
         private var _model:VideoJSModel;
 
         public function VideoJSView(){
@@ -30,7 +33,7 @@ package com.videojs{
             _model.addEventListener(VideoJSEvent.STAGE_RESIZE, onStageResize);
             _model.addEventListener(VideoPlaybackEvent.ON_META_DATA, onMetaData);
             _model.addEventListener(VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE, onDimensionUpdate);
-
+            _model.addEventListener(VideoPlaybackEvent.ON_STREAM_READY,onStreamReady);
             _uiBackground = new Sprite();
             _uiBackground.graphics.beginFill(_model.backgroundColor, 1);
             _uiBackground.graphics.drawRect(0, 0, _model.stageRect.width, _model.stageRect.height);
@@ -45,7 +48,6 @@ package com.videojs{
             addChild(_uiVideo);
 
             _model.videoReference = _uiVideo;
-
         }
 
 
@@ -91,7 +93,9 @@ package com.videojs{
             _uiVideo.x = Math.round((_model.stageRect.width - _uiVideo.width) / 2);
             _uiVideo.y = Math.round((_model.stageRect.height - _uiVideo.height) / 2);
 
-
+            if(_model.stageVideoInUse){
+              _stageVideo.viewPort = _model.stageRect;
+            }
         }
 
         private function onBackgroundColorSet(e:VideoPlaybackEvent):void{
@@ -116,6 +120,41 @@ package com.videojs{
 
         private function onDimensionUpdate(e:VideoPlaybackEvent):void{
             sizeVideoObject();
+        }
+
+        private function onStreamReady(e:VideoPlaybackEvent):void{
+            toggleStageVideo(_model.stageVideoAvailable,e.data.ns);
+        }
+
+        private function toggleStageVideo(on:Boolean,ns:NetStream):void
+        {
+            // If we choose StageVideo we attach the NetStream to StageVideo
+            if (on)
+            {
+                _model.stageVideoInUse = true;
+                // Try to render as stage video
+                var v:Vector.<StageVideo> = stage.stageVideos;
+                if ( v.length >= 1 ) {
+                    _stageVideo = v[0];
+                    _stageVideo.viewPort =_model.stageRect;
+                    _stageVideo.attachNetStream(ns);
+                }
+
+                    // If we use StageVideo, we just remove from the display list the Video object to avoid covering the StageVideo object (always in the background)
+                    removeChild (_uiVideo);
+                    removeChild (_uiBackground);
+            } else
+            {
+                // Otherwise we attach it to a Video object
+                _model.stageVideoInUse = false;
+                addChild(_uiVideo);
+                addChild(_uiBackground);
+            }
+
+            if (!_model.playing)
+            {
+              _model.play();
+            }
         }
 
     }

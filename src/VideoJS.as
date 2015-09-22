@@ -12,6 +12,8 @@ package{
     import flash.events.Event;
     import flash.events.MouseEvent;
     import flash.events.TimerEvent;
+    import flash.events.StageVideoAvailabilityEvent;
+    import flash.media.StageVideoAvailability;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
     import flash.system.Security;
@@ -162,7 +164,8 @@ package{
 
         private function onAddedToStage(e:Event):void{
             stage.addEventListener(MouseEvent.CLICK, onStageClick);
-            stage.addEventListener(Event.RESIZE, onStageResize);
+            stage.addEventListener(Event.RESIZE, onStageResize)
+            stage.addEventListener(StageVideoAvailabilityEvent.STAGE_VIDEO_AVAILABILITY, onStageVideoState);
             stage.scaleMode = StageScaleMode.NO_SCALE;
             stage.align = StageAlign.TOP_LEFT;
             _stageSizeTimer.start();
@@ -173,6 +176,13 @@ package{
                 _stageSizeTimer.stop();
                 _stageSizeTimer.removeEventListener(TimerEvent.TIMER, onStageSizeTimerTick);
                 init();
+            }
+        }
+
+        private function onStageVideoState(event:StageVideoAvailabilityEvent):void{
+            // Detect if StageVideo is available and decide what to do in toggleStageVideo
+            if(_app != null){
+                _app.model.stageVideoAvailable = (event.availability == StageVideoAvailability.AVAILABLE);
             }
         }
 
