@@ -30,6 +30,7 @@ package{
 
         private var _app:VideoJSApp;
         private var _stageSizeTimer:Timer;
+        private var _stageVideoAvailable:Boolean;
 
         public function VideoJS(){
             _stageSizeTimer = new Timer(250);
@@ -55,7 +56,7 @@ package{
             addChild(_app);
 
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-
+            _app.model.stageVideoAvailable = _stageVideoAvailable;
             // add content-menu version info
 
             var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v" + VERSION, false, false);
@@ -181,9 +182,7 @@ package{
 
         private function onStageVideoState(event:StageVideoAvailabilityEvent):void{
             // Detect if StageVideo is available and decide what to do in toggleStageVideo
-            if(_app != null){
-                _app.model.stageVideoAvailable = (event.availability == StageVideoAvailability.AVAILABLE);
-            }
+            _stageVideoAvailable = (event.availability == StageVideoAvailability.AVAILABLE);
         }
 
         private function onStageResize(e:Event):void{

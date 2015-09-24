@@ -123,37 +123,37 @@ package com.videojs{
         }
 
         private function onStreamReady(e:VideoPlaybackEvent):void{
-            toggleStageVideo(_model.stageVideoAvailable,e.data.ns);
+            toggleStageVideo(e.data.ns);
         }
 
-        private function toggleStageVideo(on:Boolean,ns:NetStream):void
+        private function toggleStageVideo(ns:NetStream):void
         {
             // If we choose StageVideo we attach the NetStream to StageVideo
-            if (on)
+            if (_model.stageVideoAvailable)
             {
-                _model.stageVideoInUse = true;
                 // Try to render as stage video
                 var v:Vector.<StageVideo> = stage.stageVideos;
                 if ( v.length >= 1 ) {
+                    _model.stageVideoInUse = true;
                     _stageVideo = v[0];
                     _stageVideo.viewPort =_model.stageRect;
                     _stageVideo.attachNetStream(ns);
+                    // If we use StageVideo, we just remove from the display list the Video object to avoid covering the StageVideo object (always in the background)
+                    if(this.contains(_uiVideo)){
+                        removeChild (_uiVideo);
+                        removeChild (_uiBackground);
+                    }
                 }
 
-                    // If we use StageVideo, we just remove from the display list the Video object to avoid covering the StageVideo object (always in the background)
-                    removeChild (_uiVideo);
-                    removeChild (_uiBackground);
-            } else
+            }
+            else
             {
                 // Otherwise we attach it to a Video object
                 _model.stageVideoInUse = false;
-                addChild(_uiVideo);
-                addChild(_uiBackground);
-            }
-
-            if (!_model.playing)
-            {
-              _model.play();
+                if(!this.contains(_uiVideo)) {
+                    addChild(_uiVideo);
+                    addChild(_uiBackground);
+                }
             }
         }
 
