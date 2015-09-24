@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video.js | Adobe Primetime HLS Flash Player</title>
+    <link rel="stylesheet" href="../src/css/reset.css"/>
+    <link rel="stylesheet" href="../src/css/styles.css"/>
+    <link rel="stylesheet" href="../src/bower_components/video.js/dist/video-js/video-js.css"/>
+    <link rel="stylesheet" href="../src/css/videojs-6play-skin.css"/>
+    <script type="text/javascript" src="../src/bower_components/video.js/dist/video-js/video.dev.js"></script>
+    <script type="text/javascript" src="../src/bower_components/video.js/dist/video-js/lang/fr.js"></script>
+    <script type="text/javascript" src="../dist/component-player-primetime.js"></script>
+    <script type="text/javascript">
+        videojs.options.primetime.swf = "../dist/component-player-primetime.swf"; // dist
+        // videojs.options.primetime.swf = "../bin-debug/VideoJS.swf"; // debug
+    </script>
+</head>
+<body style="padding-top: 20px">
+<div style="width: 624px; margin: auto;">
+    <h1>Video.js | Adobe Primetime HLS Flash Player</h1>
+    <video id="myPlayer" class="video-js vjs-default-skin" controls preload="none" width="624" height="351"
+           poster="" data-setup='{"autoplay": true}'>
+        <!--
+        <track id="chapters" kind="chapters" srclang="fr" src="chapters.vtt"/>
+        <source type="hls/primetime" src="http://poc-elemental.cdn.m6web.fr/out/u/hls/elemental_live_event_2.m3u8"/>
+        <source type="hls/primetime" src="https://static.6cloud.fr/live-stream/m6replay/m6group_web/live.m3u8"/>
+        -->
+        <source type="hls/primetime" src="http://lb.cdn.m6web.fr/s/cu/prime/vod/protected/4/0/d/heston-ep-3-burn/heston-ep-3-burn_web.m3u8"/>
+    </video>
+</div>
+</body>
+</html>

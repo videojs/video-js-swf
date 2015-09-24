@@ -11,6 +11,7 @@ package com.videojs{
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
     import flash.events.StageVideoEvent;
+    import flash.events.VideoEvent;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
     import flash.media.Video;
@@ -126,17 +127,28 @@ package com.videojs{
             toggleStageVideo(e.data.ns);
         }
 
-        private function toggleStageVideo(ns:NetStream):void
+        private function onRenderStateChanged(p_event:Event):void
+        {
+            switch(StageVideoEvent(p_event).status)
+            {
+                case VideoEvent.RENDER_STATUS_UNAVAILABLE:
+                    toggleStageVideo(null);
+                    break;
+            }
+        }
+
+        private function toggleStageVideo(ns:NetStream = null):void
         {
             // If we choose StageVideo we attach the NetStream to StageVideo
-            if (_model.stageVideoAvailable)
+            if (ns && _model.stageVideoAvailable && this.stage)
             {
                 // Try to render as stage video
-                var v:Vector.<StageVideo> = stage.stageVideos;
+                var v:Vector.<StageVideo> = this.stage.stageVideos;
                 if ( v.length >= 1 ) {
                     _model.stageVideoInUse = true;
                     _stageVideo = v[0];
                     _stageVideo.viewPort =_model.stageRect;
+                    _stageVideo.addEventListener(StageVideoEvent.RENDER_STATE, this.onRenderStateChanged);
                     _stageVideo.attachNetStream(ns);
                     // If we use StageVideo, we just remove from the display list the Video object to avoid covering the StageVideo object (always in the background)
                     if(this.contains(_uiVideo)){
@@ -148,6 +160,9 @@ package com.videojs{
             }
             else
             {
+                if(_stageVideo){
+                    _stageVideo.attachNetStream(null);
+                }
                 // Otherwise we attach it to a Video object
                 _model.stageVideoInUse = false;
                 if(!this.contains(_uiVideo)) {
