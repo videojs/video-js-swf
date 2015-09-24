@@ -8,6 +8,24 @@ module.exports = function (grunt) {
         base: '.'
       }
     },
+    replace: {
+      setupFlexConfig: {
+        src: ['flex-config.xml'],
+        dest: 'build/',
+        replacements: [{
+          from: '{FLEX_HOME}',
+          to: '../node_modules/flex-sdk/lib/flex_sdk/frameworks/'
+        },
+          {
+            from: '{TARGET_PLAYER}',
+            to: '11.1'
+          },
+          {
+            from: '{SWF_VERSION}',
+            to: '14'
+          }]
+      }
+    },
     mxmlc: {
       options: {
         // http://livedocs.adobe.com/flex/3/html/help.html?content=compilers_16.html
@@ -168,6 +186,7 @@ module.exports = function (grunt) {
   });
 
   grunt.loadNpmTasks('grunt-connect');
+  grunt.loadNpmTasks('grunt-text-replace');
   grunt.loadNpmTasks('grunt-bumpup');
   grunt.loadNpmTasks('grunt-tagrelease');
   grunt.loadNpmTasks('grunt-npm');
@@ -175,7 +194,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-prompt');
   grunt.loadNpmTasks('chg');
 
-  grunt.registerTask('dist', ['mxmlc']);
+  grunt.registerTask('dist', ['replace', 'mxmlc']);
   grunt.registerTask('default', ['dist']);
 
   grunt.registerMultiTask('mxmlc', 'Compiling SWF', function () {
@@ -213,6 +232,7 @@ module.exports = function (grunt) {
       }
 
       cmdLineOpts.push('-define=CONFIG::version, "' + pkg.version + '"');
+      cmdLineOpts.push('-load-config+=build/flex-config.xml');
       cmdLineOpts.push('--');
       cmdLineOpts.push.apply(cmdLineOpts, srcList);
 
