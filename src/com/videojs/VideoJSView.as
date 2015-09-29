@@ -52,6 +52,73 @@ package com.videojs{
         }
 
 
+        private function sizeStageVideoObject():void{
+            if(_model.stageVideoInUse){
+                var videoY:Number=0;
+                var videoX:Number=0;
+                var videoWidth:Number=0;
+                var videoHeight:Number=0;
+                var orig_width:Number = _model.metadata.width;
+                var orig_height:Number = _model.metadata.height;
+                var aspect:Number = orig_width/orig_height;
+                var containerWidth:Number=_model.stageRect.width;
+                var containerHeight:Number=_model.stageRect.height;
+                var containerAspect:Number = containerWidth/containerHeight;
+
+                if ((aspect > containerAspect) && ((aspect-containerAspect)/containerAspect > 0.107)) {
+                    // trace("film aspect is wider by more than 10%");
+                    // the film has a wider aspect ration than the container by more than 10.7%. Let's take the container's width as the video's width (possible letter box)
+                    videoWidth = containerWidth;
+                    // now set the height based on the original ratio
+                    videoHeight = videoWidth/aspect;
+                }
+
+                if ((aspect < containerAspect) && ((containerAspect-aspect)/aspect > 0.107)) {
+                    // trace("film is heigher by more than 10%");
+                    // the film has a heigher aspect ration than the container. Let's take the container's height as the video's width (possible pill box)
+                    videoHeight = containerHeight;
+                    // now set the height based on the original ratio
+                    videoWidth = videoHeight*aspect;
+                }
+
+                if ( (aspect == containerAspect) || ( (aspect > containerAspect) && ( (aspect-containerAspect)/containerAspect <= 0.107) ) ||  ( (aspect < containerAspect) && ((containerAspect-aspect)/aspect <= 0.107) ) )
+                {
+                    // trace("video and container have essentially the same aspect ratio");
+                    // the video and container have the same aspect ratio, or are at least within 10% of eachother
+                    videoWidth = containerWidth;
+                    videoHeight = containerHeight;
+                }
+
+                if (videoWidth ===0 || videoHeight ===0){
+                    return;
+                }
+
+                if (containerWidth-videoWidth >0)
+                // container is wider, we need a pill box -> center video in x axis
+                {
+                    // trace("we need to pill box this thing");
+                    videoX = ((containerWidth-videoWidth)/2);
+                    videoY = 0;
+                }
+
+                if (containerHeight-videoHeight > 0)
+                {
+                    // trace("we need to letter box this thing");
+                    // container is higher, we need a letter box -> center video in y axis
+                    videoY = ((containerHeight-videoHeight)/2);
+                    videoX = 0;
+                }
+                if (containerWidth == videoWidth && containerHeight == videoHeight) {
+                    videoX = 0;
+                    videoY = 0;
+                }
+                // close onMetaData
+
+                var stageVideoRatio=  new Rectangle(videoX,videoY,videoWidth,videoHeight);
+                _stageVideo.viewPort = stageVideoRatio;
+            }
+        }
+
         private function sizeVideoObject():void{
 
             var __targetWidth:int, __targetHeight:int;
@@ -94,9 +161,6 @@ package com.videojs{
             _uiVideo.x = Math.round((_model.stageRect.width - _uiVideo.width) / 2);
             _uiVideo.y = Math.round((_model.stageRect.height - _uiVideo.height) / 2);
 
-            if(_model.stageVideoInUse){
-              _stageVideo.viewPort = _model.stageRect;
-            }
         }
 
         private function onBackgroundColorSet(e:VideoPlaybackEvent):void{
@@ -113,10 +177,12 @@ package com.videojs{
             _uiBackground.graphics.drawRect(0, 0, _model.stageRect.width, _model.stageRect.height);
             _uiBackground.graphics.endFill();
             sizeVideoObject();
+            sizeStageVideoObject();
         }
 
         private function onMetaData(e:VideoPlaybackEvent):void{
             sizeVideoObject();
+            sizeStageVideoObject();
         }
 
         private function onDimensionUpdate(e:VideoPlaybackEvent):void{
@@ -147,7 +213,6 @@ package com.videojs{
                 if ( v.length >= 1 ) {
                     _model.stageVideoInUse = true;
                     _stageVideo = v[0];
-                    _stageVideo.viewPort =_model.stageRect;
                     _stageVideo.addEventListener(StageVideoEvent.RENDER_STATE, this.onRenderStateChanged);
                     _stageVideo.attachNetStream(ns);
                     // If we use StageVideo, we just remove from the display list the Video object to avoid covering the StageVideo object (always in the background)
