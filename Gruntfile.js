@@ -18,11 +18,11 @@ module.exports = function (grunt) {
         },
           {
             from: '{TARGET_PLAYER}',
-            to: '11.1'
+            to: '14.0'
           },
           {
             from: '{SWF_VERSION}',
-            to: '14'
+            to: '25'
           }]
       }
     },
