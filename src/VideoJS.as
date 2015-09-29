@@ -12,6 +12,8 @@ package{
     import flash.events.Event;
     import flash.events.MouseEvent;
     import flash.events.TimerEvent;
+    import flash.events.StageVideoAvailabilityEvent;
+    import flash.media.StageVideoAvailability;
     import flash.external.ExternalInterface;
     import flash.geom.Rectangle;
     import flash.system.Security;
@@ -28,6 +30,7 @@ package{
 
         private var _app:VideoJSApp;
         private var _stageSizeTimer:Timer;
+        private var _stageVideoAvailable:Boolean;
 
         public function VideoJS(){
             _stageSizeTimer = new Timer(250);
@@ -53,7 +56,7 @@ package{
             addChild(_app);
 
             _app.model.stageRect = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-
+            _app.model.stageVideoAvailable = _stageVideoAvailable;
             // add content-menu version info
 
             var _ctxVersion:ContextMenuItem = new ContextMenuItem("VideoJS Flash Component v" + VERSION, false, false);
@@ -162,7 +165,8 @@ package{
 
         private function onAddedToStage(e:Event):void{
             stage.addEventListener(MouseEvent.CLICK, onStageClick);
-            stage.addEventListener(Event.RESIZE, onStageResize);
+            stage.addEventListener(Event.RESIZE, onStageResize)
+            stage.addEventListener(StageVideoAvailabilityEvent.STAGE_VIDEO_AVAILABILITY, onStageVideoState);
             stage.scaleMode = StageScaleMode.NO_SCALE;
             stage.align = StageAlign.TOP_LEFT;
             _stageSizeTimer.start();
@@ -174,6 +178,11 @@ package{
                 _stageSizeTimer.removeEventListener(TimerEvent.TIMER, onStageSizeTimerTick);
                 init();
             }
+        }
+
+        private function onStageVideoState(event:StageVideoAvailabilityEvent):void{
+            // Detect if StageVideo is available and decide what to do in toggleStageVideo
+            _stageVideoAvailable = (event.availability == StageVideoAvailability.AVAILABLE);
         }
 
         private function onStageResize(e:Event):void{

@@ -42,6 +42,8 @@ package com.videojs{
         private var _src:String = "";
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
+        private var _stageVideoInUse:Boolean = false;
+        private var _stageVideoAvailable:Boolean = false;
 
         private static var _instance:VideoJSModel;
 
@@ -334,6 +336,20 @@ package com.videojs{
             _loop = pValue;
         }
 
+        public function get stageVideoInUse():Boolean{
+            return _stageVideoInUse;
+        }
+        public function set stageVideoInUse(pValue:Boolean):void {
+          _stageVideoInUse = pValue;
+        }
+
+        public function get stageVideoAvailable():Boolean{
+            return _stageVideoAvailable;
+        }
+        public function set stageVideoAvailable(pValue:Boolean):void {
+            _stageVideoAvailable = pValue;
+        }
+
         public function get buffered():Array{
             if(_provider){
                 return _provider.buffered;
@@ -559,7 +575,7 @@ package com.videojs{
             } else if (obj is Array) {
                 var __sanitizedArray:Array = new Array();
 
-                for each (var __item in obj){
+                for each (var __item:Object in obj){
                     __sanitizedArray.push(cleanObject(__item));
                 }
 
@@ -567,7 +583,7 @@ package com.videojs{
             } else if (typeof(obj) == 'object') {
                 var __sanitizedObject:Object = new Object();
 
-                for (var __i in obj){
+                for (var __i:String in obj){
                     __sanitizedObject[__i] = cleanObject(obj[__i]);
                 }
 

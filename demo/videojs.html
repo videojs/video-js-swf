@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video.js | Adobe Primetime HLS Flash Player</title>
+    <link href="//vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+    <script src="../node_modules/video.js/dist/video-js/video.dev.js"></script>
+    <script src="https://rawgit.com/Afrostream/videojs-afrostream/master/dist/afrostream.player.js"></script>
+    <script type="text/javascript">
+        videojs.options.techOrder = ["hls"]; // dist
+        videojs.options.hls = {
+            swf: "../dist/video-js.swf",
+            params: {
+                wmode: 'direct'
+            }
+        }; // dist
+        videojs.options.flash = videojs.options.hls;
+    </script>
+</head>
+<body style="padding-top: 20px">
+<div style="width: 624px; margin: auto;">
+    <h1>Video.js | Adobe Primetime HLS Flash Player</h1>
+    <video id="myPlayer" class="video-js vjs-default-skin" controls preload="none" width="624" height="351"
+           poster="" data-setup='{"autoplay": true}'>
+        <source
+                src="http://cdn1.afrostream.tv/vod/FF_101_Afrostream_V2/26035f9208641708.ism/master.m3u8"
+                type="application/vnd.apple.mpegurl">
+    </video>
+</div>
+</body>
+</html>

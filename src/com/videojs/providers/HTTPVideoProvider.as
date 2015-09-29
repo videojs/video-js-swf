@@ -17,7 +17,7 @@ package com.videojs.providers{
 
     public class HTTPVideoProvider extends EventDispatcher implements IProvider{
 
-        private static var FLV_HEADER = new ByteArray();
+        private static var FLV_HEADER:ByteArray = new ByteArray();
         // file marker
         FLV_HEADER.writeByte(0x46); // 'F'
         FLV_HEADER.writeByte(0x4c); // 'L'
@@ -321,7 +321,7 @@ package com.videojs.providers{
         }
 
         public function pause():void{
-            var alreadyPaused = _isPaused;
+            var alreadyPaused:Boolean = _isPaused;
             _ns.pause();
             if(_playbackStarted && !alreadyPaused){
                 _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
