@@ -124,12 +124,8 @@ package{
                 _app.model.autoplay = true;
             }
 
-            if(loaderInfo.parameters.preload === "none"){
-                _app.model.preload = false;
-            }
-
-            if(loaderInfo.parameters.poster != undefined && loaderInfo.parameters.poster != ""){
-                _app.model.poster = String(loaderInfo.parameters.poster);
+            if(loaderInfo.parameters.preload != undefined && loaderInfo.parameters.preload != ""){
+                _app.model.preload = String(loaderInfo.parameters.preload);
             }
 
             if(loaderInfo.parameters.src != undefined && loaderInfo.parameters.src != ""){
@@ -321,11 +317,12 @@ package{
                     break;
                 case "autoplay":
                     _app.model.autoplay = _app.model.humanToBoolean(pValue);
-                case "preload":
-                    _app.model.preload = _app.model.humanToBoolean(pValue);
+                    if (_app.model.autoplay) {
+                        _app.model.preload = "auto";
+                    }
                     break;
-                case "poster":
-                    _app.model.poster = String(pValue);
+                case "preload":
+                    _app.model.preload = String(pValue);
                     break;
                 case "src":
                     // same as when vjs_src() is called directly

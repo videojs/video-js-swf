@@ -6,6 +6,26 @@ _(none)_
 
 --------------------
 
+## 5.0.0-rc1 (2015-07-27)
+* Don't fire loadstart or loadedmetadata in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/178))
+* Remove unused poster support ([view](https://github.com/videojs/video-js-swf/pull/182))
+* Expose buffered as ranges, not just an end point ([view](https://github.com/videojs/video-js-swf/pull/180))
+* Do not seek to to the beginning after a video ends ([view](https://github.com/videojs/video-js-swf/pull/172))
+
+## 5.0.0-rc0 (2015-07-21)
+* Let javascript fire "seeking" instead of handling it in the SWF ([view](https://github.com/videojs/video-js-swf/pull/171))
+
+## 4.7.2 (2015-06-30)
+* Fixed an issue where an image from previous video could flash briefly while a new video is loaded ([view](https://github.com/videojs/video-js-swf/pull/167))
+
+## 4.7.1 (2015-06-23)
+* Fixed an issue where playback required two clisk to start when preload was not auto
+* @qpSHiNqp fix issue that would cause incorrect aspect ratios for some videos ([view](https://github.com/videojs/video-js-swf/pull/165))
+
+## 4.7.0 (2015-05-19)
+* @bc-bbay the preload attribute should be a string, not a boolean ([view](https://github.com/videojs/video-js-swf/pull/160))
+* @Wellming fix manual tests ([view](https://github.com/videojs/video-js-swf/pull/154))
+
 ## 4.6.1 (2015-04-22)
 * @bclwhitaker append END_SEQUENCE properly in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/152))
 
