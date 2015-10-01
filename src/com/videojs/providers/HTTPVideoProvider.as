@@ -43,7 +43,6 @@ package com.videojs.providers{
         private var _loadStarted:Boolean = false;
         private var _loadCompleted:Boolean = false;
         private var _loadErrored:Boolean = false;
-        private var _pauseOnStart:Boolean = false;
         private var _pausePending:Boolean = false;
         private var _onmetadadataFired:Boolean = false;
 
@@ -206,16 +205,24 @@ package com.videojs.providers{
             appendBuffer(FLV_HEADER);
         }
 
-        public function get buffered():Number{
-            // _src.path == null when in data generation mode
-            if(_ns && _src.path == null)
-            {
-                return _startOffset + _ns.bufferLength + _ns.time;
-            } else if(duration > 0){
-                return (_ns.bytesLoaded / _ns.bytesTotal) * duration;
-            } else {
-                 return 0;
+        public function get buffered():Array{
+            if(_ns) {
+                if (_src.path === null) {
+                    // data generation mode
+                    return [[
+                        _startOffset + _ns.time - _ns.backBufferLength,
+                        _startOffset + _ns.time + _ns.bufferLength
+                    ]];
+                } else if (duration > 0) {
+                    // this calculation is not completely accurate for
+                    // many videos (variable bitrate encodings, for
+                    // instance) but NetStream.bufferLength does not seem
+                    // to return the full amount of buffered time for
+                    // progressive download videos.
+                    return [[0, (_ns.bytesLoaded / _ns.bytesTotal) * duration]];
+                }
             }
+            return [];
         }
 
         public function get bufferedBytesEnd():int{
@@ -278,30 +285,30 @@ package com.videojs.providers{
             _loadErrored = false;
             _loadStarted = false;
             _loadCompleted = false;
-            if (_model.preload) {
+            if (_model.preload == "auto") {
               initNetConnection();
             }
         }
 
-        public function load():void{
-            _pauseOnStart = true;
-            _playbackStarted = false;
-            initNetConnection();
+        public function load():void {
+            if(!_loadStarted){
+                _playbackStarted = false;
+                initNetConnection();
+            }
         }
 
         public function play():void{
             // if this is a fresh playback request
             if(!_loadStarted){
-                _pauseOnStart = false;
-                _playbackStarted = false;
                 _metadata = {};
-                initNetConnection();
-            }
-            // if the asset is already loading
-            else{
+                _model.addEventListener(VideoPlaybackEvent.ON_STREAM_READY, function():void{
+                    play();
+                });
+                load();
+            } else {
+                // if the asset is already loading
                 if (_hasEnded) {
                   _hasEnded = false;
-                  _ns.seek(0);
                 }
                 _pausePending = false;
                 _ns.resume();
@@ -398,6 +405,8 @@ package com.videojs.providers{
         public function die():void{
             if(_videoReference)
             {
+                // Clears the image currently displayed in the Video object.
+                _videoReference.clear();
                 _videoReference.attachNetStream(null);
             }
 
@@ -428,9 +437,11 @@ package com.videojs.providers{
         }
 
         private function initNetConnection():void{
-            // the video element triggers loadstart as soon as the resource selection algorithm selects a source
+            // The video element triggers loadstart as soon as the resource selection algorithm selects a source
             // this is somewhat later than that moment but relatively close
-            if (!_loadStarted) {
+            // We check _src.path as it will be null when in data generation mode and we do not
+            // want to trigger loadstart in that case (it will be handled by the tech)
+            if (!_loadStarted && _src.path != null) {
                 _model.broadcastEventExternally(ExternalEventName.ON_LOAD_START);
             }
             _loadStarted = true;
@@ -469,7 +480,6 @@ package com.videojs.providers{
             if (_src.path === null) {
               _pausePending = true;
             }
-
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_READY, {ns:_ns}));
         }
 
@@ -533,7 +543,7 @@ package com.videojs.providers{
                     _throughputTimer.reset();
                     _throughputTimer.start();
 
-                    if(!_pauseOnStart || _model.autoplay){
+                    if(_model.autoplay){
                         _model.broadcastEventExternally(ExternalEventName.ON_RESUME);
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_START, {info:e.info}));
                     }
@@ -543,10 +553,22 @@ package com.videojs.providers{
                     if(_src.path === null) {
                         appendBytesAction(NetStreamAppendBytesAction.RESET_SEEK);
                     }
-                    _model.broadcastEventExternally(ExternalEventName.ON_SEEK_START);
                     break;
 
                 case "NetStream.Buffer.Full":
+                    // NetStream.Seek.Notify fires as soon as the
+                    // Netstream's internal buffer has been flushed
+                    // but HTML should wait to fire "seeked" until
+                    // enough data is available to resume
+                    // playback. NetStream.Buffer.Full is the first
+                    // moment enough video data is available to begin
+                    // playback.
+                    // see https://github.com/videojs/video-js-swf/pull/180
+                    if (_isSeeking) {
+                        _isSeeking = false;
+                        _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
+                    }
+
                     _pausedSeekValue = -1;
                     _playbackStarted = true;
                     if(_pausePending){
@@ -573,8 +595,6 @@ package com.videojs.providers{
                         _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_CLOSE, {info:e.info}));
                         _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);
                         _model.broadcastEventExternally(ExternalEventName.ON_PLAYBACK_COMPLETE);
-                        _startOffset = 0;
-                        _pausedSeekValue = 0;
                         break;
                     }
 
@@ -600,9 +620,8 @@ package com.videojs.providers{
 
                 case "NetStream.Seek.Notify":
                     _playbackStarted = true;
-                    _isSeeking = false;
+                    _hasEnded = false;
                     _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_STREAM_SEEK_COMPLETE, {info:e.info}));
-                    _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
                     _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_EMPTY);
                     _currentThroughput = 0;
                     _loadStartTimestamp = getTimer();
@@ -632,10 +651,6 @@ package com.videojs.providers{
         }
 
         public function onMetaData(pMetaData:Object):void{
-            if (_onmetadadataFired) {
-              return;
-            }
-
             _metadata = pMetaData;
             if(pMetaData.duration != undefined){
                 _isLive = false;
@@ -647,10 +662,18 @@ package com.videojs.providers{
                 _canSeekAhead = false;
             }
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_META_DATA, {metadata:_metadata}));
-            _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
-            _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
 
-            _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
+            // the first time metadata is encountered, trigger loadedmetadata, canplay, and loadeddata
+            if (!_onmetadadataFired) {
+                // _src.path will be null when in data generation mode and loadedmetadata will be
+                // triggered by the tech
+                if (_src.path != null) {
+                    _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
+                }
+                _model.broadcastEventExternally(ExternalEventName.ON_CAN_PLAY);
+                _model.broadcastEventExternally(ExternalEventName.ON_BUFFER_FULL);
+            }
+
             _onmetadadataFired = true;
         }
 

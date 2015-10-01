@@ -66,11 +66,11 @@ package com.videojs.providers{
         function get networkState():int;
         
         /**
-         * Should return the amount of media that has been buffered, in seconds, or 0 if
-         * this value is unknown or unable to be determined (due to lack of duration data, etc)
+         * Should return an array of normalized time ranges currently
+         * buffered of the media, in seconds.
          */
-        function get buffered():Number;
-        
+        function get buffered():Array;
+
         /**
          * Should return the number of bytes that have been loaded thus far, or 0 if
          * this value is unknown or unable to be calculated (due to streaming, bitrate switching, etc)

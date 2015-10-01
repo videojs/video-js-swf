@@ -37,12 +37,11 @@ package com.videojs{
         private var _backgroundAlpha:Number = 0;
         private var _volume:Number = 1;
         private var _autoplay:Boolean = false;
-        private var _preload:Boolean = true;
+        private var _preload:String = "auto";
         private var _loop:Boolean = false;
         private var _src:String = "";
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
-        private var _poster:String = "";
 
         private static var _instance:VideoJSModel;
 
@@ -210,7 +209,7 @@ package com.videojs{
             if(_autoplay){
                 _provider.play();
             }
-            else if(_preload){
+            else if(_preload == "auto"){
                 _provider.load();
             }
         }
@@ -261,18 +260,9 @@ package com.videojs{
             if(_autoplay){
                 _provider.play();
             }
-            else if(_preload){
+            else if(_preload == "auto"){
                 _provider.load();
             }
-        }
-
-
-        public function get poster():String{
-            return _poster;
-        }
-        public function set poster(pValue:String):void {
-            _poster = pValue;
-            broadcastEvent(new VideoJSEvent(VideoJSEvent.POSTER_SET));
         }
 
         public function get hasEnded():Boolean{
@@ -330,10 +320,10 @@ package com.videojs{
 
         }
 
-        public function get preload():Boolean{
+        public function get preload():String{
             return _preload;
         }
-        public function set preload(pValue:Boolean):void {
+        public function set preload(pValue:String):void {
             _preload = pValue;
         }
 
@@ -344,11 +334,11 @@ package com.videojs{
             _loop = pValue;
         }
 
-        public function get buffered():Number{
+        public function get buffered():Array{
             if(_provider){
                 return _provider.buffered;
             }
-            return 0;
+            return [];
         }
 
         /**
