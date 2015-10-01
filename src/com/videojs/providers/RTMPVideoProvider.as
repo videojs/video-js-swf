@@ -151,11 +151,7 @@ package com.videojs.providers{
             throw "RTMPVideoProvider does not support discontinuities";
         }
 
-<<<<<<< HEAD
-        public function get buffered():Number{
-=======
         public function get buffered():Array{
->>>>>>> release_5
             if(duration > 0){
                 return [[0, duration]];
             }
