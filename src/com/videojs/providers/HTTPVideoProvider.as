@@ -209,6 +209,9 @@ package com.videojs.providers{
             if(_ns) {
                 if (_src.path === null) {
                     // data generation mode
+                    if (_isSeeking) {
+                        return [];
+                    }
                     return [[
                         _startOffset + _ns.time - _ns.backBufferLength,
                         _startOffset + _ns.time + _ns.bufferLength
