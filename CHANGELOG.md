@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Return an empty set of seekable time ranges when seeking in data generation mode ([view](https://github.com/videojs/video-js-swf/pull/187))
 
 --------------------
 
