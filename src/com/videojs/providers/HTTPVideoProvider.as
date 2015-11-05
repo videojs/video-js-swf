@@ -356,6 +356,7 @@ package com.videojs.providers{
             }
             else if(_hasEnded)
             {
+                _isSeeking = true;
                 _playbackStarted = true;
                 _hasEnded = false;
             }
