@@ -4,12 +4,10 @@ package com.videojs.providers{
     import com.videojs.events.VideoPlaybackEvent;
     import com.videojs.structs.ExternalErrorEventName;
     import com.videojs.structs.ExternalEventName;
-    import com.videojs.structs.PlaybackType;
     
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
-    import flash.external.ExternalInterface;
     import flash.media.Video;
     import flash.net.NetConnection;
     import flash.net.NetStream;
@@ -487,6 +485,9 @@ package com.videojs.providers{
         
         private function onNetStreamStatus(e:NetStatusEvent):void{
             switch(e.info.code){
+				case "NetStream.Video.DimensionChange":
+					onMetaData(new Object());
+					break;
                 case "NetStream.Play.Reset":
                     break;
                 case "NetStream.Play.Start":
