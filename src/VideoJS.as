@@ -143,6 +143,10 @@ package{
               if(loaderInfo.parameters.rtmpStream != undefined && loaderInfo.parameters.rtmpStream != ""){
                 _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
               }
+
+              if(loaderInfo.parameters.startparam != undefined && loaderInfo.parameters.startparam != ""){
+                _app.model.startparam = loaderInfo.parameters.startparam;
+              }
             }
 
             // Hard coding this in for now until we can come up with a better solution for 5.0 to avoid XSS.
@@ -290,6 +294,9 @@ package{
                 case "rtmpStream":
                     return _app.model.rtmpStream;
                     break;
+                case "startparam":
+                    return _app.model.startparam;
+                    break;
             }
             return null;
         }
@@ -345,6 +352,9 @@ package{
                     break;
                 case "rtmpStream":
                     _app.model.rtmpStream = String(pValue);
+                    break;
+                case "startparam":
+                    _app.model.startparam = String(pValue);
                     break;
                 default:
                     _app.model.broadcastErrorEventExternally(ExternalErrorEventName.PROPERTY_NOT_FOUND, pPropertyName);

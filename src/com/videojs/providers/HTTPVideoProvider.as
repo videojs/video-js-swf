@@ -222,7 +222,7 @@ package com.videojs.providers{
                     // instance) but NetStream.bufferLength does not seem
                     // to return the full amount of buffered time for
                     // progressive download videos.
-                    return [[0, (_ns.bytesLoaded / _ns.bytesTotal) * duration]];
+                    return [[0, _startOffset + (_ns.bytesLoaded / _ns.bytesTotal) * (_metadata.duration - _startOffset)]];
                 }
             }
             return [];
@@ -368,8 +368,18 @@ package com.videojs.providers{
                 _startOffset = pTime;
                 return;
             }
-
-            _ns.seek(pTime);
+            var startBuffer = _startOffset + _ns.time;
+            var endBuffer = _startOffset + (_ns.bytesLoaded / _ns.bytesTotal) * (_metadata.duration - _startOffset);
+            if (_model.startparam !== "" && !(pTime > startBuffer && pTime < endBuffer)){
+                if (_src.path.indexOf('?') > -1) {
+                    _ns.play(_src.path + '&' + _model.startparam + '=' + pTime);
+                } else {
+                    _ns.play(_src.path + '?' + _model.startparam + '=' + pTime);
+                }
+                _startOffset = pTime;
+            } else {
+                _ns.seek(pTime);
+            }
 
         }
 
@@ -381,12 +391,35 @@ package com.videojs.providers{
                 }
                 else if(pPercent > 1){
                     _throughputTimer.stop();
-                    _ns.seek((pPercent / 100) * _metadata.duration);
+                    var startBuffer = _startOffset + _ns.time - _ns.backBufferLength;
+                    var endBuffer = _startOffset + _ns.time + _ns.bufferLength;
+                    var pTime = (pPercent / 100) * _metadata.duration;
+                    if (_model.startparam !== "" && !(pTime > startBuffer && pTime < endBuffer)){
+                        if (_src.path.indexOf('?') > -1) {
+                            _ns.play(_src.path + '&' + _model.startparam + '=' + pTime);
+                        } else {
+                            _ns.play(_src.path + '?' + _model.startparam + '=' + pTime);
+                        }
+                        _startOffset = pTime;
+                    } else {
+                        _ns.seek(pTime);
+                    }
                 }
                 else{
                     _throughputTimer.stop();
-                    _ns.seek(pPercent * _metadata.duration);
-
+                    var startBuffer = _startOffset + _ns.time - _ns.backBufferLength;
+                    var endBuffer = _startOffset + _ns.time + _ns.bufferLength;
+                    var pTime = pPercent * _metadata.duration;
+                    if (_model.startparam !== "" && !(pTime > startBuffer && pTime < endBuffer)){
+                        if (_src.path.indexOf('?') > -1) {
+                            _ns.play(_src.path + '&' + _model.startparam + '=' + pTime);
+                        } else {
+                            _ns.play(_src.path + '?' + _model.startparam + '=' + pTime);
+                        }
+                        _startOffset = pTime;
+                    } else {
+                        _ns.seek(pTime);
+                    }
                 }
             }
         }
@@ -659,6 +692,9 @@ package com.videojs.providers{
             if(pMetaData.duration != undefined){
                 _isLive = false;
                 _canSeekAhead = true;
+                if (_model.startparam !== "" && _startOffset !== 0){
+                    _metadata.duration += _startOffset;
+                }
                 _model.broadcastEventExternally(ExternalEventName.ON_DURATION_CHANGE, _metadata.duration);
             }
             else{
