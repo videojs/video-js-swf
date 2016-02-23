@@ -302,6 +302,7 @@ package com.videojs.providers{
             }
             else if(_hasEnded){
                 _ns.seek(pTime);
+                _isPaused = false;
                 _isPlaying = true;
                 _hasEnded = false;
                 _reportEnded = false;
@@ -604,11 +605,14 @@ package com.videojs.providers{
             _model.broadcastEventExternally(ExternalEventName.ON_METADATA, _metadata);
         }
 
+<<<<<<< 8e55ad1eac05dcb6bf8e93d5e8a759f7411a1958
         public function onTextData(pTextData:Object):void {
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_TEXT_DATA, {textData:pTextData}));
             _model.broadcastEventExternally(ExternalEventName.ON_TEXT_DATA, pTextData);
         }
 
+=======
+>>>>>>> fixed issue where 'pause' state was incorrect after video ends but the user scrubs back
         public function onCuePoint(pInfo:Object):void{
             _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_CUE_POINT, {cuepoint:pInfo}));
         }
