@@ -365,6 +365,7 @@ package com.videojs.providers{
 
             if(_src.path === null)
             {
+                _isSeeking = true;
                 _startOffset = pTime;
                 return;
             }
