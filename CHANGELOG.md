@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* If we are in data generation mode and even if `_playbackStarted` hasn't happened yet, we should still set `_isSeeking` to true so that we can correctly emit `seeked` after an initial (before playback) seek ([view](https://github.com/videojs/video-js-swf/pull/204))
 
 --------------------
 
