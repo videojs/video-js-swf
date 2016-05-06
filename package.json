@@ -32,5 +32,7 @@
     "grunt-npm": "~0.0.2",
     "chg": "~0.1.5"
   },
-  "scripts": {}
+  "scripts": {
+    "version": "chg release -y && git add CHANGELOG.md"
+  }
 }
