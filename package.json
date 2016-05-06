@@ -33,6 +33,6 @@
     "chg": "~0.1.5"
   },
   "scripts": {
-    "version": "chg release -y && git add CHANGELOG.md"
+    "version": "chg release -y && grunt dist && git add -f dist/ && git add CHANGELOG.md"
   }
 }
