@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* Fix `muted` and `loop` attributes not being passed to the swf ([view](https://github.com/videojs/video-js-swf/pull/205))
+_(none)_
 
 --------------------
+
+## 5.0.3 (2016-05-31)
+* Fix `muted` and `loop` attributes not being passed to the swf ([view](https://github.com/videojs/video-js-swf/pull/205))
 
 ## 5.0.2 (2016-05-06)
 * If we are in data generation mode and even if `_playbackStarted` hasn't happened yet, we should still set `_isSeeking` to true so that we can correctly emit `seeked` after an initial (before playback) seek ([view](https://github.com/videojs/video-js-swf/pull/204))
