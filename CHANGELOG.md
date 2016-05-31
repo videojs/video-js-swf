@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* Fix `muted` and `loop` attributes not being passed to the swf ([view](https://github.com/videojs/video-js-swf/pull/205))
 
 --------------------
 
