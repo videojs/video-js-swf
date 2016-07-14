@@ -147,7 +147,9 @@ package{
               if(loaderInfo.parameters.rtmpConnection != undefined && loaderInfo.parameters.rtmpConnection != ""){
                 _app.model.rtmpConnectionURL = loaderInfo.parameters.rtmpConnection;
               }
-
+              if(loaderInfo.parameters.rtmpBufferTime != undefined){
+                _app.model.rtmpBufferTime = loaderInfo.parameters.rtmpBufferTime;
+              }
               if(loaderInfo.parameters.rtmpStream != undefined && loaderInfo.parameters.rtmpStream != ""){
                 _app.model.rtmpStream = loaderInfo.parameters.rtmpStream;
               }
@@ -353,6 +355,9 @@ package{
                     break;
                 case "rtmpStream":
                     _app.model.rtmpStream = String(pValue);
+                    break;
+                case "rtmpBufferTime":
+                    _app.model.rtmpBufferTime = Number(pValue);
                     break;
                 default:
                     _app.model.broadcastErrorEventExternally(ExternalErrorEventName.PROPERTY_NOT_FOUND, pPropertyName);

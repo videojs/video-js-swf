@@ -42,6 +42,7 @@ package com.videojs{
         private var _src:String = "";
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
+        private var _rtmpBufferTime:Number = 1;
 
         private static var _instance:VideoJSModel;
 
@@ -232,7 +233,8 @@ package com.videojs{
             if (_provider != null && _currentPlaybackType == PlaybackType.RTMP) {
                 var __src:Object = {
                     connectionURL: _rtmpConnectionURL,
-                    streamURL: _rtmpStream
+                    streamURL: _rtmpStream,
+                    bufferTime: _rtmpBufferTime
                 };
                 _provider.src = __src;
             }
@@ -244,6 +246,9 @@ package com.videojs{
             if(_autoplay){
                 play();
             }
+        }
+        public function set rtmpBufferTime(pBufferTime:Number):void {
+            _rtmpBufferTime = pBufferTime;
         }
 
         /**
@@ -598,7 +603,8 @@ package com.videojs{
                     else if(_currentPlaybackType == PlaybackType.RTMP){
                         __src = {
                             connectionURL: _rtmpConnectionURL,
-                            streamURL: _rtmpStream
+                            streamURL: _rtmpStream,
+                            bufferTime: _rtmpBufferTime
                         };
                         _provider = new RTMPVideoProvider();
                         _provider.attachVideo(_videoReference);
