@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @alex-philips added support for the onTextData event
+_(none)_
 
 --------------------
+
+## 5.1.0 (2016-07-18)
+* @alex-philips added support for the onTextData event
 
 ## 5.0.3 (2016-05-31)
 * Fix `muted` and `loop` attributes not being passed to the swf ([view](https://github.com/videojs/video-js-swf/pull/205))
