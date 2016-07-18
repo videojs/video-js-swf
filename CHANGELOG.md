@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @alex-philips added support for the onTextData event
 
 --------------------
 
