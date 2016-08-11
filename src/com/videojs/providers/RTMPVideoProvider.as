@@ -394,6 +394,7 @@ package com.videojs.providers{
         private function initNetConnection():void{
             if(_nc == null){
                 _nc = new NetConnection();
+                _nc.proxyType = 'best'; // needed behind firewalls
                 _nc.client = this;
                 _nc.addEventListener(NetStatusEvent.NET_STATUS, onNetConnectionStatus);
             }
@@ -463,6 +464,7 @@ package com.videojs.providers{
             switch(e.info.code){
                 case "NetConnection.Connect.Success":
                     _model.broadcastEventExternally(ExternalEventName.ON_RTMP_CONNECT_SUCCESS);
+                    _nc.call("FCSubscribe", null, _src.streamURL); // try to subscribe
                     initNetStream();
                     break;
                 case "NetConnection.Connect.Failed":
@@ -639,7 +641,7 @@ package com.videojs.providers{
          * Called from FMS when subscribing to live streams.
          */
         public function onFCSubscribe(pInfo:Object):void {
-            // no op for now but needed by NetConnection
+            initNetStream();
         }
 
         /**
