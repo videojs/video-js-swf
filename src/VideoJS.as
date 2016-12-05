@@ -69,6 +69,7 @@ package{
             ExternalInterface.marshallExceptions = true;
             try{
                 ExternalInterface.addCallback("vjs_appendBuffer", onAppendBufferCalled);
+                ExternalInterface.addCallback("vjs_appendChunkReady", onAppendChunkReadyCalled);
                 ExternalInterface.addCallback("vjs_echo", onEchoCalled);
                 ExternalInterface.addCallback("vjs_endOfStream", onEndOfStreamCalled);
                 ExternalInterface.addCallback("vjs_abort", onAbortCalled);
@@ -191,7 +192,13 @@ package{
             }
         }
 
-        private function onAppendBufferCalled(fnName:String):void{
+        private function onAppendBufferCalled(base64str:String):void{
+            var bytes:ByteArray = Base64.decode(base64str);
+            // write the bytes to the provider
+            _app.model.appendBuffer(bytes);
+        }
+
+        private function onAppendChunkReadyCalled(fnName:String):void{
             try {
                 ExternalInterface.call(fnName);
             } catch(e:Error) {
