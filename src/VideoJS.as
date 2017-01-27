@@ -199,13 +199,10 @@ package{
         }
 
         private function onAppendChunkReadyCalled(fnName:String):void{
-            try {
-                ExternalInterface.call(fnName);
-            } catch(e:Error) {
-                var bytes:ByteArray = Base64.decode(e.message);
-                // write the bytes to the provider
-                _app.model.appendBuffer(bytes);
-            }
+            var bytes:ByteArray = Base64.decode(ExternalInterface.call(fnName));
+
+            // write the bytes to the provider
+            _app.model.appendBuffer(bytes);
         }
 
         private function onEchoCalled(pResponse:* = null):*{
