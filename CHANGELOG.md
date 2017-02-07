@@ -2,9 +2,12 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-* @mjneil added appendChunkReady, another way of passing data into the swf
+_(none)_
 
 --------------------
+
+## 5.2.0 (2017-02-07)
+* @mjneil added appendChunkReady, another way of passing data into the swf
 
 ## 5.1.0 (2016-07-18)
 * @alex-philips added support for the onTextData event
