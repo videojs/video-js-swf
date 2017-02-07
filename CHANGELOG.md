@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @albertogasparin added FCsubscribe call and proxy type to RTMP video provider
 
 --------------------
 
