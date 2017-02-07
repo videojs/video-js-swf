@@ -2,7 +2,7 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* @mjneil added appendChunkReady, another way of passing data into the swf
 
 --------------------
 
