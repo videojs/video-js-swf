@@ -293,6 +293,10 @@ package com.videojs.providers{
             }
         }
 
+        public function adjustCurrentTime(pValue:Number):void {
+            // no-op
+        }
+
         public function seekBySeconds(pTime:Number):void{
             if(_isPlaying){
                 _isSeeking = true;

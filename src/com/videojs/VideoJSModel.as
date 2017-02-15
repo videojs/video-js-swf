@@ -489,6 +489,12 @@ package com.videojs{
             }
         }
 
+        public function adjustCurrentTime(pValue:Number):void {
+            if (_provider) {
+                _provider.adjustCurrentTime(pValue);
+            }
+        }
+
         /**
          * Seeks the currently playing video to the closest keyframe prior to the value provided.
          * @param pValue

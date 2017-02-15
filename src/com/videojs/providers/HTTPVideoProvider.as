@@ -344,6 +344,12 @@ package com.videojs.providers{
             }
         }
 
+        public function adjustCurrentTime(pValue:Number):void {
+            if (_src.path === null) {
+                _startOffset = pValue;
+            }
+        }
+
         public function seekBySeconds(pTime:Number):void{
             if(_playbackStarted)
             {
