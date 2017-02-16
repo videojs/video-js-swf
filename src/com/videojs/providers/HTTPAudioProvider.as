@@ -327,6 +327,10 @@ package com.videojs.providers{
             }
         }
 
+        public function adjustCurrentTime(pValue:Number):void {
+            // no-op
+        }
+
         public function seekByPercent(pPercent:Number):void{
             if(_audioPlaybackStarted && _audioDuration > 0){
                 _soundChannel.stop();

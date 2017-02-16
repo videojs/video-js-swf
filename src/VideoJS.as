@@ -84,6 +84,10 @@ package{
                 ExternalInterface.addCallback("vjs_pause", onPauseCalled);
                 ExternalInterface.addCallback("vjs_resume", onResumeCalled);
                 ExternalInterface.addCallback("vjs_stop", onStopCalled);
+
+                // This callback should only be used when in data generation mode as it
+                // will adjust the notion of current time without notifiying the player
+                ExternalInterface.addCallback("vjs_adjustCurrentTime", onAdjustCurrentTimeCalled);
             }
             catch(e:SecurityError){
                 if (loaderInfo.parameters.debug != undefined && loaderInfo.parameters.debug == "true") {
@@ -203,6 +207,10 @@ package{
 
             // write the bytes to the provider
             _app.model.appendBuffer(bytes);
+        }
+
+        private function onAdjustCurrentTimeCalled(pValue:Number):void {
+            _app.model.adjustCurrentTime(pValue);
         }
 
         private function onEchoCalled(pResponse:* = null):*{
