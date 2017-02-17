@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * @albertogasparin added FCsubscribe call and proxy type to RTMP video provider
+* @mjneil add callback to adjust currentTime for video provider
 
 --------------------
 
