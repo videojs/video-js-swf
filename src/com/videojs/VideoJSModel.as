@@ -42,6 +42,7 @@ package com.videojs{
         private var _src:String = "";
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
+        private var _startparam:String = "";
 
         private static var _instance:VideoJSModel;
 
@@ -244,6 +245,13 @@ package com.videojs{
             if(_autoplay){
                 play();
             }
+        }
+
+        public function get startparam():String {
+            return _startparam;
+        }
+        public function set startparam(pValue:String):void {
+            _startparam = pValue;
         }
 
         /**
