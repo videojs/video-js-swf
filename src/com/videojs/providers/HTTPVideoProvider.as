@@ -17,7 +17,7 @@ package com.videojs.providers{
 
     public class HTTPVideoProvider extends EventDispatcher implements IProvider{
 
-        private static var FLV_HEADER = new ByteArray();
+        private static var FLV_HEADER : ByteArray = new ByteArray();
         // file marker
         FLV_HEADER.writeByte(0x46); // 'F'
         FLV_HEADER.writeByte(0x4c); // 'L'
@@ -45,6 +45,7 @@ package com.videojs.providers{
         private var _loadErrored:Boolean = false;
         private var _pausePending:Boolean = false;
         private var _onmetadadataFired:Boolean = false;
+        private var _playerStats:Object = new Object();
 
         /**
          * The number of seconds between the logical start of the stream and the current zero
@@ -115,6 +116,26 @@ package com.videojs.providers{
             }
         }
 
+        public function get bufferTime():Number{
+                return 0;
+        }
+		
+        public function set bufferTime(val:Number):void{
+                // not used
+        }
+
+        public function get bufferTimeMax():Number{
+                return 0;
+        }
+		
+        public function set bufferTimeMax(val:Number):void{
+                // not used
+        }
+		
+        public function get playerStats():Object{
+                return _playerStats;
+        }
+        
         public function get duration():Number{
             if(_metadata != null && _metadata.duration != undefined){
                 return Number(_metadata.duration);
@@ -324,7 +345,7 @@ package com.videojs.providers{
         }
 
         public function pause():void{
-            var alreadyPaused = _isPaused;
+            var alreadyPaused : Boolean = _isPaused;
             _ns.pause();
             if(_playbackStarted && !alreadyPaused){
                 _model.broadcastEventExternally(ExternalEventName.ON_PAUSE);

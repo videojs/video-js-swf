@@ -84,6 +84,9 @@ package{
                 ExternalInterface.addCallback("vjs_pause", onPauseCalled);
                 ExternalInterface.addCallback("vjs_resume", onResumeCalled);
                 ExternalInterface.addCallback("vjs_stop", onStopCalled);
+                ExternalInterface.addCallback("vjs_bufferTime", onBufferTime);
+                ExternalInterface.addCallback("vjs_bufferTimeMax", onBufferTimeMax);
+                ExternalInterface.addCallback("vjs_playerStats", onPlayerStats);
 
                 // This callback should only be used when in data generation mode as it
                 // will adjust the notion of current time without notifiying the player
@@ -229,6 +232,24 @@ package{
             _app.model.discontinuity();
         }
 
+        private function onBufferTime(pValue:* = null):*{
+                if(pValue != null){
+                        _app.model.bufferTime = Number(pValue);
+                }
+                return _app.model.bufferTime;
+        }
+		
+        private function onBufferTimeMax(pValue:* = null):*{
+                if(pValue != null){
+                        _app.model.bufferTimeMax = Number(pValue);
+                }
+                return _app.model.bufferTimeMax;
+        }
+		
+        private function onPlayerStats():*{
+                return _app.model.playerStats;
+        }
+
         private function onGetPropertyCalled(pPropertyName:String = ""):*{
 
             switch(pPropertyName){
@@ -313,6 +334,12 @@ package{
                 case "rtmpStream":
                     return _app.model.rtmpStream;
                     break;
+                case "bufferTime":
+                    return _app.model.bufferTime;
+                    break;
+                case "bufferTimeMax":
+                    return _app.model.bufferTimeMax;
+                    break;
             }
             return null;
         }
@@ -368,6 +395,11 @@ package{
                     break;
                 case "rtmpStream":
                     _app.model.rtmpStream = String(pValue);
+                    break;
+                case "bufferTime":
+                    _app.model.bufferTime = Number(pValue);
+                case "bufferTimeMax":
+                    _app.model.bufferTimeMax = Number(pValue);
                     break;
                 default:
                     _app.model.broadcastErrorEventExternally(ExternalErrorEventName.PROPERTY_NOT_FOUND, pPropertyName);

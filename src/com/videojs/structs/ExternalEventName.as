@@ -25,5 +25,8 @@ package com.videojs.structs{
 
         public static const ON_TEXT_DATA:String = "textdata";
 
+        public static const ON_BUFFERTIME_CHANGE:String = "buffertimechange";
+        public static const ON_BUFFERTIMEMAX_CHANGE:String = "buffertimemaxchange";
+
     }
 }

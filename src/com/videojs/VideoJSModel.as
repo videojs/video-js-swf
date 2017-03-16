@@ -10,6 +10,7 @@ package com.videojs{
     import com.videojs.structs.ExternalEventName;
     import com.videojs.structs.PlaybackType;
     import com.videojs.structs.PlayerMode;
+    import com.videojs.Defaults;
 
     import flash.events.Event;
     import flash.events.EventDispatcher;
@@ -42,7 +43,9 @@ package com.videojs{
         private var _src:String = "";
         private var _rtmpConnectionURL:String = "";
         private var _rtmpStream:String = "";
-
+        private var _bufferTime:Number = Defaults.BUFFER_TIME;
+        private var _bufferTimeMax:Number = Defaults.BUFFER_TIME_MAX;
+        private var _playerStats:Object = new Object();
         private static var _instance:VideoJSModel;
 
         public function VideoJSModel(pLock:SingletonLock){
@@ -199,6 +202,44 @@ package com.videojs{
             }
             return _src;
         }
+        
+        public function set bufferTime(pValue:Number):void {
+                _bufferTime = pValue;
+                if(_provider){
+                        _provider.bufferTime = _bufferTime;
+                }
+                broadcastEventExternally(ExternalEventName.ON_BUFFERTIME_CHANGE, _bufferTime);
+        }
+		
+        public function get bufferTime():Number{
+            if(_provider){
+                return _provider.bufferTime;
+            }
+            return _bufferTime;
+        }
+        
+        public function set bufferTimeMax(pValue:Number):void {
+                _bufferTimeMax = pValue;
+                if(_provider){
+			_provider.bufferTimeMax = _bufferTimeMax;
+                }
+                broadcastEventExternally(ExternalEventName.ON_BUFFERTIMEMAX_CHANGE, _bufferTimeMax);
+        }
+		
+        public function get bufferTimeMax():Number{
+            if(_provider){
+                return _provider.bufferTimeMax;
+            }
+            return _bufferTimeMax;
+        }
+        
+        public function get playerStats():Object{
+            if(_provider){
+                return _provider.playerStats;
+            }
+            return _playerStats;
+        }
+        
         public function set src(pValue:String):void {
             _src = pValue;
             _rtmpConnectionURL = "";
@@ -599,6 +640,8 @@ package com.videojs{
                         };
                         _provider = new HTTPVideoProvider();
                         _provider.attachVideo(_videoReference);
+                        _provider.bufferTime = _bufferTime;
+                        _provider.bufferTimeMax = _bufferTimeMax;
                         _provider.init(__src, _autoplay);
                     }
                     else if(_currentPlaybackType == PlaybackType.RTMP){
@@ -607,6 +650,8 @@ package com.videojs{
                             streamURL: _rtmpStream
                         };
                         _provider = new RTMPVideoProvider();
+                        _provider.bufferTime = _bufferTime;
+                        _provider.bufferTimeMax = _bufferTimeMax;
                         _provider.attachVideo(_videoReference);
                         _provider.init(__src, _autoplay);
                     }
@@ -625,7 +670,6 @@ package com.videojs{
         }
     }
 }
-
 
 /**
  * @internal This is a private class declared outside of the package
