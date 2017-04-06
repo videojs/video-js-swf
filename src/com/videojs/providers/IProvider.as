@@ -125,6 +125,12 @@ package com.videojs.providers{
         function get metadata():Object;
 
         /**
+         * Should return an object that contains playback quality details, following the
+         * form of https://w3c.github.io/media-source/#VideoPlaybackQuality
+         */
+        function get videoPlaybackQuality():Object;
+
+        /**
          * Should return the most reasonable string representation of the current assets source location.
          */
         function get srcAsString():String;

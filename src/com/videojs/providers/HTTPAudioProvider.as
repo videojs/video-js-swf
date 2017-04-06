@@ -170,6 +170,11 @@ package com.videojs.providers{
             return _metadata;
         }
 
+        public function get videoPlaybackQuality():Object{
+          // only meant for video
+          return {};
+        }
+
         public function get srcAsString():String{
             if(_src != null && _src.path != undefined){
                 return _src.path;
