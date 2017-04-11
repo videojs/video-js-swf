@@ -272,7 +272,9 @@ package com.videojs.providers{
         }
 
         public function get videoPlaybackQuality():Object{
-            if (_ns != null) {
+            if (_ns != null &&
+                _ns.hasOwnProperty('decodedFrames') &&
+                _ns.info.hasOwnProperty('droppedFrames')) {
                 return {
                     droppedVideoFrames: _ns.info.droppedFrames,
                     totalVideoFrames: _ns.decodedFrames + _ns.info.droppedFrames
