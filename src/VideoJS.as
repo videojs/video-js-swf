@@ -313,6 +313,9 @@ package{
                 case "rtmpStream":
                     return _app.model.rtmpStream;
                     break;
+                case "getVideoPlaybackQuality":
+                    return _app.model.videoPlaybackQuality;
+                    break;
             }
             return null;
         }

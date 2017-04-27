@@ -271,6 +271,18 @@ package com.videojs.providers{
             return _metadata;
         }
 
+        public function get videoPlaybackQuality():Object{
+            if (_ns != null &&
+                _ns.hasOwnProperty('decodedFrames') &&
+                _ns.info.hasOwnProperty('droppedFrames')) {
+                return {
+                    droppedVideoFrames: _ns.info.droppedFrames,
+                    totalVideoFrames: _ns.decodedFrames + _ns.info.droppedFrames
+                };
+            }
+            return {};
+        }
+
         public function set src(pSrc:Object):void{
             init(pSrc, false);
         }
