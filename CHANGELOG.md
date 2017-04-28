@@ -3,6 +3,8 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * Add getVideoPlaybackQuality API
+* Fix buffered() getter for RTMP provider
+* Fix paused state for RTMP provider after video ends
 
 --------------------
 
