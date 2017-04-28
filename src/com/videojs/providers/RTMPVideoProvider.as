@@ -318,6 +318,7 @@ package com.videojs.providers{
             }
             else if(_hasEnded){
                 _ns.seek(pTime);
+                _isPaused = false;
                 _isPlaying = true;
                 _hasEnded = false;
                 _reportEnded = false;
