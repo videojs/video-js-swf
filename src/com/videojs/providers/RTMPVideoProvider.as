@@ -151,8 +151,8 @@ package com.videojs.providers{
         }
 
         public function get buffered():Array{
-            if(duration > 0){
-                return [[0, duration]];
+            if(_metadata != null && _metadata.duration != undefined && _metadata.duration > 0){
+                return [[0, _metadata.duration]];
             }
             else{
                 return [];
