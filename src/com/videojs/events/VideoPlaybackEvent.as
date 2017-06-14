@@ -1,9 +1,9 @@
 package com.videojs.events{
-    
+
     import flash.events.Event;
-    
+
     public class VideoPlaybackEvent extends Event{
-        
+
         public static const ON_CUE_POINT:String = "VideoPlaybackEvent.ON_CUE_POINT";
         public static const ON_META_DATA:String = "VideoPlaybackEvent.ON_META_DATA";
         public static const ON_XMP_DATA:String = "VideoPlaybackEvent.ON_XMP_DATA";
@@ -22,18 +22,19 @@ package com.videojs.events{
         public static const ON_ERROR:String = "VideoPlaybackEvent.ON_ERROR";
         public static const ON_UPDATE:String = "VideoPlaybackEvent.ON_UPDATE";
         public static const ON_VIDEO_DIMENSION_UPDATE:String = "VideoPlaybackEvent.ON_VIDEO_DIMENSION_UPDATE";
-        
+        public static const ON_TEXT_DATA:String = "VideoPlaybackEvent.ON_TEXT_DATA";
+
         // a flexible container object for whatever data needs to be attached to any of these events
         private var _data:Object;
-        
+
         public function VideoPlaybackEvent(pType:String, pData:Object = null){
             super(pType, true, false);
             _data = pData;
         }
-        
+
         public function get data():Object {
             return _data;
         }
-        
+
     }
 }

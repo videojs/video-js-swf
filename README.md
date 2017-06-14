@@ -2,8 +2,7 @@ The light-weight Flash video player that makes Flash work like HTML5 video. This
 
 This project doesn't need to be used if you simply want to use the Flash video player.  Head back to the main Video.js project if that's all you need, as the compiled SWF is checked in there.
 
-Installation
-============
+## Installation
 
 1. Install Node Packages.
 ```bash
@@ -24,9 +23,30 @@ Production/ Distribution (runs mxmlc task and copies SWF to dist/):
 ```
 4. Open your browser at [http://localhost:8000/index.html](http://localhost:8000/index.html) to see a video play.  You can keep using grunt to rebuild the Flash code.
 
+## Releasing
 
-Running Unit and Integration Tests
-===========
+1. Make sure that the following file is modified with these values:
+
+```
+node_modules/flex-sdk/lib/flex_sdk/frameworks/flex-config.xml
+```
+
+```xml
+<!-- Specifies the minimum player version that will run the compiled SWF. -->
+<target-player>10.3</target-player>
+
+<!-- Specifies the version of the compiled SWF -->
+<swf-version>12</swf-version>
+```
+
+2. Run the commands:
+```sh
+npm version {major,minor,patch}
+npm publish
+```
+The swf and changelog will be automatically built and added to the repo on version.
+
+## Running Unit and Integration Tests
 
 ** Note - We want to drop all of this for grunt based / Karma testing.
 

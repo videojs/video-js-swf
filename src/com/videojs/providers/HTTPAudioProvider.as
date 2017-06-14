@@ -170,6 +170,11 @@ package com.videojs.providers{
             return _metadata;
         }
 
+        public function get videoPlaybackQuality():Object{
+          // only meant for video
+          return {};
+        }
+
         public function get srcAsString():String{
             if(_src != null && _src.path != undefined){
                 return _src.path;
@@ -325,6 +330,10 @@ package com.videojs.providers{
                 _audioPlaybackPaused = false;
                 _model.broadcastEventExternally(ExternalEventName.ON_SEEK_COMPLETE);
             }
+        }
+
+        public function adjustCurrentTime(pValue:Number):void {
+            // no-op
         }
 
         public function seekByPercent(pPercent:Number):void{

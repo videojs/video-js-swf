@@ -271,6 +271,18 @@ package com.videojs.providers{
             return _metadata;
         }
 
+        public function get videoPlaybackQuality():Object{
+            if (_ns != null &&
+                _ns.hasOwnProperty('decodedFrames') &&
+                _ns.info.hasOwnProperty('droppedFrames')) {
+                return {
+                    droppedVideoFrames: _ns.info.droppedFrames,
+                    totalVideoFrames: _ns.decodedFrames + _ns.info.droppedFrames
+                };
+            }
+            return {};
+        }
+
         public function set src(pSrc:Object):void{
             init(pSrc, false);
         }
@@ -344,6 +356,12 @@ package com.videojs.providers{
             }
         }
 
+        public function adjustCurrentTime(pValue:Number):void {
+            if (_src.path === null) {
+                _startOffset = pValue;
+            }
+        }
+
         public function seekBySeconds(pTime:Number):void{
             if(_playbackStarted)
             {
@@ -365,6 +383,7 @@ package com.videojs.providers{
 
             if(_src.path === null)
             {
+                _isSeeking = true;
                 _startOffset = pTime;
                 return;
             }
@@ -679,6 +698,11 @@ package com.videojs.providers{
             }
 
             _onmetadadataFired = true;
+        }
+
+        public function onTextData(pTextData:Object):void {
+            _model.broadcastEvent(new VideoPlaybackEvent(VideoPlaybackEvent.ON_TEXT_DATA, {textData:pTextData}));
+            _model.broadcastEventExternally(ExternalEventName.ON_TEXT_DATA, pTextData);
         }
 
         public function onCuePoint(pInfo:Object):void{
