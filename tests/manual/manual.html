@@ -5,13 +5,13 @@
     <meta http-equiv="Content-Style-Type" content="text/css" />
     <meta http-equiv="imagetoolbar" content="no" />
     <title>VideoJS Workbench</title>
-    <link rel="stylesheet" href="css/reset.css"/> 
-    <link rel="stylesheet" href="css/styles.css"/> 
+    <link rel="stylesheet" href="css/reset.css"/>
+    <link rel="stylesheet" href="css/styles.css"/>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script type="text/javascript" src="js/swfobject.js"></script>
     <script type="text/javascript">
 
-      
+
       function init(){
 
         // control
@@ -85,7 +85,7 @@
           $propVideoHeight = $("#propVideoHeight");
 
       }
-      
+
       function log(msg){
         try{
           console.log(msg);
@@ -97,7 +97,7 @@
         createSWF(e);
         setTimeout(waitForSWF, 100);
       }
-      
+
       function waitForSWF() {
         var vid = $("#videoPlayer")[0];
         log("Waiting for the SWF to be loaded...");
@@ -129,12 +129,12 @@
           allowScriptAccess: "always",
           bgcolor: "#000000"
         };
-      
+
         var attributes = {
           id: "videoPlayer",
           name: "videoPlayer"
         };
-      
+
         swfobject.embedSWF("../../dist/video-js.swf", "videoPlayer", "100%", "100%", "10.3", "", flashvars, params, attributes);
 
       }
@@ -159,7 +159,7 @@
           e.preventDefault();
         }
         var el = $("#videoPlayer")[0];
-        el.vjs_src("http://video-js.zencoder.com/oceans-clip.mp4?");
+        el.vjs_src("http://vjs.zencdn.net/v/oceans.mp4?");
       }
 
       function playVideo(e){
@@ -220,7 +220,7 @@
       function updatePlayerProperties(){
 
         var el = $("#videoPlayer")[0];
-        
+
         $propCurrentSrc.html(el.vjs_getProperty("currentSrc"));
         $propCurrentTime.html(el.vjs_getProperty("currentTime"));
         $propTime.html(el.vjs_getProperty("time"));
@@ -355,15 +355,15 @@
           <div id="videoPlayerWrapper" style="">
             <div id="videoPlayer"></div>
           </div>
-        </div> 
+        </div>
         <div id="control" class="span2">
           <h1>Simple Controls</h1>
           <p>Once playback has started, the SWF's control methods will work:</p>
           <a id="btnPause" class="button" href="#">pause()</a><br>
-          <a id="btnResume" class="button" href="#">resume()</a><br> 
-          <a id="btnSeek5" class="button" href="#">seek(5)</a><br> 
+          <a id="btnResume" class="button" href="#">resume()</a><br>
+          <a id="btnSeek5" class="button" href="#">seek(5)</a><br>
         </div>
       </div>
     </section>
-  </body>  
+  </body>
 </html>
