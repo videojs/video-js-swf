@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* chore: update broken URLs
+* fix: decouple muted() from volume=0
 
 --------------------
 
