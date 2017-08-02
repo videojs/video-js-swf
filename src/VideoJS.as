@@ -339,6 +339,8 @@ package{
                     break;
                 case "bufferTimeMax":
                     return _app.model.bufferTimeMax;
+                case "getVideoPlaybackQuality":
+                    return _app.model.videoPlaybackQuality;
                     break;
             }
             return null;

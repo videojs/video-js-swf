@@ -205,8 +205,8 @@ package com.videojs.providers{
         }
 
         public function get buffered():Array{
-            if(duration > 0){
-                return [[0, duration]];
+            if(_metadata != null && _metadata.duration != undefined && _metadata.duration > 0){
+                return [[0, _metadata.duration]];
             }
             else{
                 return [];
@@ -254,6 +254,18 @@ package com.videojs.providers{
 
         public function get metadata():Object{
             return _metadata;
+        }
+
+        public function get videoPlaybackQuality():Object{
+            if (_ns != null &&
+                _ns.hasOwnProperty('decodedFrames') &&
+                _ns.info.hasOwnProperty('droppedFrames')) {
+                return {
+                    droppedVideoFrames: _ns.info.droppedFrames,
+                    totalVideoFrames: _ns.decodedFrames + _ns.info.droppedFrames
+                };
+            }
+            return {};
         }
 
         public function set src(pSrc:Object):void{
@@ -361,6 +373,7 @@ package com.videojs.providers{
             }
             else if(_hasEnded){
                 _ns.seek(pTime);
+                _isPaused = false;
                 _isPlaying = true;
                 _hasEnded = false;
                 _reportEnded = false;
