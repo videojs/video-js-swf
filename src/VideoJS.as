@@ -78,6 +78,7 @@ package{
                 ExternalInterface.addCallback("vjs_getProperty", onGetPropertyCalled);
                 ExternalInterface.addCallback("vjs_setProperty", onSetPropertyCalled);
                 ExternalInterface.addCallback("vjs_autoplay", onAutoplayCalled);
+                ExternalInterface.addCallback("vjs_muted", onMutedCalled);
                 ExternalInterface.addCallback("vjs_src", onSrcCalled);
                 ExternalInterface.addCallback("vjs_load", onLoadCalled);
                 ExternalInterface.addCallback("vjs_play", onPlayCalled);
@@ -381,6 +382,10 @@ package{
         private function onAutoplayCalled(pAutoplay:* = false):void{
           _app.model.autoplay = _app.model.humanToBoolean(pAutoplay);
         }
+        
+        private function onMutedCalled(pMuted:* = false):void{
+            _app.model.muted = _app.model.humanToBoolean(pMuted);
+        }        
 
         private function isExternalMSObjectURL(pSrc:*):Boolean{
           return pSrc.indexOf('blob:vjs-media-source/') === 0;
