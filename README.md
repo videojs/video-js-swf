@@ -1,6 +1,9 @@
-The light-weight Flash video player that makes Flash work like HTML5 video. This allows player skins, plugins, and other features to work with both HTML5 and Flash
+The lightweight Flash video player for Video.js. This allows the Video.js player's skins, plugins, and other features to work with both HTML5 and Flash.
 
-This project doesn't need to be used if you simply want to use the Flash video player.  Head back to the main Video.js project if that's all you need, as the compiled SWF is checked in there.
+This project doesn't need to be used if you simply want to use the Flash tech in Video.js.
+
+- For Video.js 5.x and below, the Flash tech is part of the [Video.js core repository](https://github.com/videojs/video.js).
+- For Video.js 6.x and above, the Flash tech is in a [separate repository](https://github.com/videojs/videojs-flash).
 
 ## Installation
 
