@@ -7,6 +7,8 @@ This project doesn't need to be used if you simply want to use the Flash tech in
 
 ## Installation
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/videojs/video-js-swf.svg)](https://greenkeeper.io/)
+
 1. Install Node Packages.
 ```bash
     npm install
