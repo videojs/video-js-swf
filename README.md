@@ -1,3 +1,5 @@
+# This project is no longer maintained as Adobe Flash is being [End-of-lifed.](https://www.adobe.com/products/flashplayer/end-of-life.html)
+
 The lightweight Flash video player for Video.js. This allows the Video.js player's skins, plugins, and other features to work with both HTML5 and Flash.
 
 This project doesn't need to be used if you simply want to use the Flash tech in Video.js.
